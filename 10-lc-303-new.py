@@ -12,6 +12,9 @@ class NumArray: #new
         return self.preSum[right+1] - self.preSum[left]
         
 
+# Your NumArray object will be instantiated and called as such:
+# obj = NumArray(nums)
+# param_1 = obj.sumRange(left,right)
       
             
 
@@ -23,7 +26,3 @@ if __name__ == '__main__':
 
         
 
-
-# Your NumArray object will be instantiated and called as such:
-# obj = NumArray(nums)
-# param_1 = obj.sumRange(left,right)
