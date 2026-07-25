@@ -22,4 +22,7 @@ class Solution:
 
         return count
     
+#O(n)
+
+    
 
