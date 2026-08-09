@@ -12,7 +12,7 @@ class TreeNode:
 
 # pre-order: center-left-right
 #in-order: left-center-right
-#back-order:  
+#posterorder: left-right-center
 class Solution:
     def preorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
         res=[]

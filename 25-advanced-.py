@@ -8,7 +8,7 @@ class TreeNode:
         self.val = val
         self.left = left
         self.right = right
-        
+
 #use stack
 #iterative method
 class Solution:
@@ -23,6 +23,7 @@ class Solution:
             node=stack.pop()
             res.append(node.val)
 
+            #pushing logic
             if node.right:
                 stack.append(node.right)
             if node.left:

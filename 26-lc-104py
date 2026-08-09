@@ -1,0 +1,33 @@
+#lc-104
+#maximum depth of binary tree
+
+from typing import  Optional
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+#use poster-order
+# left-right-center
+#        
+class Solution:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        #base case 边界条件
+        if root is None:
+            return 0 #int, need to return a real value
+
+        #iteration
+        left=self.maxDepth(root.left) #return the max depth of the left side
+        right=self.maxDepth(root.right)
+
+        
+
+        #return
+        return max(left,right)+1
+
+
+#DFS
+
