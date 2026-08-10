@@ -6,8 +6,9 @@ class Solution3: #even better hash table
         for i,item in enumerate(nums):
             other = target - item
             if other in cache:
-                return(i, cache[other])
+                return [i, cache[other]]
             cache[item] = i
+        return []
 
 
 #when you need to find two numbers in a list that add up to a specific target, 
