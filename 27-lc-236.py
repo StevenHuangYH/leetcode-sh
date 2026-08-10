@@ -10,7 +10,7 @@ class TreeNode:
         self.right = None
 
 #DFS
-#Poster-order: left-right-center
+#Poster-order: left-right-root
 
 class Solution:
     #retrun the completed information

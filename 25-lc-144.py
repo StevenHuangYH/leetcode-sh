@@ -10,9 +10,9 @@ class TreeNode:
         self.left = left
         self.right = right
 
-# pre-order: center-left-right
-#in-order: left-center-right
-#posterorder: left-right-center
+# pre-order: root-left-right
+#in-order: left-root-right
+#posterorder: left-right-root
 class Solution:
     def preorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
         res=[]
