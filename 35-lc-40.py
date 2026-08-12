@@ -29,7 +29,7 @@ class Solution:
                 if i > starting_index and candidates[i]==candidates[i-1]:
                     continue
 
-
+                #track back here
                 path.append(candidates[i])
 
                 #since every number could only used once so i+1
@@ -39,7 +39,12 @@ class Solution:
 
         dfs(0,0)
         return result
-        
+
+
+
+
+
+
 
 
 
