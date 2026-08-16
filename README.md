@@ -1,0 +1,206 @@
+# 🧠 LeetCode Self-Practices & Algorithm Curriculum
+
+[![Python 3.x](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
+[![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
+[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-45+-brightgreen.svg)]()
+
+Welcome to the **LeetCode Self-Practices** repository! This repository contains Python implementations, problem notes, and structured practice tracks covering foundational to advanced data structures and algorithmic patterns.
+
+---
+
+## 📑 Table of Contents
+
+1. [📊 Practice Statistics & Summary](#-practice-statistics--summary)
+2. [📁 Repository Structure](#-repository-structure)
+3. [📚 Topic-Wise Curriculum & Problem Index](#-topic-wise-curriculum--problem-index)
+   - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
+   - [2. Binary Search](#2-binary-search)
+   - [3. Prefix Sum & Difference Arrays](#3-prefix-sum--difference-arrays)
+   - [4. Intervals & In-Place Array Hashing](#4-intervals--in-place-array-hashing)
+   - [5. Linked Lists](#5-linked-lists)
+   - [6. Stacks & Queues](#6-stacks--queues)
+   - [7. Trees & Binary Search Trees (BST)](#7-trees--binary-search-trees-bst)
+   - [8. Backtracking & Combinatorics](#8-backtracking--combinatorics)
+   - [9. Graph Algorithms (DFS, BFS, Topological Sort)](#9-graph-algorithms-dfs-bfs-topological-sort)
+   - [10. Dynamic Programming & Math / Game Theory](#10-dynamic-programming--math--game-theory)
+   - [11. Object-Oriented Programming (OOP) & Foundations](#11-object-oriented-programming-oop--foundations)
+4. [🚀 How to Run & Practice](#-how-to-run--practice)
+
+---
+
+## 📊 Practice Statistics & Summary
+
+| Difficulty | Count | Percentage |
+| :--- | :--- | :--- |
+| 🟢 **Easy** | 16 | ~35% |
+| 🟡 **Medium** | 28 | ~61% |
+| 🔴 **Hard** | 2 | ~4% |
+| **Total** | **46+ Solutions** | **100%** |
+
+---
+
+## 📁 Repository Structure
+
+```tree
+leetcode-sh/
+├── luffy/                        # Core structured curriculum (categorized 01-42)
+│   ├── 01-___BASICS___.txt       # Topic division markers
+│   ├── 02-___ARRAYS_AND_STRINGS___.txt
+│   ├── 07-___BINARY_SEARCH___.txt
+│   ├── ...
+│   ├── file_topics.txt           # Topic index reference
+│   └── *.py                      # Python solution implementations
+├── top-100/                      # Top 100 Liked Problems
+│   └── s-lc-53.py                # LC 53: Maximum Subarray
+├── s-lc-2029.py                  # LC 2029: Stone Game IX
+├── s-lc-2029.md                  # LC 2029: Detailed analysis & math notes
+├── s-lc-3090.py                  # LC 3090: Maximum Length Substring With at Most Two Occurrences
+└── README.md                     # Repository documentation & guide
+```
+
+---
+
+## 📚 Topic-Wise Curriculum & Problem Index
+
+### 1. Arrays, Strings, Two Pointers & Sliding Window
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | 🟢 Easy | Hash Map | Single-pass hash map storing complement `target - num`. |
+| **3** | Longest Substring Without Repeating Characters | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | 🟡 Medium | Sliding Window | Maintain set/dict window; contract left pointer when duplicate seen. |
+| **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | 🟢 Easy | Two Pointers (Slow/Fast) | Overwrite duplicate elements in-place with slow pointer. |
+| **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`8-lc-59-spiral-martix.py`](luffy/8-lc-59-spiral-martix.py)<br>[`9-lc-59-spiral-martx-2.py`](luffy/9-lc-59-spiral-martx-2.py) | 🟡 Medium | Matrix Simulation | Layer-by-layer traversal with boundary tracking (top, bottom, left, right). |
+| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`3-lc-167-two-sum-2.py`](luffy/3-lc-167-two-sum-2.py) | 🟡 Medium | Two Pointers (Left/Right) | Exploit sorted order; shrink search space based on sum vs target. |
+| **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`6-lc-209-minimum-size-subarray-sum.py`](luffy/6-lc-209-minimum-size-subarray-sum.py) | 🟡 Medium | Sliding Window | Expand right pointer to reach target sum, then shrink left to minimize window. |
+| **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`s-lc-3090.py`](s-lc-3090.py) | 🟢 Easy | Sliding Window / Frequency Map | Window condition: maintain character frequency `<= 2`. |
+
+---
+
+### 2. Binary Search
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **704** | Binary Search | [LC 704](https://leetcode.com/problems/binary-search/) | [`7-lc-207-binary-search`](luffy/7-lc-207-binary-search) | 🟢 Easy | Binary Search (Closed Interval) | `left <= right` with `mid = left + (right - left) // 2` to prevent overflow. |
+
+---
+
+### 3. Prefix Sum & Difference Arrays
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **303** | Range Sum Query - Immutable | [LC 303](https://leetcode.com/problems/range-sum-query-immutable/) | [`10-lc-303-general-Range-sum-query-immutable.py`](luffy/10-lc-303-general-Range-sum-query-immutable.py)<br>[`10-lc-303-new.py`](luffy/10-lc-303-new.py)<br>[`10-pre-lc-303-practices.py`](luffy/10-pre-lc-303-practices.py) | 🟢 Easy | Prefix Sum Array | Precompute cumulative sum array: `query(i, j) = prefix[j+1] - prefix[i]` in $O(1)$. |
+| **560** | Subarray Sum Equals K | [LC 560](https://leetcode.com/problems/subarray-sum-equals-k/) | [`11-lc-560-Subarray-Sum-equals-k`](luffy/11-lc-560-Subarray-Sum-equals-k)<br>[`11-prefixSum-example.py`](luffy/11-prefixSum-example.py) | 🟡 Medium | Prefix Sum + Hash Map | Track frequency of running prefix sums; check if `curr_sum - k` occurred. |
+| **1109** | Corporate Flight Bookings | [LC 1109](https://leetcode.com/problems/corporate-flight-bookings/) | [`12-lc-1109.py`](luffy/12-lc-1109.py) | 🟡 Medium | Difference Array | Range update $[l, r]$ by `diff[l] += val` and `diff[r+1] -= val`, then compute prefix sums. |
+
+---
+
+### 4. Intervals & In-Place Array Hashing
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **41** | First Missing Positive | [LC 41](https://leetcode.com/problems/first-missing-positive/) | [`14-lc-41.py`](luffy/14-lc-41.py) | 🔴 Hard | Cyclic Sort / In-Place Hash | Place number `x` at index `x - 1` in $O(n)$ time and $O(1)$ extra space. |
+| **56** | Merge Intervals | [LC 56](https://leetcode.com/problems/merge-intervals/) | [`13-lc-56-merge.py`](luffy/13-lc-56-merge.py) | 🟡 Medium | Interval Sorting | Sort intervals by start time and merge overlapping segments (`curr.start <= prev.end`). |
+
+---
+
+### 5. Linked Lists
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`16-lc-21.py`](luffy/16-lc-21.py) | 🟢 Easy | Dummy Head + Two Pointers | Build new list with dummy head, appending the smaller node at each step. |
+| **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`17-lc-141.py`](luffy/17-lc-141.py) | 🟢 Easy | Floyd's Fast & Slow Pointers | Fast moves 2 steps, slow moves 1 step; collision indicates cycle. |
+| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`18-lc-142.py`](luffy/18-lc-142.py) | 🟡 Medium | Floyd's Algorithm + Math | Reset one pointer to head upon collision; both advance by 1 to meet at cycle entry. |
+| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`15-lc-206.py`](luffy/15-lc-206.py) | 🟢 Easy | Iterative Pointer Reversal | Maintain `prev`, `curr`, and `next` pointers to reverse next links in-place. |
+
+---
+
+### 6. Stacks & Queues
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`19-lc-stack-1-brackets.py`](luffy/19-lc-stack-1-brackets.py)<br>[`20-lc-stack2.py`](luffy/20-lc-stack2.py) | 🟢 Easy | Stack | Push opening brackets; pop and match corresponding closing bracket. |
+| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`21-lc-stack3-min -stack.py`](luffy/21-lc-stack3-min%20-stack.py) | 🟡 Medium | Auxiliary Stack / Pair Stack | Track running minimum alongside each pushed value in $O(1)$. |
+| **227** | Basic Calculator II | [LC 227](https://leetcode.com/problems/basic-calculator-ii/) | [`22-lc-227.py`](luffy/22-lc-227.py) | 🟡 Medium | Stack / Parsing | Evaluate `*` and `/` immediately on top of stack; sum all values for `+` and `-`. |
+| **232** | Implement Queue using Stacks | [LC 232](https://leetcode.com/problems/implement-queue-using-stacks/) | [`24-lc-232.py`](luffy/24-lc-232.py) | 🟢 Easy | Two Stacks (`in_stack`, `out_stack`) | Amortized $O(1)$ pop/peek by transferring elements only when `out_stack` is empty. |
+| **394** | Decode String | [LC 394](https://leetcode.com/problems/decode-string/) | [`23-lc-394.py`](luffy/23-lc-394.py) | 🟡 Medium | Stack (Counts & Strings) | Push current string and multiplier onto stack when encountering `[`; pop on `]`. |
+
+---
+
+### 7. Trees & Binary Search Trees (BST)
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **94** | Binary Tree Inorder Traversal | [LC 94](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [`25-lc-94-inorder.py`](luffy/25-lc-94-inorder.py) | 🟢 Easy | DFS (Left, Root, Right) | Traversal yields sorted order for BSTs; implemented recursively & iteratively. |
+| **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`29-lc-98-sol-1.py`](luffy/29-lc-98-sol-1.py)<br>[`29-lc-98-sol-2.py`](luffy/29-lc-98-sol-2.py)<br>[`29-lc-98-sol-3.py`](luffy/29-lc-98-sol-3.py)<br>[`29-lc-98-sol-4.py`](luffy/29-lc-98-sol-4.py) | 🟡 Medium | BST Range Bounds / Inorder | Validate node with strictly bounded $(min\_val, max\_val)$ interval. |
+| **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`28-lc-102.py`](luffy/28-lc-102.py) | 🟡 Medium | BFS (Queue) | Level-by-level queue traversal using `len(queue)` snapshots. |
+| **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`26-lc-104py`](luffy/26-lc-104py) | 🟢 Easy | DFS / Divide & Conquer | `max_depth = 1 + max(left_depth, right_depth)`. |
+| **105** | Construct Binary Tree from Preorder and Inorder Traversal | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`30-lc-105.py`](luffy/30-lc-105.py) | 🟡 Medium | Divide & Conquer / Hash Map | Preorder gives root; Inorder splits left and right subtrees. |
+| **144** | Binary Tree Preorder Traversal | [LC 144](https://leetcode.com/problems/binary-tree-preorder-traversal/) | [`25-lc-144.py`](luffy/25-lc-144.py) | 🟢 Easy | DFS (Root, Left, Right) | Root processed before recursive traversal of subtrees. |
+| **145** | Binary Tree Postorder Traversal | [LC 145](https://leetcode.com/problems/binary-tree-postorder-traversal/) | [`25-lc-145.py`](luffy/25-lc-145.py) | 🟢 Easy | DFS (Left, Right, Root) | Subtrees processed before processing the root node. |
+| **236** | Lowest Common Ancestor of a Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`27-lc-236.py`](luffy/27-lc-236.py) | 🟡 Medium | Postorder DFS | If both left and right return non-null, root is the LCA. |
+| **Misc** | Advanced Tree Practices | — | [`25-advanced-.py`](luffy/25-advanced-.py) | 🟡 Medium | Tree Patterns | Comprehensive tree construction and traversal utilities. |
+
+---
+
+### 8. Backtracking & Combinatorics
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **39** | Combination Sum | [LC 39](https://leetcode.com/problems/combination-sum/) | [`34-lc-39.py`](luffy/34-lc-39.py) | 🟡 Medium | Backtracking (Unbounded Choice) | Pass `start_index` to allow reuse of the current element without duplicate permutations. |
+| **40** | Combination Sum II | [LC 40](https://leetcode.com/problems/combination-sum-ii/) | [`35-lc-40.py`](luffy/35-lc-40.py) | 🟡 Medium | Backtracking + Deduplication | Sort candidates; skip duplicate elements at the same tree depth (`if i > start and nums[i] == nums[i-1]: continue`). |
+| **46** | Permutations | [LC 46](https://leetcode.com/problems/permutations/) | [`32-lc-46.py`](luffy/32-lc-46.py) | 🟡 Medium | Backtracking (Used Array) | Maintain `used` boolean array or swap elements in-place to explore all orderings. |
+| **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`31-lc-77.py`](luffy/31-lc-77.py) | 🟡 Medium | Backtracking + Pruning | Prune search branch if remaining candidates are insufficient to reach size $k$. |
+| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`33-lc-78.py`](luffy/33-lc-78.py) | 🟡 Medium | Backtracking / Cascading | Append path copy at every recursion step; explore subsets of length $0 \dots n$. |
+| **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`37-lc-79.py`](luffy/37-lc-79.py) | 🟡 Medium | 2D Grid DFS + Backtracking | Mark visited cells in-place (e.g. `'#'`); restore character on backtracking. |
+| **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`36-lc-131.py`](luffy/36-lc-131.py) | 🟡 Medium | Backtracking + Palindrome Check | Partition string at valid palindrome prefixes; recurse on remaining suffix. |
+
+---
+
+### 9. Graph Algorithms (DFS, BFS, Topological Sort)
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **130** | Surrounded Regions | [LC 130](https://leetcode.com/problems/surrounded-regions/) | [`39-lc-130.py`](luffy/39-lc-130.py) | 🟡 Medium | Boundary Flood Fill (DFS/BFS) | Flood fill from outer border `'O'`s to protect them; flip remaining interior `'O'`s. |
+| **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`38-lc-200.py`](luffy/38-lc-200.py) | 🟡 Medium | Grid DFS / BFS (Sink Island) | Increment count upon finding `'1'`; recursively sink connected island to `'0'`. |
+| **207** | Course Schedule | [LC 207](https://leetcode.com/problems/course-schedule/) | [`42-lc-207.py`](luffy/42-lc-207.py) | 🟡 Medium | Topological Sort (Kahn's / DFS) | Detect cycles in directed graph using in-degrees (Kahn's BFS) or 3-state DFS. |
+| **994** | Rotting Oranges | [LC 994](https://leetcode.com/problems/rotting-oranges/) | [`40-lc-994.py`](luffy/40-lc-994.py) | 🟡 Medium | Multi-source BFS | Enqueue all initially rotten oranges; propagate minute by minute to adjacent fresh ones. |
+| **1091** | Shortest Path in Binary Matrix | [LC 1091](https://leetcode.com/problems/shortest-path-in-binary-matrix/) | [`41-lc-1091.py`](luffy/41-lc-1091.py) | 🟡 Medium | 8-Directional BFS | Find shortest path in unweighted grid; BFS guarantees minimum distance. |
+
+---
+
+### 10. Dynamic Programming & Math / Game Theory
+
+| # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
+| :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **53** | Maximum Subarray | [LC 53](https://leetcode.com/problems/maximum-subarray/) | [`top-100/s-lc-53.py`](top-100/s-lc-53.py) | 🟡 Medium | Kadane's Algorithm / DP | `curr_max = max(num, curr_max + num)`; maintains maximum contiguous sum in $O(n)$. |
+| **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`s-lc-2029.py`](s-lc-2029.py)<br>[`s-lc-2029.md`](s-lc-2029.md) | 🟡 Medium | Modulo Arithmetic / Game Theory | Count residues modulo 3 ($c_0, c_1, c_2$); analyze winning conditions based on $c_0 \pmod 2$. |
+
+---
+
+### 11. Object-Oriented Programming (OOP) & Foundations
+
+| # | Topic / Concept | Reference File | Difficulty | Core Concept | Description |
+| :-: | :--- | :--- | :-: | :--- | :--- |
+| **2235** | Add Two Integers | [`1-lc-2235.py`](luffy/1-lc-2235.py) | 🟢 Easy | Basic Arithmetic | Python function syntax and return values. |
+| **OOP** | Car Class & Inheritance | [`car_object-oriented-example.py`](luffy/car_object-oriented-example.py) | 🟢 Easy | OOP Principles | Encapsulation, `__init__`, class methods, and object instantiation in Python. |
+
+---
+
+## 🚀 How to Run & Practice
+
+### Running a Solution Locally
+Execute any Python script directly using Python 3:
+
+```bash
+# Example: Run Two Sum solution
+python luffy/2-lc-1-two-sum-lc.py
+
+# Example: Run Stone Game IX solution
+python s-lc-2029.py
+```
+
+### Adding New Solutions
+When adding a new solution:
+1. Place the Python solution script in the relevant topic folder (e.g. `luffy/`, `top-100/`, or root).
+2. Follow the naming convention: `<index>-lc-<problem_number>-<title>.py`.
+3. Update the corresponding topic table in [README.md](README.md).
