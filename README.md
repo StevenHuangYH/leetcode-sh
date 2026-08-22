@@ -35,9 +35,9 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 | Difficulty | Count | Percentage |
 | :--- | :--- | :--- |
 | **Easy** | 17 | ~33% |
-| **Medium** | 32 | ~63% |
+| **Medium** | 33 | ~63% |
 | **Hard** | 2 | ~4% |
-| **Total** | **51+ Solutions** | **100%** |
+| **Total** | **52+ Solutions** | **100%** |
 
 ---
 
@@ -64,7 +64,9 @@ leetcode-sh/
 │   ├── s-lc-167-two-sum-2.py
 │   ├── s-lc-167-two-sum-2.md
 │   ├── s-lc-209-minimum-size-subarry-sum.py
-│   └── s-lc-209-minimum-size-subarry-sum.md
+│   ├── s-lc-209-minimum-size-subarry-sum.md
+│   ├── s-lc-713.py
+│   └── s-lc-713.md
 ├── daily-practice/               # Daily LeetCode Practices & In-Depth Notes
 │   ├── s-lc-2029.py
 │   ├── s-lc-2029.md
@@ -116,6 +118,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-236.py`](luffy/27-lc-236.py) | Medium | Postorder DFS Traversal |
 | **394** | Decode String | [LC 394](https://leetcode.com/problems/decode-string/) | [`luffy/23-lc-394.py`](luffy/23-lc-394.py) | Medium | Dual Stack (Count Stack + Str Stack) |
 | **560** | Subarray Sum Equals K | [LC 560](https://leetcode.com/problems/subarray-sum-equals-k/) | [`luffy/11-lc-560-Subarray-Sum-equals-k`](luffy/11-lc-560-Subarray-Sum-equals-k) | Medium | Prefix Sum + Frequency Hash Map |
+| **713** | Subarray Product Less Than K | [LC 713](https://leetcode.com/problems/subarray-product-less-than-k/) | [`top-100/s-lc-713.py`](top-100/s-lc-713.py)<br>[`top-100/s-lc-713.md`](top-100/s-lc-713.md) | Medium | Sliding Window & Subarray Counting ($O(n)$) |
 | **994** | Rotting Oranges | [LC 994](https://leetcode.com/problems/rotting-oranges/) | [`luffy/40-lc-994.py`](luffy/40-lc-994.py) | Medium | Multi-source Breadth-First Search (BFS) |
 
 ---
@@ -147,6 +150,7 @@ Dedicated tracking index for daily practice problems and latest contest question
 | **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`8-lc-59-spiral-martix.py`](luffy/8-lc-59-spiral-martix.py)<br>[`9-lc-59-spiral-martx-2.py`](luffy/9-lc-59-spiral-martx-2.py) | Medium | Matrix Simulation | Layer-by-layer traversal with boundary tracking (top, bottom, left, right). |
 | **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md)<br>[`3-lc-167-two-sum-2.py`](luffy/3-lc-167-two-sum-2.py) | Medium | Two Pointers (Left/Right) | Exploit sorted order; shrink search space based on sum vs target (1-based index). |
 | **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/s-lc-209-minimum-size-subarry-sum.py`](top-100/s-lc-209-minimum-size-subarry-sum.py)<br>[`top-100/s-lc-209-minimum-size-subarry-sum.md`](top-100/s-lc-209-minimum-size-subarry-sum.md)<br>[`6-lc-209-minimum-size-subarray-sum.py`](luffy/6-lc-209-minimum-size-subarray-sum.py) | Medium | Sliding Window | Expand right pointer to reach target sum, then shrink left to minimize window. |
+| **713** | Subarray Product Less Than K | [LC 713](https://leetcode.com/problems/subarray-product-less-than-k/) | [`top-100/s-lc-713.py`](top-100/s-lc-713.py)<br>[`top-100/s-lc-713.md`](top-100/s-lc-713.md) | Medium | Sliding Window / Product Counting | Maintain window product `prod < k`; count valid subarrays ending at `right` with `right - left + 1`. |
 | **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/s-lc-3090.py`](daily-practice/s-lc-3090.py)<br>[`daily-practice/s-lc-3090.md`](daily-practice/s-lc-3090.md) | Easy | Sliding Window / Frequency Map | Window condition: maintain character frequency `<= 2`. |
 | **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`daily-practice/s-lc-3471.py`](daily-practice/s-lc-3471.py)<br>[`daily-practice/s-lc-3471.md`](daily-practice/s-lc-3471.md) | Easy | Fixed Sliding Window / Hash Table | Slide fixed window of size $k$; count frequencies across distinct windows using set deduplication. |
 
