@@ -12,7 +12,8 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 
 1. [Practice Statistics & Summary](#practice-statistics--summary)
 2. [Repository Structure](#repository-structure)
-3. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
+3. [🔥 LeetCode Top 100 Liked Track](#-leetcode-top-100-liked-track)
+4. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
    - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
    - [2. Binary Search](#2-binary-search)
    - [3. Prefix Sum & Difference Arrays](#3-prefix-sum--difference-arrays)
@@ -24,7 +25,7 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
    - [9. Graph Algorithms (DFS, BFS, Topological Sort)](#9-graph-algorithms-dfs-bfs-topological-sort)
    - [10. Dynamic Programming & Math / Game Theory](#10-dynamic-programming--math--game-theory)
    - [11. Object-Oriented Programming (OOP) & Foundations](#11-object-oriented-programming-oop--foundations)
-4. [How to Run & Practice](#how-to-run--practice)
+5. [How to Run & Practice](#how-to-run--practice)
 
 ---
 
@@ -50,12 +51,17 @@ leetcode-sh/
 │   ├── ...
 │   ├── file_topics.txt           # Topic index reference
 │   └── *.py                      # Python solution implementations
-├── top-100/                      # Top 100 Liked Problems
+├── top-100/                      # Top 100 Liked Problems & Notes
 │   ├── s-lc-11-contain-with-most-water.py
+│   ├── s-lc-11-contain-with-most-water.md
 │   ├── s-lc-15-3-sum.py
+│   ├── s-lc-15-3-sum.md
 │   ├── s-lc-42-trapping-rain-water.py
+│   ├── s-lc-42-trapping-rain-water.md
 │   ├── s-lc-53-maxiumu-subarry.py
-│   └── s-lc-167-two-sum-2.py
+│   ├── s-lc-53-maxiumu-subarry.md
+│   ├── s-lc-167-two-sum-2.py
+│   └── s-lc-167-two-sum-2.md
 ├── s-lc-15.py                    # LC 15: 3Sum solution
 ├── s-lc-15.md                    # LC 15: Detailed analysis & notes
 ├── s-lc-167.py                   # LC 167: Two Sum II solution
@@ -70,7 +76,48 @@ leetcode-sh/
 
 ---
 
-## Topic-Wise Curriculum & Problem Index
+## 🔥 LeetCode Top 100 Liked Track
+
+A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Interview** problems implemented in this repository.
+
+| # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
+| :-: | :--- | :-: | :--- | :-: | :--- |
+| **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`luffy/2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map (Complement `target - num`) |
+| **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Dynamic Sliding Window |
+| **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py)<br>[`top-100/s-lc-11-contain-with-most-water.md`](top-100/s-lc-11-contain-with-most-water.md) | Medium | Two Pointers (Greedy Shorter Line) |
+| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md)<br>[`s-lc-15.py`](s-lc-15.py)<br>[`s-lc-15.md`](s-lc-15.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
+| **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-stack-1-brackets.py`](luffy/19-lc-stack-1-brackets.py)<br>[`luffy/20-lc-stack2.py`](luffy/20-lc-stack2.py) | Easy | Stack Matching |
+| **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-21.py`](luffy/16-lc-21.py) | Easy | Dummy Head + Two Pointers |
+| **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`luffy/5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | Easy | Slow/Fast Two Pointers (In-place) |
+| **39** | Combination Sum | [LC 39](https://leetcode.com/problems/combination-sum/) | [`luffy/34-lc-39.py`](luffy/34-lc-39.py) | Medium | Backtracking (Unbounded Choice) |
+| **41** | First Missing Positive | [LC 41](https://leetcode.com/problems/first-missing-positive/) | [`luffy/14-lc-41.py`](luffy/14-lc-41.py) | Hard | Cyclic Sort / In-Place Hashing ($O(1)$ space) |
+| **42** | Trapping Rain Water | [LC 42](https://leetcode.com/problems/trapping-rain-water/) | [`top-100/s-lc-42-trapping-rain-water.py`](top-100/s-lc-42-trapping-rain-water.py)<br>[`top-100/s-lc-42-trapping-rain-water.md`](top-100/s-lc-42-trapping-rain-water.md) | Hard | Two Pointers Sweep / Prefix-Suffix Max |
+| **46** | Permutations | [LC 46](https://leetcode.com/problems/permutations/) | [`luffy/32-lc-46.py`](luffy/32-lc-46.py) | Medium | Backtracking (`used` array / in-place swap) |
+| **53** | Maximum Subarray | [LC 53](https://leetcode.com/problems/maximum-subarray/) | [`top-100/s-lc-53-maxiumu-subarry.py`](top-100/s-lc-53-maxiumu-subarry.py)<br>[`top-100/s-lc-53-maxiumu-subarry.md`](top-100/s-lc-53-maxiumu-subarry.md) | Medium | Kadane's Algorithm / DP ($O(1)$ space) |
+| **56** | Merge Intervals | [LC 56](https://leetcode.com/problems/merge-intervals/) | [`luffy/13-lc-56-merge.py`](luffy/13-lc-56-merge.py) | Medium | Interval Sorting & Merging |
+| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`luffy/33-lc-78.py`](luffy/33-lc-78.py) | Medium | Backtracking / Cascading |
+| **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-79.py`](luffy/37-lc-79.py) | Medium | 2D Grid DFS + Backtracking |
+| **94** | Binary Tree Inorder Traversal | [LC 94](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [`luffy/25-lc-94-inorder.py`](luffy/25-lc-94-inorder.py) | Easy | Tree DFS (Inorder: L-Root-R) |
+| **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-98-sol-1.py`](luffy/29-lc-98-sol-1.py)... | Medium | BST Range Bounds `(min_val, max_val)` |
+| **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`luffy/28-lc-102.py`](luffy/28-lc-102.py) | Medium | Queue BFS Level-by-Level |
+| **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`luffy/26-lc-104py`](luffy/26-lc-104py) | Easy | Tree DFS / Divide & Conquer |
+| **105** | Construct Tree from Preorder & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-105.py`](luffy/30-lc-105.py) | Medium | Divide & Conquer / Subtree Slicing |
+| **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`luffy/36-lc-131.py`](luffy/36-lc-131.py) | Medium | Backtracking + Palindrome Verification |
+| **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`luffy/17-lc-141.py`](luffy/17-lc-141.py) | Easy | Floyd's Fast & Slow Pointers |
+| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-142.py`](luffy/18-lc-142.py) | Medium | Fast/Slow Pointers + Cycle Entry Math |
+| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-stack3-min -stack.py`](luffy/21-lc-stack3-min%20-stack.py) | Medium | Auxiliary Min Stack ($O(1)$ `getMin`) |
+| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md)<br>[`s-lc-167.py`](s-lc-167.py)<br>[`s-lc-167.md`](s-lc-167.md) | Medium | Two Pointers on Sorted Array ($O(1)$ space) |
+| **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`luffy/38-lc-200.py`](luffy/38-lc-200.py) | Medium | Grid DFS / BFS (Sink Islands) |
+| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-206.py`](luffy/15-lc-206.py) | Easy | Pointer Reversal (`prev`, `curr`, `next`) |
+| **207** | Course Schedule | [LC 207](https://leetcode.com/problems/course-schedule/) | [`42-lc-207.py`](luffy/42-lc-207.py) | Medium | Topological Sort (Kahn's BFS / DFS) |
+| **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-236.py`](luffy/27-lc-236.py) | Medium | Postorder DFS Traversal |
+| **394** | Decode String | [LC 394](https://leetcode.com/problems/decode-string/) | [`luffy/23-lc-394.py`](luffy/23-lc-394.py) | Medium | Dual Stack (Count Stack + Str Stack) |
+| **560** | Subarray Sum Equals K | [LC 560](https://leetcode.com/problems/subarray-sum-equals-k/) | [`luffy/11-lc-560-Subarray-Sum-equals-k`](luffy/11-lc-560-Subarray-Sum-equals-k) | Medium | Prefix Sum + Frequency Hash Map |
+| **994** | Rotting Oranges | [LC 994](https://leetcode.com/problems/rotting-oranges/) | [`luffy/40-lc-994.py`](luffy/40-lc-994.py) | Medium | Multi-source Breadth-First Search (BFS) |
+
+---
+
+## 4. Topic-Wise Curriculum & Problem Index
 
 ### 1. Arrays, Strings, Two Pointers & Sliding Window
 
