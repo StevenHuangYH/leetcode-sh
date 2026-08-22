@@ -12,8 +12,8 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 
 1. [Practice Statistics & Summary](#practice-statistics--summary)
 2. [Repository Structure](#repository-structure)
-3. [LeetCode Top 100 Liked Track](#leetcode-top-100-liked-track)
-4. [Daily Practice Track](#daily-practice-track)
+3. [🔥 Top 100 Liked Track](#-top-100-liked-track)
+4. [📅 Daily Practice Track](#-daily-practice-track)
 5. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
    - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
    - [2. Binary Search](#2-binary-search)
@@ -80,7 +80,7 @@ leetcode-sh/
 
 ---
 
-## LeetCode Top 100 Liked Track
+## 🔥 Top 100 Liked Track
 
 A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Interview** problems implemented in this repository.
 
@@ -123,7 +123,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 
 ---
 
-## Daily Practice Track
+## 📅 Daily Practice Track
 
 Dedicated tracking index for daily practice problems and latest contest questions organized in [`daily-practice/`](daily-practice).
 
