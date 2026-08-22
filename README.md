@@ -13,7 +13,8 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 1. [Practice Statistics & Summary](#practice-statistics--summary)
 2. [Repository Structure](#repository-structure)
 3. [🔥 LeetCode Top 100 Liked Track](#-leetcode-top-100-liked-track)
-4. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
+4. [📅 Daily Practice Track](#-daily-practice-track)
+5. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
    - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
    - [2. Binary Search](#2-binary-search)
    - [3. Prefix Sum & Difference Arrays](#3-prefix-sum--difference-arrays)
@@ -25,7 +26,7 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
    - [9. Graph Algorithms (DFS, BFS, Topological Sort)](#9-graph-algorithms-dfs-bfs-topological-sort)
    - [10. Dynamic Programming & Math / Game Theory](#10-dynamic-programming--math--game-theory)
    - [11. Object-Oriented Programming (OOP) & Foundations](#11-object-oriented-programming-oop--foundations)
-5. [How to Run & Practice](#how-to-run--practice)
+6. [How to Run & Practice](#how-to-run--practice)
 
 ---
 
@@ -64,15 +65,14 @@ leetcode-sh/
 │   ├── s-lc-167-two-sum-2.md
 │   ├── s-lc-209-minimum-size-subarry-sum.py
 │   └── s-lc-209-minimum-size-subarry-sum.md
-├── s-lc-15.py                    # LC 15: 3Sum solution
-├── s-lc-15.md                    # LC 15: Detailed analysis & notes
-├── s-lc-167.py                   # LC 167: Two Sum II solution
-├── s-lc-167.md                   # LC 167: Detailed analysis & notes
-├── s-lc-2029.py                  # LC 2029: Stone Game IX
-├── s-lc-2029.md                  # LC 2029: Detailed analysis & math notes
-├── s-lc-3090.py                  # LC 3090: Maximum Length Substring With at Most Two Occurrences
-├── s-lc-3471.py                  # LC 3471: Find the Largest Almost Missing Integer
-├── s-lc-3471.md                  # LC 3471: Detailed analysis & notes
+├── daily-practice/               # Daily LeetCode Practices & In-Depth Notes
+│   ├── s-lc-2029.py
+│   ├── s-lc-2029.md
+│   ├── leetcode_2029_stone_game_ix.md
+│   ├── s-lc-3090.py
+│   ├── s-lc-3090.md
+│   ├── s-lc-3471.py
+│   └── s-lc-3471.md
 └── README.md                     # Repository documentation & guide
 ```
 
@@ -87,7 +87,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`luffy/2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map (Complement `target - num`) |
 | **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Dynamic Sliding Window |
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py)<br>[`top-100/s-lc-11-contain-with-most-water.md`](top-100/s-lc-11-contain-with-most-water.md) | Medium | Two Pointers (Greedy Shorter Line) |
-| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md)<br>[`s-lc-15.py`](s-lc-15.py)<br>[`s-lc-15.md`](s-lc-15.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
+| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
 | **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-stack-1-brackets.py`](luffy/19-lc-stack-1-brackets.py)<br>[`luffy/20-lc-stack2.py`](luffy/20-lc-stack2.py) | Easy | Stack Matching |
 | **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-21.py`](luffy/16-lc-21.py) | Easy | Dummy Head + Two Pointers |
 | **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`luffy/5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | Easy | Slow/Fast Two Pointers (In-place) |
@@ -108,7 +108,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`luffy/17-lc-141.py`](luffy/17-lc-141.py) | Easy | Floyd's Fast & Slow Pointers |
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-142.py`](luffy/18-lc-142.py) | Medium | Fast/Slow Pointers + Cycle Entry Math |
 | **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-stack3-min -stack.py`](luffy/21-lc-stack3-min%20-stack.py) | Medium | Auxiliary Min Stack ($O(1)$ `getMin`) |
-| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md)<br>[`s-lc-167.py`](s-lc-167.py)<br>[`s-lc-167.md`](s-lc-167.md) | Medium | Two Pointers on Sorted Array ($O(1)$ space) |
+| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md) | Medium | Two Pointers on Sorted Array ($O(1)$ space) |
 | **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`luffy/38-lc-200.py`](luffy/38-lc-200.py) | Medium | Grid DFS / BFS (Sink Islands) |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-206.py`](luffy/15-lc-206.py) | Easy | Pointer Reversal (`prev`, `curr`, `next`) |
 | **207** | Course Schedule | [LC 207](https://leetcode.com/problems/course-schedule/) | [`42-lc-207.py`](luffy/42-lc-207.py) | Medium | Topological Sort (Kahn's BFS / DFS) |
@@ -120,7 +120,19 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 
 ---
 
-## 4. Topic-Wise Curriculum & Problem Index
+## 📅 Daily Practice Track
+
+Dedicated tracking index for daily practice problems and latest contest questions organized in [`daily-practice/`](daily-practice).
+
+| # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
+| :-: | :--- | :-: | :--- | :-: | :--- |
+| **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/s-lc-2029.py`](daily-practice/s-lc-2029.py)<br>[`daily-practice/s-lc-2029.md`](daily-practice/s-lc-2029.md)<br>[`daily-practice/leetcode_2029_stone_game_ix.md`](daily-practice/leetcode_2029_stone_game_ix.md) | Medium | Modulo Arithmetic / Game Theory |
+| **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/s-lc-3090.py`](daily-practice/s-lc-3090.py)<br>[`daily-practice/s-lc-3090.md`](daily-practice/s-lc-3090.md) | Easy | Sliding Window / Frequency Map |
+| **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`daily-practice/s-lc-3471.py`](daily-practice/s-lc-3471.py)<br>[`daily-practice/s-lc-3471.md`](daily-practice/s-lc-3471.md) | Easy | Fixed Sliding Window / Math |
+
+---
+
+## 5. Topic-Wise Curriculum & Problem Index
 
 ### 1. Arrays, Strings, Two Pointers & Sliding Window
 
@@ -129,14 +141,14 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map | Single-pass hash map storing complement `target - num`. |
 | **3** | Longest Substring Without Repeating Characters | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Sliding Window | Maintain set/dict window; contract left pointer when duplicate seen. |
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py)<br>[`top-100/s-lc-11-contain-with-most-water.md`](top-100/s-lc-11-contain-with-most-water.md) | Medium | Two Pointers (Left/Right) | Move the pointer pointing to the shorter line to potentially maximize area. |
-| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md)<br>[`s-lc-15.py`](s-lc-15.py)<br>[`s-lc-15.md`](s-lc-15.md) | Medium | Two Pointers / Extreme Pruning | Sort array; fix anchor $nums[i]$; 2-way extreme pruning (min-sum break, max-sum continue) & deduplication. |
+| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md) | Medium | Two Pointers / Extreme Pruning | Sort array; fix anchor $nums[i]$; 2-way extreme pruning (min-sum break, max-sum continue) & deduplication. |
 | **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | Easy | Two Pointers (Slow/Fast) | Overwrite duplicate elements in-place with slow pointer. |
 | **42** | Trapping Rain Water | [LC 42](https://leetcode.com/problems/trapping-rain-water/) | [`top-100/s-lc-42-trapping-rain-water.py`](top-100/s-lc-42-trapping-rain-water.py)<br>[`top-100/s-lc-42-trapping-rain-water.md`](top-100/s-lc-42-trapping-rain-water.md) | Hard | Two Pointers / Pre-Suf Max | Maintain `pre_max` and `suf_max` or two-pointer inward sweep to trap water. |
 | **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`8-lc-59-spiral-martix.py`](luffy/8-lc-59-spiral-martix.py)<br>[`9-lc-59-spiral-martx-2.py`](luffy/9-lc-59-spiral-martx-2.py) | Medium | Matrix Simulation | Layer-by-layer traversal with boundary tracking (top, bottom, left, right). |
-| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`s-lc-167.py`](s-lc-167.py)<br>[`s-lc-167.md`](s-lc-167.md)<br>[`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md)<br>[`3-lc-167-two-sum-2.py`](luffy/3-lc-167-two-sum-2.py) | Medium | Two Pointers (Left/Right) | Exploit sorted order; shrink search space based on sum vs target (1-based index). |
+| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md)<br>[`3-lc-167-two-sum-2.py`](luffy/3-lc-167-two-sum-2.py) | Medium | Two Pointers (Left/Right) | Exploit sorted order; shrink search space based on sum vs target (1-based index). |
 | **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/s-lc-209-minimum-size-subarry-sum.py`](top-100/s-lc-209-minimum-size-subarry-sum.py)<br>[`top-100/s-lc-209-minimum-size-subarry-sum.md`](top-100/s-lc-209-minimum-size-subarry-sum.md)<br>[`6-lc-209-minimum-size-subarray-sum.py`](luffy/6-lc-209-minimum-size-subarray-sum.py) | Medium | Sliding Window | Expand right pointer to reach target sum, then shrink left to minimize window. |
-| **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`s-lc-3090.py`](s-lc-3090.py) | Easy | Sliding Window / Frequency Map | Window condition: maintain character frequency `<= 2`. |
-| **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`s-lc-3471.py`](s-lc-3471.py)<br>[`s-lc-3471.md`](s-lc-3471.md) | Easy | Fixed Sliding Window / Hash Table | Slide fixed window of size $k$; count frequencies across distinct windows using set deduplication. |
+| **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/s-lc-3090.py`](daily-practice/s-lc-3090.py)<br>[`daily-practice/s-lc-3090.md`](daily-practice/s-lc-3090.md) | Easy | Sliding Window / Frequency Map | Window condition: maintain character frequency `<= 2`. |
+| **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`daily-practice/s-lc-3471.py`](daily-practice/s-lc-3471.py)<br>[`daily-practice/s-lc-3471.md`](daily-practice/s-lc-3471.md) | Easy | Fixed Sliding Window / Hash Table | Slide fixed window of size $k$; count frequencies across distinct windows using set deduplication. |
 
 ---
 
@@ -236,8 +248,8 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 
 | # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
-| **53** | Maximum Subarray | [LC 53](https://leetcode.com/problems/maximum-subarray/) | [`top-100/s-lc-53-maxiumu-subarry.py`](top-100/s-lc-53-maxiumu-subarry.py) | Medium | Kadane's Algorithm / DP | `curr_max = max(num, curr_max + num)`; maintains maximum contiguous sum in $O(n)$. |
-| **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`s-lc-2029.py`](s-lc-2029.py)<br>[`s-lc-2029.md`](s-lc-2029.md)<br>[`leetcode_2029_stone_game_ix.md`](leetcode_2029_stone_game_ix.md) | Medium | Modulo Arithmetic / Game Theory | Count residues modulo 3 ($c_0, c_1, c_2$); analyze winning conditions based on $c_0 \pmod 2$. |
+| **53** | Maximum Subarray | [LC 53](https://leetcode.com/problems/maximum-subarray/) | [`top-100/s-lc-53-maxiumu-subarry.py`](top-100/s-lc-53-maxiumu-subarry.py)<br>[`top-100/s-lc-53-maxiumu-subarry.md`](top-100/s-lc-53-maxiumu-subarry.md) | Medium | Kadane's Algorithm / DP | `curr_max = max(num, curr_max + num)`; maintains maximum contiguous sum in $O(n)$. |
+| **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/s-lc-2029.py`](daily-practice/s-lc-2029.py)<br>[`daily-practice/s-lc-2029.md`](daily-practice/s-lc-2029.md)<br>[`daily-practice/leetcode_2029_stone_game_ix.md`](daily-practice/leetcode_2029_stone_game_ix.md) | Medium | Modulo Arithmetic / Game Theory | Count residues modulo 3 ($c_0, c_1, c_2$); analyze winning conditions based on $c_0 \pmod 2$. |
 
 ---
 
@@ -250,31 +262,37 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 
 ---
 
-## How to Run & Practice
+## 6. How to Run & Practice
 
 ### Running a Solution Locally
 Execute any Python script directly using Python 3:
 
 ```bash
-# Example: Run Two Sum solution
+# Example: Run Two Sum solution (Luffy track)
 python luffy/2-lc-1-two-sum-lc.py
 
-# Example: Run 3Sum solution
+# Example: Run 3Sum solution (Top 100 track)
 python top-100/s-lc-15-3-sum.py
 
-# Example: Run Two Sum II solution
-python s-lc-167.py
+# Example: Run Two Sum II solution (Top 100 track)
+python top-100/s-lc-167-two-sum-2.py
 
-# Example: Run Stone Game IX solution
-python s-lc-2029.py
+# Example: Run Minimum Size Subarray Sum solution (Top 100 track)
+python top-100/s-lc-209-minimum-size-subarry-sum.py
 
-# Example: Run Trapping Rain Water solution
-python top-100/s-lc-42-trapping-rain-water.py
+# Example: Run Stone Game IX solution (Daily Practice track)
+python daily-practice/s-lc-2029.py
+
+# Example: Run Almost Missing Integer solution (Daily Practice track)
+python daily-practice/s-lc-3471.py
 ```
 
 ### Adding New Solutions
 When adding a new solution:
-1. Place the Python solution script in the relevant topic folder (e.g. `luffy/`, `top-100/`, or root).
+1. Place the Python solution script and Markdown notes in the relevant topic folder:
+   - `top-100/` for LeetCode Top 100 Liked problems.
+   - `daily-practice/` for daily challenges and contest problems.
+   - `luffy/` for curriculum progression tracks.
 2. Follow the naming convention: `<index>-lc-<problem_number>-<title>.py` or `s-lc-<problem_number>.py`.
 3. Update the corresponding topic table in [README.md](README.md).
 
