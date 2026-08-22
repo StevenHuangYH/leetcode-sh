@@ -26,7 +26,7 @@ class Solution:
             
             # 当窗口内乘积 >= k 时，收缩左边界
             while prod >= k:
-                prod //= nums[left]
+                prod /= nums[left]
                 left += 1
                 
             # 核心计数：以 right 结尾且合法的连续子数组个数恰好为 right - left + 1

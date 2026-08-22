@@ -53,6 +53,8 @@ leetcode-sh/
 │   ├── file_topics.txt           # Topic index reference
 │   └── *.py                      # Python solution implementations
 ├── top-100/                      # Top 100 Liked Problems & Notes
+│   ├── s-lc-3-longest-substring-without-repeating-characters.py
+│   ├── s-lc-3-longest-substring-without-repeating-characters.md
 │   ├── s-lc-11-contain-with-most-water.py
 │   ├── s-lc-11-contain-with-most-water.md
 │   ├── s-lc-15-3-sum.py
@@ -87,7 +89,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
 | :-: | :--- | :-: | :--- | :-: | :--- |
 | **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`luffy/2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map (Complement `target - num`) |
-| **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Dynamic Sliding Window |
+| **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`top-100/s-lc-3-longest-substring-without-repeating-characters.py`](top-100/s-lc-3-longest-substring-without-repeating-characters.py)<br>[`top-100/s-lc-3-longest-substring-without-repeating-characters.md`](top-100/s-lc-3-longest-substring-without-repeating-characters.md)<br>[`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Dynamic Sliding Window |
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py)<br>[`top-100/s-lc-11-contain-with-most-water.md`](top-100/s-lc-11-contain-with-most-water.md) | Medium | Two Pointers (Greedy Shorter Line) |
 | **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
 | **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-stack-1-brackets.py`](luffy/19-lc-stack-1-brackets.py)<br>[`luffy/20-lc-stack2.py`](luffy/20-lc-stack2.py) | Easy | Stack Matching |
@@ -142,7 +144,7 @@ Dedicated tracking index for daily practice problems and latest contest question
 | # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
 | **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map | Single-pass hash map storing complement `target - num`. |
-| **3** | Longest Substring Without Repeating Characters | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Sliding Window | Maintain set/dict window; contract left pointer when duplicate seen. |
+| **3** | Longest Substring Without Repeating Characters | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`top-100/s-lc-3-longest-substring-without-repeating-characters.py`](top-100/s-lc-3-longest-substring-without-repeating-characters.py)<br>[`top-100/s-lc-3-longest-substring-without-repeating-characters.md`](top-100/s-lc-3-longest-substring-without-repeating-characters.md)<br>[`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Sliding Window | Maintain set/dict window; contract left pointer when duplicate seen (`cnt[s[left]] -= 1`). |
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py)<br>[`top-100/s-lc-11-contain-with-most-water.md`](top-100/s-lc-11-contain-with-most-water.md) | Medium | Two Pointers (Left/Right) | Move the pointer pointing to the shorter line to potentially maximize area. |
 | **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`top-100/s-lc-15-3-sum.md`](top-100/s-lc-15-3-sum.md) | Medium | Two Pointers / Extreme Pruning | Sort array; fix anchor $nums[i]$; 2-way extreme pruning (min-sum break, max-sum continue) & deduplication. |
 | **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | Easy | Two Pointers (Slow/Fast) | Overwrite duplicate elements in-place with slow pointer. |
