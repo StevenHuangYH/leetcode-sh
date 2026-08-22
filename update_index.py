@@ -7,11 +7,11 @@ This script scans all workspace folders (top-100, daily-practice, luffy,
 README.md, INDEX.md), extracts topic-wise problem indexes, and compiles
 a standalone, self-contained single-page web app (index.html).
 
-Usage:
-  python update_index.py            # Build index.html once
-  python update_index.py --open     # Build index.html and open in browser
-  python update_index.py --watch    # Watch workspace files & auto-rebuild
-  python update_index.py --git-hook # Install automatic git pre-commit hook
+Features:
+- Categorized dropdown / pull-up collapsible accordion tabs
+- Filter pills (All, 🎯 Problem Index, 🔥 Top 100, 📚 Luffy, 📅 Daily)
+- KaTeX math rendering, syntax highlighting, and SPA client-side routing
+- Automated git pre-commit hook integration
 =============================================================================
 """
 
@@ -152,7 +152,7 @@ def collect_workspace_documents():
     return all_docs
 
 def build_index_html():
-    """Generates the single-page index.html file."""
+    """Generates the single-page index.html file with collapsible accordion categories."""
     all_docs = collect_workspace_documents()
     docs_json = json.dumps(all_docs)
 
@@ -251,21 +251,86 @@ def build_index_html():
       color: #fff;
       border-color: var(--accent);
     }}
+    .accordion-controls {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px 4px;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+      font-size: 11px;
+      color: var(--text-muted);
+    }}
+    .control-btn {{
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: opacity 0.15s;
+    }}
+    .control-btn:hover {{
+      text-decoration: underline;
+      color: #79c0ff;
+    }}
     .nav-list {{
       flex: 1;
       overflow-y: auto;
-      padding: 12px 8px;
+      padding: 8px 8px 16px;
+    }}
+    .section-group {{
+      margin-bottom: 6px;
     }}
     .section-title {{
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-muted);
-      padding: 12px 12px 4px;
+      padding: 8px 10px;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 6px;
+      transition: background-color 0.15s, color 0.15s;
+    }}
+    .section-title:hover {{
+      background-color: rgba(177, 186, 196, 0.08);
+      color: #f0f6fc;
+    }}
+    .section-title-left {{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .chevron {{
+      font-size: 9px;
+      display: inline-block;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-muted);
+      width: 12px;
+      text-align: center;
+    }}
+    .section-group.collapsed .chevron {{
+      transform: rotate(-90deg);
+    }}
+    .count-badge {{
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }}
+    .section-items {{
+      overflow: hidden;
+      transition: all 0.2s ease-out;
+    }}
+    .section-group.collapsed .section-items {{
+      display: none;
     }}
     .nav-item {{
       display: flex;
@@ -423,6 +488,13 @@ def build_index_html():
         <span class="pill" onclick="setFilter('daily-practice')">📅 Daily Track</span>
       </div>
     </div>
+    <div class="accordion-controls">
+      <span>Categories</span>
+      <div style="display: flex; gap: 8px;">
+        <button class="control-btn" onclick="expandAllCategories()">▾ Expand All</button>
+        <button class="control-btn" onclick="collapseAllCategories()">▴ Fold All</button>
+      </div>
+    </div>
     <div class="nav-list" id="navList">
       <!-- Injected by JavaScript -->
     </div>
@@ -445,6 +517,7 @@ def build_index_html():
     const docs = {docs_json};
     let currentKey = "topic-all";
     let activeTrack = "all";
+    const collapsedCategories = {{}};
 
     function setFilter(track) {{
       activeTrack = track;
@@ -460,6 +533,30 @@ def build_index_html():
       }});
       renderNav();
       filterDocs();
+    }}
+
+    function toggleCategory(groupName) {{
+      collapsedCategories[groupName] = !collapsedCategories[groupName];
+      renderNav();
+    }}
+
+    function expandAllCategories() {{
+      for (const k in collapsedCategories) {{
+        collapsedCategories[k] = false;
+      }}
+      renderNav();
+    }}
+
+    function collapseAllCategories() {{
+      const groups = [
+        "🎯 Problem Index",
+        "📖 Overview",
+        "🔥 Top 100 Liked Track",
+        "📅 Daily Practice Track",
+        "📚 Luffy Curriculum (01-42)"
+      ];
+      groups.forEach(g => collapsedCategories[g] = true);
+      renderNav();
     }}
 
     function renderNav() {{
@@ -482,7 +579,21 @@ def build_index_html():
 
         if (filteredKeys.length === 0) continue;
 
-        html += `<div class="section-title"><span>${{groupName}}</span><span>${{filteredKeys.length}}</span></div>`;
+        const isCollapsed = !!collapsedCategories[groupName];
+        const collapseClass = isCollapsed ? "collapsed" : "";
+
+        html += `
+          <div class="section-group ${{collapseClass}}" id="group-${{groupName.replace(/[^a-zA-Z0-9]/g, '_')}}">
+            <div class="section-title" onclick="toggleCategory('${{groupName}}')">
+              <div class="section-title-left">
+                <span class="chevron">▼</span>
+                <span>${{groupName}}</span>
+              </div>
+              <span class="count-badge">${{filteredKeys.length}}</span>
+            </div>
+            <div class="section-items">
+        `;
+
         for (const k of filteredKeys) {{
           const doc = docs[k];
           const activeClass = k === currentKey ? "active" : "";
@@ -494,6 +605,11 @@ def build_index_html():
             </div>
           `;
         }}
+
+        html += `
+            </div>
+          </div>
+        `;
       }}
       navList.innerHTML = html;
     }}
@@ -502,6 +618,12 @@ def build_index_html():
       if (!docs[key]) return;
       currentKey = key;
       const doc = docs[key];
+
+      // Auto un-collapse the active item's group
+      if (doc.category && collapsedCategories[doc.category]) {{
+        collapsedCategories[doc.category] = false;
+        renderNav();
+      }}
 
       document.querySelectorAll(".nav-item").forEach(el => {{
         el.classList.toggle("active", el.dataset.key === key);
@@ -580,6 +702,13 @@ def build_index_html():
           item.style.display = "none";
         }}
       }});
+
+      // Auto expand categories when search is active
+      if (q.trim().length > 0) {{
+        document.querySelectorAll(".section-group").forEach(group => {{
+          group.classList.remove("collapsed");
+        }});
+      }}
     }}
 
     function copyContent() {{
