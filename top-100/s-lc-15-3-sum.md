@@ -5,7 +5,7 @@
 - **Tags:** Array, Two Pointers, Sorting, Pruning
 - **Corresponding Python Files:**
   - [`top-100/s-lc-15-3-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-15-3-sum.py)
-  - [`s-lc-15.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/s-lc-15.py)
+  - [`s-lc-15.py`](top-100/s-lc-15-3-sum.py)
 
 ---
 

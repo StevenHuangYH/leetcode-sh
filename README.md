@@ -109,7 +109,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`luffy/36-lc-131.py`](luffy/36-lc-131.py) | Medium | Backtracking + Palindrome Verification |
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`luffy/17-lc-141.py`](luffy/17-lc-141.py) | Easy | Floyd's Fast & Slow Pointers |
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-142.py`](luffy/18-lc-142.py) | Medium | Fast/Slow Pointers + Cycle Entry Math |
-| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-stack3-min -stack.py`](luffy/21-lc-stack3-min%20-stack.py) | Medium | Auxiliary Min Stack ($O(1)$ `getMin`) |
+| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-stack3-min-stack.py`](luffy/21-lc-stack3-min-stack.py) | Medium | Auxiliary Min Stack ($O(1)$ `getMin`) |
 | **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/s-lc-167-two-sum-2.py`](top-100/s-lc-167-two-sum-2.py)<br>[`top-100/s-lc-167-two-sum-2.md`](top-100/s-lc-167-two-sum-2.md) | Medium | Two Pointers on Sorted Array ($O(1)$ space) |
 | **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`luffy/38-lc-200.py`](luffy/38-lc-200.py) | Medium | Grid DFS / BFS (Sink Islands) |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-206.py`](luffy/15-lc-206.py) | Easy | Pointer Reversal (`prev`, `curr`, `next`) |
@@ -199,7 +199,7 @@ Dedicated tracking index for daily practice problems and latest contest question
 | # | Problem Title | LeetCode Link | Solution File | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
 | **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`19-lc-stack-1-brackets.py`](luffy/19-lc-stack-1-brackets.py)<br>[`20-lc-stack2.py`](luffy/20-lc-stack2.py) | Easy | Stack | Push opening brackets; pop and match corresponding closing bracket. |
-| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`21-lc-stack3-min -stack.py`](luffy/21-lc-stack3-min%20-stack.py) | Medium | Auxiliary Stack / Pair Stack | Track running minimum alongside each pushed value in $O(1)$. |
+| **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`21-lc-stack3-min-stack.py`](luffy/21-lc-stack3-min-stack.py) | Medium | Auxiliary Stack / Pair Stack | Track running minimum alongside each pushed value in $O(1)$. |
 | **227** | Basic Calculator II | [LC 227](https://leetcode.com/problems/basic-calculator-ii/) | [`22-lc-227.py`](luffy/22-lc-227.py) | Medium | Stack / Parsing | Evaluate `*` and `/` immediately on top of stack; sum all values for `+` and `-`. |
 | **232** | Implement Queue using Stacks | [LC 232](https://leetcode.com/problems/implement-queue-using-stacks/) | [`24-lc-232.py`](luffy/24-lc-232.py) | Easy | Two Stacks (`in_stack`, `out_stack`) | Amortized $O(1)$ pop/peek by transferring elements only when `out_stack` is empty. |
 | **394** | Decode String | [LC 394](https://leetcode.com/problems/decode-string/) | [`23-lc-394.py`](luffy/23-lc-394.py) | Medium | Stack (Counts & Strings) | Push current string and multiplier onto stack when encountering `[`; pop on `]`. |
