@@ -32,10 +32,10 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 
 | Difficulty | Count | Percentage |
 | :--- | :--- | :--- |
-| **Easy** | 17 | ~34% |
-| **Medium** | 31 | ~62% |
+| **Easy** | 17 | ~33% |
+| **Medium** | 32 | ~63% |
 | **Hard** | 2 | ~4% |
-| **Total** | **50+ Solutions** | **100%** |
+| **Total** | **51+ Solutions** | **100%** |
 
 ---
 
@@ -52,9 +52,12 @@ leetcode-sh/
 │   └── *.py                      # Python solution implementations
 ├── top-100/                      # Top 100 Liked Problems
 │   ├── s-lc-11-contain-with-most-water.py
+│   ├── s-lc-15-3-sum.py
 │   ├── s-lc-42-trapping-rain-water.py
 │   ├── s-lc-53-maxiumu-subarry.py
 │   └── s-lc-167-two-sum-2.py
+├── s-lc-15.py                    # LC 15: 3Sum solution
+├── s-lc-15.md                    # LC 15: Detailed analysis & notes
 ├── s-lc-167.py                   # LC 167: Two Sum II solution
 ├── s-lc-167.md                   # LC 167: Detailed analysis & notes
 ├── s-lc-2029.py                  # LC 2029: Stone Game IX
@@ -76,6 +79,7 @@ leetcode-sh/
 | **1** | Two Sum | [LC 1](https://leetcode.com/problems/two-sum/) | [`2-lc-1-two-sum-lc.py`](luffy/2-lc-1-two-sum-lc.py) | Easy | Hash Map | Single-pass hash map storing complement `target - num`. |
 | **3** | Longest Substring Without Repeating Characters | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`4-lc-3-longest-substring-without-repeating-characters.py`](luffy/4-lc-3-longest-substring-without-repeating-characters.py) | Medium | Sliding Window | Maintain set/dict window; contract left pointer when duplicate seen. |
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/s-lc-11-contain-with-most-water.py`](top-100/s-lc-11-contain-with-most-water.py) | Medium | Two Pointers (Left/Right) | Move the pointer pointing to the shorter line to potentially maximize area. |
+| **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/s-lc-15-3-sum.py`](top-100/s-lc-15-3-sum.py)<br>[`s-lc-15.py`](s-lc-15.py)<br>[`s-lc-15.md`](s-lc-15.md) | Medium | Two Pointers / Extreme Pruning | Sort array; fix anchor $nums[i]$; 2-way extreme pruning (min-sum break, max-sum continue) & deduplication. |
 | **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`5-lc-26-remove-duplicates-from-sorted-array.py`](luffy/5-lc-26-remove-duplicates-from-sorted-array.py) | Easy | Two Pointers (Slow/Fast) | Overwrite duplicate elements in-place with slow pointer. |
 | **42** | Trapping Rain Water | [LC 42](https://leetcode.com/problems/trapping-rain-water/) | [`top-100/s-lc-42-trapping-rain-water.py`](top-100/s-lc-42-trapping-rain-water.py) | Hard | Two Pointers / Pre-Suf Max | Maintain `pre_max` and `suf_max` or two-pointer inward sweep to trap water. |
 | **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`8-lc-59-spiral-martix.py`](luffy/8-lc-59-spiral-martix.py)<br>[`9-lc-59-spiral-martx-2.py`](luffy/9-lc-59-spiral-martx-2.py) | Medium | Matrix Simulation | Layer-by-layer traversal with boundary tracking (top, bottom, left, right). |
@@ -204,6 +208,12 @@ Execute any Python script directly using Python 3:
 ```bash
 # Example: Run Two Sum solution
 python luffy/2-lc-1-two-sum-lc.py
+
+# Example: Run 3Sum solution
+python top-100/s-lc-15-3-sum.py
+
+# Example: Run Two Sum II solution
+python s-lc-167.py
 
 # Example: Run Stone Game IX solution
 python s-lc-2029.py
