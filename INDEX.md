@@ -10,7 +10,7 @@ Welcome to the **Master Problem Index** for the LeetCode self-practices and algo
 [![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
 [![Problems Solved](https://img.shields.io/badge/Problems_Indexed-50+-brightgreen.svg)]()
 
-Welcome to the **LeetCode Self-Practices** repository! This repository contains Python implementations, problem notes, and structured practice tracks covering foundational to advanced data structures and algorithmic patterns.
+Welcome to my personal LeetCode question cracking collections. This repository is where I store my solutions, and categorize my various data structures or problem sets.
 
 ---
 
