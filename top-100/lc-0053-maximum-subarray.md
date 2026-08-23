@@ -3,7 +3,7 @@
 
 - **Difficulty:** Medium (经典动态规划 / Kadane 算法)
 - **Tags:** Array, Dynamic Programming, Divide and Conquer
-- **Corresponding Python File:** [`top-100/s-lc-53-maxiumu-subarry.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-53-maxiumu-subarry.py)
+- **Corresponding Python File:** [`top-100/lc-0053-maximum-subarray.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/lc-0053-maximum-subarray.py)
 
 ---
 

@@ -3,7 +3,7 @@
 
 - **Difficulty:** Hard (高频面试经典题 / 前后缀最大值 & 双指针)
 - **Tags:** Array, Two Pointers, Dynamic Programming, Stack
-- **Corresponding Python File:** [`top-100/s-lc-42-trapping-rain-water.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-42-trapping-rain-water.py)
+- **Corresponding Python File:** [`top-100/lc-0042-trapping-rain-water.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/lc-0042-trapping-rain-water.py)
 
 ---
 

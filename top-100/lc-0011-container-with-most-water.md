@@ -3,7 +3,7 @@
 
 - **Difficulty:** Medium (经典对撞双指针)
 - **Tags:** Array, Two Pointers, Greedy
-- **Corresponding Python File:** [`top-100/s-lc-11-contain-with-most-water.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-11-contain-with-most-water.py)
+- **Corresponding Python File:** [`top-100/lc-0011-container-with-most-water.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/lc-0011-container-with-most-water.py)
 
 ---
 

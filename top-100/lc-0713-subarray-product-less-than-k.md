@@ -3,7 +3,7 @@
 
 - **Difficulty:** Medium (滑动窗口经典题 / 区间计数)
 - **Tags:** Array, Sliding Window
-- **Corresponding Python File:** [`top-100/s-lc-713.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-713.py)
+- **Corresponding Python File:** [`top-100/lc-0713-subarray-product-less-than-k.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/lc-0713-subarray-product-less-than-k.py)
 
 ---
 

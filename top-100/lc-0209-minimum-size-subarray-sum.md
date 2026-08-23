@@ -4,8 +4,8 @@
 - **Difficulty:** Medium (滑动窗口经典入门题)
 - **Tags:** Array, Binary Search, Sliding Window, Prefix Sum
 - **Corresponding Python Files:**
-  - [`top-100/s-lc-209-minimum-size-subarry-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/s-lc-209-minimum-size-subarry-sum.py)
-  - [`luffy/6-lc-209-minimum-size-subarray-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/6-lc-209-minimum-size-subarray-sum.py)
+  - [`top-100/lc-0209-minimum-size-subarray-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/top-100/lc-0209-minimum-size-subarray-sum.py)
+  - [`luffy/06-lc-0209-minimum-size-subarray-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/06-lc-0209-minimum-size-subarray-sum.py)
 
 ---
 

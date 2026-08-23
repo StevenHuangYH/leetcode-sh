@@ -3,7 +3,7 @@
 
 - **Difficulty:** Easy
 - **Tags:** Array, Hash Table, Sliding Window, Math
-- **Corresponding Python File:** [`daily-practice/s-lc-3471.py`](daily-practice/s-lc-3471.py)
+- **Corresponding Python File:** [`daily-practice/lc-3471-find-the-largest-almost-missing-integer.py`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)
 
 ---
 

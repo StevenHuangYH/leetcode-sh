@@ -3,7 +3,7 @@
 
 - **Difficulty:** Easy (滑动窗口频数统计)
 - **Tags:** Hash Table, String, Sliding Window
-- **Corresponding Python File:** [`daily-practice/s-lc-3090.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/daily-practice/s-lc-3090.py)
+- **Corresponding Python File:** [`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)
 
 ---
 

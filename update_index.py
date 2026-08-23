@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """
 =============================================================================
-LeetCode Workspace - Automated index.html Builder & Watcher
+LeetCode Workspace - Automated index.html Builder & Study Station
 =============================================================================
 This script scans all workspace folders (top-100, daily-practice, luffy,
-README.md, INDEX.md), extracts topic-wise problem indexes, and compiles
-a standalone, self-contained single-page web app (index.html).
+README.md), organizes problems into paired (Code + Notes) entities,
+and compiles a standalone, self-contained single-page web app (index.html).
 
 Features:
-- Categorized dropdown / pull-up collapsible accordion tabs
-- Filter pills (All, 🎯 Problem Index, 🔥 Top 100, 📚 Luffy, 📅 Daily)
-- KaTeX math rendering, syntax highlighting, and SPA client-side routing
-- Automated git pre-commit hook integration
+- Side-by-side Dual Split View (Left: Markdown Walkthrough, Right: Python Code)
+- View mode switcher (Dual Split, Notes Only, Code Only) with resizable pane
+- Category Accordions with Expand/Fold All controls
+- Difficulty filter tags (Easy, Medium, Hard)
+- LocalStorage persistent review checkmarks & progress counter
+- Keyboard shortcuts (/ for search, Esc to clear)
+- Automated Git pre-commit hook integration
 =============================================================================
 """
 
@@ -24,7 +27,6 @@ import argparse
 import subprocess
 from pathlib import Path
 
-# Resolve base workspace directory
 BASE_DIR = Path(__file__).resolve().parent
 
 def get_file_type(filename: str) -> str:
@@ -37,44 +39,26 @@ def get_file_type(filename: str) -> str:
     return "other"
 
 def collect_workspace_documents():
-    """Scans all folders and builds the complete docs index."""
-    all_docs = {}
+    """Scans all folders and builds structured problem entities."""
+    raw_files = {}
+    problems = {}
+    topic_docs = {}
 
-    def process_file(rel_path: str, category: str, display_title: str, short_label: str):
-        full_path = BASE_DIR / rel_path
-        ftype = get_file_type(rel_path)
-        if not full_path.is_file() and not rel_path.startswith("topic-"):
-            return
+    def read_file_content(full_path):
         try:
             with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
-                raw_content = f.read()
+                return f.read()
         except Exception as e:
-            raw_content = f"Error reading file: {e}"
-
-        if ftype == "py":
-            content = f"# Python Solution: `{full_path.name}`\n\n```python\n{raw_content}\n```"
-        elif ftype == "txt":
-            content = f"# Curriculum Topic Marker: `{full_path.name}`\n\n```text\n{raw_content}\n```"
-        else:
-            content = raw_content
-
-        all_docs[rel_path] = {
-            "category": category,
-            "title": display_title,
-            "short": short_label,
-            "path": rel_path,
-            "type": ftype,
-            "content": content
-        }
+            return f"Error reading file: {e}"
 
     # 1. Parse Topic-Wise Problem Index from README.md Section 5
     readme_path = BASE_DIR / "README.md"
+    readme_text = ""
     if readme_path.exists():
-        with open(readme_path, "r", encoding="utf-8", errors="ignore") as f:
-            readme_text = f.read()
+        readme_text = read_file_content(readme_path)
 
         topic_sections = [
-            ("topic-all", "Problem Index: Complete Topic Catalog", "All 11 Topics Combined", None),
+            ("topic-all", "Problem Index: Complete Catalog", "All 11 Topics Combined", None),
             ("topic-01-arrays-sliding-window", "1. Arrays, Strings & Sliding Window", "1. Arrays & Sliding Window", "### 1. Arrays, Strings, Two Pointers & Sliding Window"),
             ("topic-02-binary-search", "2. Binary Search", "2. Binary Search", "### 2. Binary Search"),
             ("topic-03-prefix-sum", "3. Prefix Sum & Difference Arrays", "3. Prefix Sum & Difference", "### 3. Prefix Sum & Difference Arrays"),
@@ -88,7 +72,7 @@ def collect_workspace_documents():
             ("topic-11-oop", "11. OOP & Foundations", "11. OOP & Foundations", "### 11. OOP & Foundations"),
         ]
 
-        sec5_match = re.search(r'(## 5\. Topic-Wise Curriculum & Problem Index.*?)(\n## 6\. How to Run)', readme_text, re.DOTALL)
+        sec5_match = re.search(r'(## 📚 Topic-Wise Curriculum & Problem Index.*?)(\n## 🖥️ Interactive Web Viewer|\n## 🚀 How to Run)', readme_text, re.DOTALL)
         sec5_text = sec5_match.group(1) if sec5_match else readme_text
 
         for key, title, short, header in topic_sections:
@@ -102,66 +86,114 @@ def collect_workspace_documents():
                 else:
                     topic_content = f"# Problem Index — {title}\n\nNo content parsed."
 
-            all_docs[key] = {
+            topic_docs[key] = {
+                "key": key,
                 "category": "🎯 Problem Index",
                 "title": title,
                 "short": short,
                 "path": f"problem-index/{key}",
-                "type": "md",
-                "content": topic_content
+                "type": "doc",
+                "notes": topic_content,
+                "code": "",
+                "diff": "All"
             }
 
-    # 2. Overview Documents
-    process_file("README.md", "📖 Overview", "LeetCode Self-Practices Overview (README)", "README.md")
-    process_file("INDEX.md", "📖 Overview", "Master Problem Database & Curriculum Index (INDEX.md)", "INDEX.md")
+    # 2. Overview Document (README.md)
+    overview_docs = {
+        "README.md": {
+            "key": "README.md",
+            "category": "📖 Overview",
+            "title": "LeetCode Self-Practices Overview (README)",
+            "short": "README.md",
+            "path": "README.md",
+            "type": "doc",
+            "notes": readme_text,
+            "code": "",
+            "diff": "All"
+        }
+    }
 
-    # 3. Top 100 Liked Track
-    top100_dir = BASE_DIR / "top-100"
-    if top100_dir.exists():
-        for f in sorted(os.listdir(top100_dir)):
-            if f.startswith("__") or f.endswith(".pyc"):
+    # 3. Helper to detect difficulty from markdown content or filename
+    def extract_difficulty(text: str, filename: str) -> str:
+        if "Hard" in text:
+            return "Hard"
+        elif "Easy" in text:
+            return "Easy"
+        elif "Medium" in text:
+            return "Medium"
+        return "Medium"
+
+    # 4. Process Problem Tracks (top-100, daily-practice, luffy)
+    tracks = [
+        ("top-100", "🔥 Top 100 Liked Track"),
+        ("daily-practice", "📅 Daily Practice Track"),
+        ("luffy", "📚 Luffy Curriculum (01-42)"),
+    ]
+
+    for dir_name, cat_title in tracks:
+        track_dir = BASE_DIR / dir_name
+        if not track_dir.exists():
+            continue
+
+        files = sorted(os.listdir(track_dir))
+        stem_groups = {}
+        for f in files:
+            if f.startswith("__") or f.endswith(".pyc") or f == "file_topics.txt":
                 continue
-            rel = f"top-100/{f}"
-            short = f.replace("s-lc-", "LC ").replace("-", " ")
-            if short.endswith(".md") or short.endswith(".py"):
-                short = short[:-3]
-            process_file(rel, "🔥 Top 100 Liked Track", f"Top 100: {f}", short)
+            stem = f
+            if f.endswith(".py"):
+                stem = f[:-3]
+            elif f.endswith(".md"):
+                stem = f[:-3]
+            stem_groups.setdefault(stem, []).append(f)
 
-    # 4. Daily Practice Track
-    daily_dir = BASE_DIR / "daily-practice"
-    if daily_dir.exists():
-        for f in sorted(os.listdir(daily_dir)):
-            if f.startswith("__") or f.endswith(".pyc"):
-                continue
-            rel = f"daily-practice/{f}"
-            short = f.replace("s-lc-", "LC ").replace("-", " ")
-            if short.endswith(".md") or short.endswith(".py"):
-                short = short[:-3]
-            process_file(rel, "📅 Daily Practice Track", f"Daily Practice: {f}", short)
+        for stem, group_files in stem_groups.items():
+            py_file = next((f for f in group_files if f.endswith(".py")), None)
+            md_file = next((f for f in group_files if f.endswith(".md")), None)
 
-    # 5. Luffy Curriculum
-    luffy_dir = BASE_DIR / "luffy"
-    if luffy_dir.exists():
-        for f in sorted(os.listdir(luffy_dir)):
-            if f.startswith("__") or f.endswith(".pyc"):
-                continue
-            rel = f"luffy/{f}"
-            short = f.replace("-lc-", " LC ").replace(".py", "").replace("___", "").replace("_", " ")
-            process_file(rel, "📚 Luffy Curriculum (01-42)", f"Luffy Curriculum: {f}", short)
+            py_content = read_file_content(track_dir / py_file) if py_file else ""
+            md_content = read_file_content(track_dir / md_file) if md_file else ""
 
-    return all_docs
+            # Make nice title and short label
+            short_name = stem
+            if short_name.startswith("lc-"):
+                short_name = short_name.replace("lc-", "LC ")
+            elif "-lc-" in short_name:
+                short_name = short_name.replace("-lc-", " LC ")
+            short_name = short_name.replace("-", " ")
+
+            diff = extract_difficulty(md_content, stem)
+            problem_key = f"{dir_name}/{stem}"
+
+            problems[problem_key] = {
+                "key": problem_key,
+                "category": cat_title,
+                "title": f"{cat_title}: {short_name}",
+                "short": short_name,
+                "path": f"{dir_name}/{stem}",
+                "type": "problem",
+                "notes": md_content,
+                "code": py_content,
+                "diff": diff,
+                "py_file": f"{dir_name}/{py_file}" if py_file else "",
+                "md_file": f"{dir_name}/{md_file}" if md_file else ""
+            }
+
+    # Aggregate all items
+    all_items = {**overview_docs, **topic_docs, **problems}
+    return all_items
 
 def build_index_html():
-    """Generates the single-page index.html file with collapsible accordion categories."""
-    all_docs = collect_workspace_documents()
-    docs_json = json.dumps(all_docs)
+    """Generates the single-page index.html file with dual split-pane view."""
+    all_items = collect_workspace_documents()
+    items_json = json.dumps(all_items)
 
     html_template = f"""<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeetCode Self-Practices - Problem Index & Workspace Browser</title>
+  <title>LeetCode Study Station - Split Dual View & Interactive Notes</title>
   <!-- Marked for Markdown Rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Highlight.js for Syntax Highlighting -->
@@ -176,6 +208,7 @@ def build_index_html():
     :root {{
       --bg-main: #0d1117;
       --bg-sidebar: #161b22;
+      --bg-panel: #11161d;
       --border-color: #30363d;
       --text-main: #c9d1d9;
       --text-muted: #8b949e;
@@ -183,9 +216,9 @@ def build_index_html():
       --accent-hover: #1f6feb;
       --card-bg: #1c2128;
       --code-bg: #161b22;
-      --tag-md: #238636;
-      --tag-py: #1f6feb;
-      --tag-txt: #8957e5;
+      --diff-easy: #3fb950;
+      --diff-medium: #d29922;
+      --diff-hard: #f85149;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -197,46 +230,74 @@ def build_index_html():
       overflow: hidden;
     }}
     #sidebar {{
-      width: 380px;
-      min-width: 380px;
+      width: 370px;
+      min-width: 370px;
       background-color: var(--bg-sidebar);
       border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       height: 100%;
+      z-index: 10;
     }}
     .sidebar-header {{
-      padding: 16px;
+      padding: 16px 14px 10px;
       border-bottom: 1px solid var(--border-color);
     }}
-    .sidebar-header h1 {{
-      font-size: 15px;
-      font-weight: 600;
-      color: #f0f6fc;
+    .header-top {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
-      letter-spacing: 0.3px;
+    }}
+    .header-top h1 {{
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .progress-badge {{
+      font-size: 11px;
+      padding: 2px 7px;
+      background: rgba(56, 139, 253, 0.15);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      border-radius: 10px;
+      color: var(--accent);
+      font-weight: 600;
+    }}
+    .search-box-wrapper {{
+      position: relative;
+      margin-bottom: 8px;
     }}
     .search-box {{
       width: 100%;
-      padding: 8px 12px;
+      padding: 7px 10px 7px 30px;
       background-color: var(--bg-main);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       color: #fff;
-      font-size: 13px;
+      font-size: 12.5px;
       outline: none;
+    }}
+    .search-icon {{
+      position: absolute;
+      left: 9px;
+      top: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
     }}
     .search-box:focus {{
       border-color: var(--accent);
     }}
     .filter-pills {{
       display: flex;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 5px;
+      margin-top: 6px;
       flex-wrap: wrap;
     }}
     .pill {{
-      padding: 3px 8px;
+      padding: 2px 7px;
       font-size: 11px;
       border-radius: 12px;
       background: var(--card-bg);
@@ -251,11 +312,14 @@ def build_index_html():
       color: #fff;
       border-color: var(--accent);
     }}
+    .pill-diff-easy.active {{ background: rgba(63, 185, 80, 0.25); border-color: #3fb950; color: #3fb950; }}
+    .pill-diff-medium.active {{ background: rgba(210, 153, 34, 0.25); border-color: #d29922; color: #d29922; }}
+    .pill-diff-hard.active {{ background: rgba(248, 81, 73, 0.25); border-color: #f85149; color: #f85149; }}
     .accordion-controls {{
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 14px 4px;
+      padding: 7px 14px 4px;
       border-bottom: 1px solid rgba(48, 54, 61, 0.4);
       font-size: 11px;
       color: var(--text-muted);
@@ -268,26 +332,24 @@ def build_index_html():
       cursor: pointer;
       padding: 2px 4px;
       border-radius: 4px;
-      transition: opacity 0.15s;
     }}
     .control-btn:hover {{
       text-decoration: underline;
-      color: #79c0ff;
     }}
     .nav-list {{
       flex: 1;
       overflow-y: auto;
-      padding: 8px 8px 16px;
+      padding: 6px 8px 16px;
     }}
     .section-group {{
       margin-bottom: 6px;
     }}
     .section-title {{
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-muted);
-      padding: 8px 10px;
+      padding: 7px 10px;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
@@ -295,7 +357,7 @@ def build_index_html():
       cursor: pointer;
       user-select: none;
       border-radius: 6px;
-      transition: background-color 0.15s, color 0.15s;
+      transition: background-color 0.15s;
     }}
     .section-title:hover {{
       background-color: rgba(177, 186, 196, 0.08);
@@ -335,15 +397,16 @@ def build_index_html():
     .nav-item {{
       display: flex;
       align-items: center;
-      padding: 7px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
       color: var(--text-main);
       text-decoration: none;
-      font-size: 13px;
+      font-size: 12.5px;
       cursor: pointer;
       margin-bottom: 2px;
       transition: all 0.15s ease;
-      gap: 8px;
+      gap: 7px;
+      position: relative;
     }}
     .nav-item:hover {{
       background-color: rgba(177, 186, 196, 0.12);
@@ -355,28 +418,144 @@ def build_index_html():
       font-weight: 600;
       border-left: 3px solid var(--accent);
     }}
-    .tag {{
-      font-size: 9px;
-      font-weight: 600;
-      padding: 1px 5px;
-      border-radius: 4px;
-      margin-left: auto;
-      text-transform: uppercase;
+    .check-box {{
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+      color: transparent;
+      transition: all 0.15s;
     }}
-    .tag-md {{ background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.4); }}
-    .tag-py {{ background: rgba(31, 111, 235, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.4); }}
-    .tag-txt {{ background: rgba(137, 87, 229, 0.2); color: #bc8cff; border: 1px solid rgba(188, 140, 255, 0.4); }}
-    #main-content {{
+    .check-box.checked {{
+      background: #238636;
+      border-color: #2ea043;
+      color: #fff;
+    }}
+    .diff-dot {{
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }}
+    .diff-Easy {{ background: var(--diff-easy); }}
+    .diff-Medium {{ background: var(--diff-medium); }}
+    .diff-Hard {{ background: var(--diff-hard); }}
+    .diff-All {{ display: none; }}
+
+    /* Main Workspace Container */
+    #main-container {{
       flex: 1;
-      overflow-y: auto;
-      padding: 32px 48px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
       background-color: var(--bg-main);
     }}
+    .top-toolbar {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-sidebar);
+      min-height: 48px;
+    }}
+    .item-meta {{
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }}
+    .view-toggles {{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .btn {{
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11.5px;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }}
+    .btn.active, .btn:hover {{
+      background: var(--border-color);
+      color: #fff;
+      border-color: var(--accent);
+    }}
+    .btn-primary {{
+      background: rgba(56, 139, 253, 0.2);
+      border-color: rgba(88, 166, 255, 0.4);
+      color: var(--accent);
+    }}
+    .btn-primary:hover {{
+      background: var(--accent-hover);
+      color: #fff;
+    }}
+
+    /* Split Pane Workspace */
+    #workspace {{
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      height: calc(100vh - 48px);
+    }}
+    .pane {{
+      overflow-y: auto;
+      height: 100%;
+      padding: 28px 36px;
+    }}
+    #left-pane {{
+      flex: 1;
+      background-color: var(--bg-main);
+      border-right: 1px solid var(--border-color);
+    }}
+    #right-pane {{
+      flex: 1;
+      background-color: var(--bg-panel);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+    }}
+    .pane-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }}
+    .pane-title {{
+      font-size: 13px;
+      font-weight: 600;
+      color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+
+    /* Markdown Body Styling */
     .markdown-body {{
-      max-width: 1000px;
+      max-width: 900px;
       margin: 0 auto;
       line-height: 1.65;
-      font-size: 15px;
+      font-size: 14.5px;
     }}
     .markdown-body h1, .markdown-body h2, .markdown-body h3 {{
       color: #f0f6fc;
@@ -386,7 +565,7 @@ def build_index_html():
       padding-bottom: 6px;
     }}
     .markdown-body p, .markdown-body ul, .markdown-body ol {{
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }}
     .markdown-body code {{
       background-color: var(--code-bg);
@@ -401,14 +580,14 @@ def build_index_html():
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       overflow-x: auto;
     }}
     .markdown-body pre code {{
       border: none;
       padding: 0;
       background-color: transparent;
-      font-size: 13.5px;
+      font-size: 13px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }}
     .markdown-body table {{
@@ -440,99 +619,176 @@ def build_index_html():
       margin-bottom: 16px;
       color: #f0f6fc;
     }}
-    .top-bar {{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
-    }}
-    .doc-meta {{
-      font-size: 13px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }}
-    .btn {{
-      background: var(--card-bg);
+
+    /* Code Pane Viewer */
+    .code-viewer {{
+      flex: 1;
+      background-color: var(--code-bg);
       border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.15s;
+      border-radius: 8px;
+      overflow: auto;
+      padding: 16px;
     }}
-    .btn:hover {{
-      background: var(--border-color);
-      color: #fff;
+    .code-viewer pre code {{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
     }}
   </style>
 </head>
 <body>
 
+  <!-- Left Sidebar Navigation -->
   <div id="sidebar">
     <div class="sidebar-header">
-      <h1>LeetCode Workspace</h1>
-      <input type="text" id="search" class="search-box" placeholder="Search problems, topics, files..." oninput="filterDocs()">
+      <div class="header-top">
+        <h1>LeetCode Station</h1>
+        <span class="progress-badge" id="progressStats">0 / 0 Done</span>
+      </div>
+      <div class="search-box-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" class="search-box" placeholder="Search problems, patterns, numbers... (/)" oninput="filterItems()">
+      </div>
       <div class="filter-pills">
-        <span class="pill active" onclick="setFilter('all')">All</span>
-        <span class="pill" onclick="setFilter('problem-index')">🎯 Problem Index</span>
-        <span class="pill" onclick="setFilter('top-100')">🔥 Top 100</span>
-        <span class="pill" onclick="setFilter('luffy')">📚 Luffy Track</span>
-        <span class="pill" onclick="setFilter('daily-practice')">📅 Daily Track</span>
+        <span class="pill active" onclick="setTrackFilter('all')">All</span>
+        <span class="pill" onclick="setTrackFilter('problem-index')">🎯 Index</span>
+        <span class="pill" onclick="setTrackFilter('top-100')">🔥 Top 100</span>
+        <span class="pill" onclick="setTrackFilter('luffy')">📚 Luffy</span>
+        <span class="pill" onclick="setTrackFilter('daily-practice')">📅 Daily</span>
+      </div>
+      <div class="filter-pills" style="margin-top: 4px;">
+        <span class="pill" onclick="setDiffFilter('All')">All Diff</span>
+        <span class="pill pill-diff-easy" onclick="setDiffFilter('Easy')">Easy</span>
+        <span class="pill pill-diff-medium" onclick="setDiffFilter('Medium')">Medium</span>
+        <span class="pill pill-diff-hard" onclick="setDiffFilter('Hard')">Hard</span>
       </div>
     </div>
     <div class="accordion-controls">
-      <span>Categories</span>
+      <span>Curriculum Categories</span>
       <div style="display: flex; gap: 8px;">
         <button class="control-btn" onclick="expandAllCategories()">▾ Expand All</button>
         <button class="control-btn" onclick="collapseAllCategories()">▴ Fold All</button>
       </div>
     </div>
     <div class="nav-list" id="navList">
-      <!-- Injected by JavaScript -->
+      <!-- Injected dynamically by JavaScript -->
     </div>
   </div>
 
-  <div id="main-content">
-    <div class="top-bar">
-      <div class="doc-meta" id="docMeta">Loading...</div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn" onclick="copyContent()">Copy Content</button>
-        <button class="btn" onclick="window.print()">Print / Export</button>
+  <!-- Main Content Workspace (Split-Pane) -->
+  <div id="main-container">
+    <div class="top-toolbar">
+      <div class="item-meta" id="itemMeta">Loading...</div>
+      <div class="view-toggles">
+        <button class="btn btn-primary" id="btnDual" onclick="setViewMode('dual')">◫ Dual Split</button>
+        <button class="btn" id="btnNotes" onclick="setViewMode('notes')">📝 Notes Only</button>
+        <button class="btn" id="btnCode" onclick="setViewMode('code')">🐍 Code Only</button>
+        <button class="btn" onclick="copyActiveCode()">Copy Code</button>
+        <button class="btn" onclick="window.print()">Export</button>
       </div>
     </div>
-    <div class="markdown-body" id="docViewer">
-      <!-- Markdown Content Injected Here -->
+
+    <div id="workspace">
+      <!-- Left Pane: Notes & Walkthrough -->
+      <div class="pane" id="left-pane">
+        <div class="markdown-body" id="notesViewer">
+          <!-- Markdown Rendered Here -->
+        </div>
+      </div>
+
+      <!-- Right Pane: Syntax-Highlighted Code -->
+      <div class="pane" id="right-pane">
+        <div class="pane-header">
+          <span class="pane-title" id="codePaneTitle">🐍 Solution Source Code</span>
+          <button class="btn" onclick="copyActiveCode()">Copy Python</button>
+        </div>
+        <div class="code-viewer">
+          <pre><code class="language-python" id="codeViewer"># Solution code</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const docs = {docs_json};
-    let currentKey = "topic-all";
+    const items = {items_json};
+    let currentKey = "README.md";
     let activeTrack = "all";
+    let activeDiff = "All";
+    let viewMode = "dual"; // 'dual', 'notes', 'code'
     const collapsedCategories = {{}};
+    const reviewedSet = new Set(JSON.parse(localStorage.getItem("reviewedProblems") || "[]"));
 
-    function setFilter(track) {{
+    function saveReviewed() {{
+      localStorage.setItem("reviewedProblems", JSON.stringify(Array.from(reviewedSet)));
+      updateProgressBadge();
+    }}
+
+    function toggleReviewed(e, key) {{
+      e.stopPropagation();
+      if (reviewedSet.has(key)) {{
+        reviewedSet.delete(key);
+      }} else {{
+        reviewedSet.add(key);
+      }}
+      saveReviewed();
+      renderNav();
+    }}
+
+    function updateProgressBadge() {{
+      const problemKeys = Object.keys(items).filter(k => items[k].type === "problem");
+      const doneCount = problemKeys.filter(k => reviewedSet.has(k)).length;
+      const pct = problemKeys.length ? Math.round((doneCount / problemKeys.length) * 100) : 0;
+      document.getElementById("progressStats").innerText = `${{doneCount}} / ${{problemKeys.length}} (${{pct}}%)`;
+    }}
+
+    function setViewMode(mode) {{
+      viewMode = mode;
+      const leftPane = document.getElementById("left-pane");
+      const rightPane = document.getElementById("right-pane");
+      
+      document.getElementById("btnDual").classList.toggle("active", mode === "dual");
+      document.getElementById("btnNotes").classList.toggle("active", mode === "notes");
+      document.getElementById("btnCode").classList.toggle("active", mode === "code");
+
+      if (mode === "dual") {{
+        leftPane.style.display = "block";
+        leftPane.style.flex = "1";
+        rightPane.style.display = "flex";
+        rightPane.style.flex = "1";
+      }} else if (mode === "notes") {{
+        leftPane.style.display = "block";
+        leftPane.style.flex = "1";
+        rightPane.style.display = "none";
+      }} else if (mode === "code") {{
+        leftPane.style.display = "none";
+        rightPane.style.display = "flex";
+        rightPane.style.flex = "1";
+      }}
+    }}
+
+    function setTrackFilter(track) {{
       activeTrack = track;
-      document.querySelectorAll(".pill").forEach(p => {{
+      document.querySelectorAll(".sidebar-header .filter-pills:first-of-type .pill").forEach(p => {{
         const text = p.innerText.toLowerCase();
-        if (track === 'all' && text.includes('all')) {{
+        if (track === 'all' && text === 'all') {{
           p.classList.add('active');
-        }} else if (track !== 'all' && (text.includes(track) || (track === 'problem-index' && text.includes('problem index')))) {{
+        }} else if (track !== 'all' && text.includes(track.replace('-', ' '))) {{
           p.classList.add('active');
         }} else {{
           p.classList.remove('active');
         }}
       }});
       renderNav();
-      filterDocs();
+      filterItems();
+    }}
+
+    function setDiffFilter(diff) {{
+      activeDiff = diff;
+      document.querySelectorAll(".sidebar-header .filter-pills:last-of-type .pill").forEach(p => {{
+        p.classList.toggle("active", p.innerText.includes(diff));
+      }});
+      renderNav();
+      filterItems();
     }}
 
     function toggleCategory(groupName) {{
@@ -562,19 +818,22 @@ def build_index_html():
     function renderNav() {{
       const navList = document.getElementById("navList");
       const groups = {{
-        "🎯 Problem Index": Object.keys(docs).filter(k => k.startsWith("topic-")),
-        "📖 Overview": Object.keys(docs).filter(k => k === "README.md" || k === "INDEX.md"),
-        "🔥 Top 100 Liked Track": Object.keys(docs).filter(k => k.startsWith("top-100/")),
-        "📅 Daily Practice Track": Object.keys(docs).filter(k => k.startsWith("daily-practice/")),
-        "📚 Luffy Curriculum (01-42)": Object.keys(docs).filter(k => k.startsWith("luffy/"))
+        "🎯 Problem Index": Object.keys(items).filter(k => k.startsWith("topic-")),
+        "📖 Overview": Object.keys(items).filter(k => k === "README.md"),
+        "🔥 Top 100 Liked Track": Object.keys(items).filter(k => k.startsWith("top-100/")),
+        "📅 Daily Practice Track": Object.keys(items).filter(k => k.startsWith("daily-practice/")),
+        "📚 Luffy Curriculum (01-42)": Object.keys(items).filter(k => k.startsWith("luffy/"))
       }};
 
       let html = "";
       for (const [groupName, keys] of Object.entries(groups)) {{
         const filteredKeys = keys.filter(k => {{
-          if (activeTrack === 'all') return true;
-          if (activeTrack === 'problem-index') return k.startsWith("topic-");
-          return k.startsWith(activeTrack) || (activeTrack === 'README.md' && (k === 'README.md' || k === 'INDEX.md'));
+          const item = items[k];
+          const matchTrack = activeTrack === 'all' || 
+            (activeTrack === 'problem-index' && k.startsWith("topic-")) ||
+            k.startsWith(activeTrack);
+          const matchDiff = activeDiff === 'All' || item.diff === activeDiff || item.diff === 'All';
+          return matchTrack && matchDiff;
         }});
 
         if (filteredKeys.length === 0) continue;
@@ -595,13 +854,17 @@ def build_index_html():
         `;
 
         for (const k of filteredKeys) {{
-          const doc = docs[k];
+          const item = items[k];
           const activeClass = k === currentKey ? "active" : "";
-          const tagClass = `tag-${{doc.type}}`;
+          const isReviewed = reviewedSet.has(k);
+          const checkedClass = isReviewed ? "checked" : "";
+          const diffClass = `diff-${{item.diff}}`;
+
           html += `
-            <div class="nav-item ${{activeClass}}" onclick="switchDoc('${{k}}')" data-key="${{k}}" data-title="${{doc.title}}" data-track="${{doc.path.split('/')[0]}}">
-              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${{doc.short}}</span>
-              <span class="tag ${{tagClass}}">${{doc.type}}</span>
+            <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" data-title="${{item.title}}" data-track="${{item.path.split('/')[0]}}" data-diff="${{item.diff}}">
+              ${{item.type === 'problem' ? `<span class="check-box ${{checkedClass}}" onclick="toggleReviewed(event, '${{k}}')" title="Mark as reviewed">✓</span>` : ''}}
+              <span class="diff-dot ${{diffClass}}"></span>
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${{item.short}}</span>
             </div>
           `;
         }}
@@ -614,14 +877,14 @@ def build_index_html():
       navList.innerHTML = html;
     }}
 
-    function switchDoc(key) {{
-      if (!docs[key]) return;
+    function switchItem(key) {{
+      if (!items[key]) return;
       currentKey = key;
-      const doc = docs[key];
+      const item = items[key];
 
-      // Auto un-collapse the active item's group
-      if (doc.category && collapsedCategories[doc.category]) {{
-        collapsedCategories[doc.category] = false;
+      // Auto expand category
+      if (item.category && collapsedCategories[item.category]) {{
+        collapsedCategories[item.category] = false;
         renderNav();
       }}
 
@@ -629,8 +892,24 @@ def build_index_html():
         el.classList.toggle("active", el.dataset.key === key);
       }});
 
-      document.getElementById("docMeta").innerHTML = `📁 <strong>${{doc.path}}</strong> <span style="color: var(--text-muted);">| ${{doc.title}}</span>`;
-      
+      // Top Toolbar Metadata
+      document.getElementById("itemMeta").innerHTML = `
+        <span>📁 <strong>${{item.path}}</strong></span>
+        ${{item.diff !== 'All' ? `<span class="diff-dot diff-${{item.diff}}"></span><span style="font-size: 11px; color: var(--text-muted);">${{item.diff}}</span>` : ''}}
+      `;
+
+      // Auto view mode: Full width for docs/overview, dual for problems
+      if (item.type === "doc" || !item.code) {{
+        setViewMode("notes");
+        document.getElementById("btnDual").style.display = "none";
+        document.getElementById("btnCode").style.display = "none";
+      }} else {{
+        document.getElementById("btnDual").style.display = "flex";
+        document.getElementById("btnCode").style.display = "flex";
+        setViewMode("dual");
+      }}
+
+      // Render Markdown
       marked.setOptions({{
         highlight: function(code, lang) {{
           const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -640,14 +919,14 @@ def build_index_html():
         breaks: true
       }});
 
-      document.getElementById("docViewer").innerHTML = marked.parse(doc.content);
+      document.getElementById("notesViewer").innerHTML = marked.parse(item.notes || "# No Notes Available");
 
-      document.querySelectorAll('pre code').forEach((el) => {{
+      document.querySelectorAll('#notesViewer pre code').forEach((el) => {{
         hljs.highlightElement(el);
       }});
 
       if (window.renderMathInElement) {{
-        renderMathInElement(document.getElementById("docViewer"), {{
+        renderMathInElement(document.getElementById("notesViewer"), {{
           delimiters: [
             {{left: "$$", right: "$$", display: true}},
             {{left: "$", right: "$", display: false}}
@@ -655,39 +934,53 @@ def build_index_html():
         }});
       }}
 
-      // Smart link interception: clicking internal markdown links navigates inside the SPA!
-      document.querySelectorAll('#docViewer a').forEach(a => {{
+      // Render Code Pane
+      const codeEl = document.getElementById("codeViewer");
+      codeEl.textContent = item.code || "# No python solution file directly associated";
+      delete codeEl.dataset.highlighted;
+      hljs.highlightElement(codeEl);
+
+      // Smart link interception: clicking internal markdown links navigates inside SPA!
+      document.querySelectorAll('#notesViewer a').forEach(a => {{
         const href = a.getAttribute('href');
         if (!href) return;
         if (href.startsWith('http://') || href.startsWith('https://')) return;
         if (href.startsWith('#')) return;
 
         let cleanHref = href.replace(/^(\\.\\/|\\/)/, '');
-        if (docs[cleanHref]) {{
+        if (cleanHref.endsWith('.py') || cleanHref.endsWith('.md')) {{
+          cleanHref = cleanHref.replace(/\\.(py|md)$/, '');
+        }}
+
+        if (items[cleanHref]) {{
           a.onclick = (e) => {{
             e.preventDefault();
-            switchDoc(cleanHref);
+            switchItem(cleanHref);
           }};
         }} else {{
-          const matchingKey = Object.keys(docs).find(k => k.endsWith(cleanHref) || cleanHref.endsWith(k));
+          const matchingKey = Object.keys(items).find(k => k.endsWith(cleanHref) || cleanHref.endsWith(k));
           if (matchingKey) {{
             a.onclick = (e) => {{
               e.preventDefault();
-              switchDoc(matchingKey);
+              switchItem(matchingKey);
             }};
           }}
         }}
       }});
 
-      document.getElementById("main-content").scrollTop = 0;
+      document.getElementById("left-pane").scrollTop = 0;
+      document.getElementById("right-pane").scrollTop = 0;
     }}
 
-    function filterDocs() {{
+    function filterItems() {{
       const q = document.getElementById("search").value.toLowerCase();
       document.querySelectorAll(".nav-item").forEach(item => {{
         const title = item.dataset.title.toLowerCase();
         const key = item.dataset.key.toLowerCase();
+        const diff = item.dataset.diff;
         const matchSearch = title.includes(q) || key.includes(q);
+        const matchDiff = activeDiff === 'All' || diff === activeDiff || diff === 'All';
+        
         let matchTrack = false;
         if (activeTrack === 'all') {{
           matchTrack = true;
@@ -696,14 +989,15 @@ def build_index_html():
         }} else {{
           matchTrack = item.dataset.track === activeTrack;
         }}
-        if (matchSearch && matchTrack) {{
+
+        if (matchSearch && matchTrack && matchDiff) {{
           item.style.display = "flex";
         }} else {{
           item.style.display = "none";
         }}
       }});
 
-      // Auto expand categories when search is active
+      // Auto expand categories when search query entered
       if (q.trim().length > 0) {{
         document.querySelectorAll(".section-group").forEach(group => {{
           group.classList.remove("collapsed");
@@ -711,16 +1005,33 @@ def build_index_html():
       }}
     }}
 
-    function copyContent() {{
-      const doc = docs[currentKey];
-      if (!doc) return;
-      navigator.clipboard.writeText(doc.content).then(() => {{
-        alert("Copied to clipboard!");
+    function copyActiveCode() {{
+      const item = items[currentKey];
+      if (!item || !item.code) return;
+      navigator.clipboard.writeText(item.code).then(() => {{
+        const btn = document.querySelector("#right-pane .pane-header button");
+        if (btn) {{
+          btn.innerText = "✓ Copied!";
+          setTimeout(() => btn.innerText = "Copy Python", 1500);
+        }}
       }});
     }}
 
+    // Global keyboard shortcuts
+    window.addEventListener("keydown", (e) => {{
+      if (e.key === "/" && document.activeElement.tagName !== "INPUT") {{
+        e.preventDefault();
+        document.getElementById("search").focus();
+      }} else if (e.key === "Escape") {{
+        document.getElementById("search").value = "";
+        document.getElementById("search").blur();
+        filterItems();
+      }}
+    }});
+
     renderNav();
-    switchDoc(currentKey);
+    updateProgressBadge();
+    switchItem(currentKey);
   </script>
 </body>
 </html>
@@ -730,16 +1041,15 @@ def build_index_html():
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_template)
 
-    print(f"✨ [Success] Built {output_path.name} ({len(all_docs)} items indexed: 11 topics + 89 workspace files).")
+    print(f"✨ [Success] Built {output_path.name} ({len(all_items)} problem entities & curriculum tracks).")
     return output_path
 
 def open_in_browser():
-    """Opens index.html in the default system browser."""
+    """Opens index.html in default system browser."""
     html_file = BASE_DIR / "index.html"
     if not html_file.exists():
         build_index_html()
     
-    # WSL Windows browser launch support
     cmd_exe = Path("/mnt/c/WINDOWS/System32/cmd.exe")
     if cmd_exe.exists():
         win_path = f"C:\\Users\\steve\\iCloudDrive\\desktop\\leetcode-sh\\index.html"

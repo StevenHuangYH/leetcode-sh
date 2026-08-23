@@ -4,8 +4,8 @@
 - **Difficulty:** Medium (高频面试经典题 / 滑动窗口模版题)
 - **Tags:** Hash Table, String, Sliding Window
 - **Corresponding Python Files:**
-  - [`top-100/s-lc-3-longest-substring-without-repeating-characters.py`](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/s-lc-3-longest-substring-without-repeating-characters.py)
-  - [`luffy/4-lc-3-longest-substring-without-repeating-characters.py`](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/luffy/4-lc-3-longest-substring-without-repeating-characters.py)
+  - [`top-100/lc-0003-longest-substring-without-repeating-characters.py`](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0003-longest-substring-without-repeating-characters.py)
+  - [`luffy/04-lc-0003-longest-substring-without-repeating-characters.py`](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/luffy/04-lc-0003-longest-substring-without-repeating-characters.py)
 
 ---
 

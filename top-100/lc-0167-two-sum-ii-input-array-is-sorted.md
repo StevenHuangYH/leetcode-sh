@@ -3,7 +3,7 @@
 
 - **Difficulty:** Medium (面试高频 / 经典双指针)
 - **Tags:** Array, Two Pointers, Binary Search
-- **Corresponding Python File:** [`s-lc-167.py`](top-100/s-lc-167-two-sum-2.py)
+- **Corresponding Python File:** [`s-lc-167.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)
 
 ---
 
