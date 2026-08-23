@@ -184,7 +184,7 @@ def collect_workspace_documents():
     return all_items
 
 def build_index_html():
-    """Generates the single-page index.html file with dual split-pane view."""
+    """Generates the single-page index.html file with dual split-pane view and responsive tree explorer."""
     all_items = collect_workspace_documents()
     items_json = json.dumps(all_items)
 
@@ -208,9 +208,11 @@ def build_index_html():
     :root {{
       --bg-main: #0d1117;
       --bg-sidebar: #161b22;
-      --bg-panel: #11161d;
+      --bg-panel: #0d1117;
       --border-color: #30363d;
+      --border-subtle: #21262d;
       --text-main: #c9d1d9;
+      --text-bright: #f0f6fc;
       --text-muted: #8b949e;
       --accent: #58a6ff;
       --accent-hover: #1f6feb;
@@ -219,6 +221,7 @@ def build_index_html():
       --diff-easy: #3fb950;
       --diff-medium: #d29922;
       --diff-hard: #f85149;
+      --sidebar-width: 320px;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -229,223 +232,316 @@ def build_index_html():
       height: 100vh;
       overflow: hidden;
     }}
+
+    /* Mobile Backdrop */
+    #sidebar-backdrop {{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 990;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }}
+    #sidebar-backdrop.active {{
+      display: block;
+      opacity: 1;
+    }}
+
+    /* Left Sidebar Navigation (Tree Explorer) */
     #sidebar {{
-      width: 370px;
-      min-width: 370px;
+      width: var(--sidebar-width);
+      min-width: 220px;
+      max-width: 650px;
       background-color: var(--bg-sidebar);
       border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       height: 100%;
-      z-index: 10;
+      position: relative;
+      flex-shrink: 0;
+      z-index: 20;
+      transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease;
     }}
+    #sidebar.collapsed {{
+      width: 0 !important;
+      min-width: 0 !important;
+      max-width: 0 !important;
+      margin-left: 0;
+      border-right: none;
+      overflow: hidden;
+      pointer-events: none;
+    }}
+    #sidebar.collapsed > * {{
+      display: none !important;
+    }}
+
+    /* Resizer Handle */
+    .resizer {{
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 30;
+      transition: background-color 0.15s;
+    }}
+    .resizer:hover, .resizer.dragging {{
+      background-color: var(--accent);
+    }}
+
+    /* Sidebar Header */
     .sidebar-header {{
-      padding: 16px 14px 10px;
+      padding: 12px 14px 8px;
       border-bottom: 1px solid var(--border-color);
     }}
-    .header-top {{
+    .header-brand {{
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }}
-    .header-top h1 {{
-      font-size: 14.5px;
+    .brand-title {{
+      font-size: 13.5px;
       font-weight: 700;
-      color: #f0f6fc;
+      color: var(--text-bright);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
+      user-select: none;
+    }}
+    .brand-icon {{
+      font-size: 15px;
     }}
     .progress-badge {{
       font-size: 11px;
       padding: 2px 7px;
-      background: rgba(56, 139, 253, 0.15);
-      border: 1px solid rgba(88, 166, 255, 0.3);
+      background: rgba(56, 139, 253, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.25);
       border-radius: 10px;
       color: var(--accent);
       font-weight: 600;
+      white-space: nowrap;
     }}
     .search-box-wrapper {{
       position: relative;
-      margin-bottom: 8px;
+      margin-bottom: 2px;
     }}
     .search-box {{
       width: 100%;
-      padding: 7px 10px 7px 30px;
+      padding: 6px 26px 6px 28px;
       background-color: var(--bg-main);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       color: #fff;
-      font-size: 12.5px;
-      outline: none;
-    }}
-    .search-icon {{
-      position: absolute;
-      left: 9px;
-      top: 8px;
-      color: var(--text-muted);
       font-size: 12px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }}
     .search-box:focus {{
       border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
     }}
-    .filter-pills {{
-      display: flex;
-      gap: 5px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }}
-    .pill {{
-      padding: 2px 7px;
-      font-size: 11px;
-      border-radius: 12px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    .search-icon {{
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--text-muted);
+      font-size: 11px;
+      pointer-events: none;
+    }}
+    .search-clear-btn {{
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
       cursor: pointer;
-      user-select: none;
-      transition: all 0.15s;
+      display: none;
+      padding: 2px;
+      line-height: 1;
     }}
-    .pill.active, .pill:hover {{
-      background: var(--accent-hover);
+    .search-clear-btn:hover {{
       color: #fff;
-      border-color: var(--accent);
     }}
-    .pill-diff-easy.active {{ background: rgba(63, 185, 80, 0.25); border-color: #3fb950; color: #3fb950; }}
-    .pill-diff-medium.active {{ background: rgba(210, 153, 34, 0.25); border-color: #d29922; color: #d29922; }}
-    .pill-diff-hard.active {{ background: rgba(248, 81, 73, 0.25); border-color: #f85149; color: #f85149; }}
-    .accordion-controls {{
+
+    /* Explorer Bar (Header for Tree) */
+    .explorer-bar {{
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 7px 14px 4px;
-      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
-      font-size: 11px;
-      color: var(--text-muted);
-    }}
-    .control-btn {{
-      background: transparent;
-      border: none;
-      color: var(--accent);
-      font-size: 11px;
-      cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 4px;
-    }}
-    .control-btn:hover {{
-      text-decoration: underline;
-    }}
-    .nav-list {{
-      flex: 1;
-      overflow-y: auto;
-      padding: 6px 8px 16px;
-    }}
-    .section-group {{
-      margin-bottom: 6px;
-    }}
-    .section-title {{
+      padding: 8px 14px 6px;
+      border-bottom: 1px solid var(--border-subtle);
       font-size: 11px;
       font-weight: 700;
-      text-transform: uppercase;
       color: var(--text-muted);
-      padding: 7px 10px;
       letter-spacing: 0.5px;
+      user-select: none;
+    }}
+    .explorer-actions {{
+      display: flex;
+      gap: 4px;
+    }}
+    .icon-btn {{
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: all 0.15s;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+    }}
+    .icon-btn:hover {{
+      background: rgba(177, 186, 196, 0.12);
+      color: var(--text-bright);
+      border-color: var(--border-color);
+    }}
+
+    /* Tree View Container */
+    .tree-container {{
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 8px 20px;
+    }}
+    .tree-folder {{
+      margin-bottom: 2px;
+    }}
+    .tree-folder-header {{
+      display: flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 6px;
       cursor: pointer;
       user-select: none;
-      border-radius: 6px;
-      transition: background-color 0.15s;
-    }}
-    .section-title:hover {{
-      background-color: rgba(177, 186, 196, 0.08);
-      color: #f0f6fc;
-    }}
-    .section-title-left {{
-      display: flex;
-      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: background-color 0.15s, color 0.15s;
       gap: 6px;
     }}
-    .chevron {{
+    .tree-folder-header:hover {{
+      background-color: rgba(177, 186, 196, 0.08);
+      color: var(--text-bright);
+    }}
+    .tree-chevron {{
       font-size: 9px;
-      display: inline-block;
-      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: var(--text-muted);
       width: 12px;
       text-align: center;
+      color: var(--text-muted);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      flex-shrink: 0;
     }}
-    .section-group.collapsed .chevron {{
+    .tree-folder.collapsed .tree-chevron {{
       transform: rotate(-90deg);
     }}
-    .count-badge {{
+    .tree-folder-icon {{
+      font-size: 13px;
+      line-height: 1;
+      flex-shrink: 0;
+    }}
+    .tree-folder-name {{
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }}
+    .tree-count-badge {{
       font-size: 10px;
       padding: 1px 6px;
       border-radius: 10px;
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border-subtle);
       color: var(--text-muted);
+      font-weight: 500;
+      flex-shrink: 0;
     }}
-    .section-items {{
-      overflow: hidden;
+    .tree-children {{
+      position: relative;
+      margin-left: 13px;
+      padding-left: 6px;
+      border-left: 1px solid rgba(240, 246, 252, 0.08);
       transition: all 0.2s ease-out;
     }}
-    .section-group.collapsed .section-items {{
+    .tree-folder.collapsed .tree-children {{
       display: none;
     }}
+
+    /* Tree Node / Nav Item */
     .nav-item {{
       display: flex;
       align-items: center;
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 5px 8px;
+      border-radius: 5px;
       color: var(--text-main);
       text-decoration: none;
-      font-size: 12.5px;
+      font-size: 12px;
       cursor: pointer;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
       transition: all 0.15s ease;
-      gap: 7px;
+      gap: 6px;
       position: relative;
     }}
     .nav-item:hover {{
       background-color: rgba(177, 186, 196, 0.12);
-      color: #f0f6fc;
+      color: var(--text-bright);
     }}
     .nav-item.active {{
       background-color: rgba(56, 139, 253, 0.15);
       color: var(--accent);
       font-weight: 600;
-      border-left: 3px solid var(--accent);
     }}
-    .check-box {{
-      width: 14px;
-      height: 14px;
+    .tree-check {{
+      width: 13px;
+      height: 13px;
       border: 1px solid var(--border-color);
       border-radius: 3px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 9px;
       flex-shrink: 0;
       color: transparent;
       transition: all 0.15s;
     }}
-    .check-box.checked {{
+    .tree-check.checked {{
       background: #238636;
       border-color: #2ea043;
       color: #fff;
     }}
-    .diff-dot {{
+    .tree-file-icon {{
+      font-size: 12px;
+      opacity: 0.85;
+      flex-shrink: 0;
+    }}
+    .tree-title {{
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }}
+    .tree-diff-dot {{
       width: 7px;
       height: 7px;
       border-radius: 50%;
       flex-shrink: 0;
+      margin-left: auto;
     }}
-    .diff-Easy {{ background: var(--diff-easy); }}
-    .diff-Medium {{ background: var(--diff-medium); }}
-    .diff-Hard {{ background: var(--diff-hard); }}
+    .diff-Easy {{ background-color: var(--diff-easy); }}
+    .diff-Medium {{ background-color: var(--diff-medium); }}
+    .diff-Hard {{ background-color: var(--diff-hard); }}
     .diff-All {{ display: none; }}
 
     /* Main Workspace Container */
@@ -456,57 +552,138 @@ def build_index_html():
       height: 100vh;
       overflow: hidden;
       background-color: var(--bg-main);
+      min-width: 0;
     }}
+
+    /* Top Toolbar */
     .top-toolbar {{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border-color);
+      height: 46px;
+      min-height: 46px;
       background-color: var(--bg-sidebar);
-      min-height: 48px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      gap: 12px;
+      z-index: 10;
     }}
-    .item-meta {{
-      font-size: 13px;
-      color: var(--text-main);
+    .toolbar-left {{
       display: flex;
       align-items: center;
       gap: 10px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      min-width: 0;
+      flex: 1;
     }}
-    .view-toggles {{
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }}
-    .btn {{
-      background: var(--card-bg);
+    .toggle-sidebar-btn {{
+      background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 4px 10px;
+      width: 28px;
+      height: 28px;
       border-radius: 6px;
-      cursor: pointer;
-      font-size: 11.5px;
-      transition: all 0.15s;
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
     }}
-    .btn.active, .btn:hover {{
-      background: var(--border-color);
+    .toggle-sidebar-btn:hover {{
+      background: rgba(177, 186, 196, 0.12);
       color: #fff;
       border-color: var(--accent);
     }}
-    .btn-primary {{
-      background: rgba(56, 139, 253, 0.2);
-      border-color: rgba(88, 166, 255, 0.4);
-      color: var(--accent);
+    .breadcrumb {{
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }}
-    .btn-primary:hover {{
-      background: var(--accent-hover);
+    .breadcrumb-folder {{
+      color: var(--text-muted);
+    }}
+    .breadcrumb-sep {{
+      color: var(--text-muted);
+      opacity: 0.5;
+      font-size: 11px;
+    }}
+    .breadcrumb-file {{
+      font-weight: 600;
+      color: var(--text-bright);
+    }}
+    .diff-badge {{
+      font-size: 10.5px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-left: 4px;
+    }}
+    .diff-badge.diff-Easy {{ background: rgba(63, 185, 80, 0.15); color: var(--diff-easy); border: 1px solid rgba(63, 185, 80, 0.3); }}
+    .diff-badge.diff-Medium {{ background: rgba(210, 153, 34, 0.15); color: var(--diff-medium); border: 1px solid rgba(210, 153, 34, 0.3); }}
+    .diff-badge.diff-Hard {{ background: rgba(248, 81, 73, 0.15); color: var(--diff-hard); border: 1px solid rgba(248, 81, 73, 0.3); }}
+
+    /* Toolbar Right Controls */
+    .toolbar-right {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }}
+    .segmented-control {{
+      display: inline-flex;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }}
+    .seg-btn {{
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      transition: all 0.15s;
+      user-select: none;
+    }}
+    .seg-btn:hover {{
+      color: var(--text-bright);
+    }}
+    .seg-btn.active {{
+      background: rgba(56, 139, 253, 0.18);
+      color: var(--accent);
+      font-weight: 600;
+    }}
+    .action-btn {{
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      transition: all 0.15s;
+      user-select: none;
+    }}
+    .action-btn:hover {{
+      background: rgba(177, 186, 196, 0.15);
       color: #fff;
+      border-color: var(--accent);
     }}
 
     /* Split Pane Workspace */
@@ -514,7 +691,7 @@ def build_index_html():
       flex: 1;
       display: flex;
       overflow: hidden;
-      height: calc(100vh - 48px);
+      height: calc(100vh - 46px);
     }}
     .pane {{
       overflow-y: auto;
@@ -544,7 +721,7 @@ def build_index_html():
     .pane-title {{
       font-size: 13px;
       font-weight: 600;
-      color: #f0f6fc;
+      color: var(--text-bright);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -634,89 +811,198 @@ def build_index_html():
       font-size: 13px;
       line-height: 1.55;
     }}
+
+    /* Responsive Breakpoints & Mobile Drawer */
+    @media (max-width: 768px) {{
+      #sidebar {{
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: min(85vw, 340px) !important;
+        min-width: unset !important;
+        max-width: unset !important;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: none;
+      }}
+      #sidebar.mobile-open {{
+        transform: translateX(0);
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.7);
+      }}
+      #sidebar.collapsed {{
+        transform: translateX(-100%);
+        width: min(85vw, 340px) !important;
+      }}
+      .resizer {{
+        display: none !important;
+      }}
+      .top-toolbar {{
+        padding: 0 10px;
+      }}
+      .breadcrumb {{
+        font-size: 11.5px;
+      }}
+      .seg-label {{
+        display: none;
+      }}
+      #workspace {{
+        flex-direction: column;
+      }}
+      #left-pane {{
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 20px;
+      }}
+      #right-pane {{
+        padding: 16px 20px;
+      }}
+    }}
   </style>
 </head>
 <body>
 
-  <!-- Left Sidebar Navigation -->
-  <div id="sidebar">
+  <!-- Mobile Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
+  <!-- Left Sidebar Navigation (Tree Explorer) -->
+  <aside id="sidebar">
     <div class="sidebar-header">
-      <div class="header-top">
-        <h1>LeetCode Station</h1>
-        <span class="progress-badge" id="progressStats">0 / 0 Done</span>
+      <div class="header-brand">
+        <div class="brand-title">
+          <span class="brand-icon">📚</span>
+          <span>LeetCode Station</span>
+        </div>
+        <span class="progress-badge" id="progressStats" title="Solved / Total Problems">0 / 0 Done</span>
       </div>
       <div class="search-box-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="text" id="search" class="search-box" placeholder="Search problems, patterns, numbers... (/)" oninput="filterItems()">
-      </div>
-      <div class="filter-pills">
-        <span class="pill active" onclick="setTrackFilter('all')">All</span>
-        <span class="pill" onclick="setTrackFilter('problem-index')">🎯 Index</span>
-        <span class="pill" onclick="setTrackFilter('top-100')">🔥 Top 100</span>
-        <span class="pill" onclick="setTrackFilter('luffy')">📚 Luffy</span>
-        <span class="pill" onclick="setTrackFilter('daily-practice')">📅 Daily</span>
-      </div>
-      <div class="filter-pills" style="margin-top: 4px;">
-        <span class="pill" onclick="setDiffFilter('All')">All Diff</span>
-        <span class="pill pill-diff-easy" onclick="setDiffFilter('Easy')">Easy</span>
-        <span class="pill pill-diff-medium" onclick="setDiffFilter('Medium')">Medium</span>
-        <span class="pill pill-diff-hard" onclick="setDiffFilter('Hard')">Hard</span>
+        <input type="text" id="search" class="search-box" placeholder="Search problems, patterns... (/)" oninput="handleSearch(this.value)">
+        <button id="searchClear" class="search-clear-btn" onclick="clearSearch()" title="Clear search (Esc)">✕</button>
       </div>
     </div>
-    <div class="accordion-controls">
-      <span>Curriculum Categories</span>
-      <div style="display: flex; gap: 8px;">
-        <button class="control-btn" onclick="expandAllCategories()">▾ Expand All</button>
-        <button class="control-btn" onclick="collapseAllCategories()">▴ Fold All</button>
+
+    <div class="explorer-bar">
+      <span>EXPLORER</span>
+      <div class="explorer-actions">
+        <button class="icon-btn" onclick="expandAllFolders()" title="Expand All Folders">⊞</button>
+        <button class="icon-btn" onclick="collapseAllFolders()" title="Collapse All Folders">⊟</button>
       </div>
     </div>
-    <div class="nav-list" id="navList">
+
+    <div class="tree-container" id="treeRoot">
       <!-- Injected dynamically by JavaScript -->
     </div>
-  </div>
 
-  <!-- Main Content Workspace (Split-Pane) -->
-  <div id="main-container">
-    <div class="top-toolbar">
-      <div class="item-meta" id="itemMeta">Loading...</div>
-      <div class="view-toggles">
-        <button class="btn btn-primary" id="btnDual" onclick="setViewMode('dual')">◫ Dual Split</button>
-        <button class="btn" id="btnNotes" onclick="setViewMode('notes')">📝 Notes Only</button>
-        <button class="btn" id="btnCode" onclick="setViewMode('code')">🐍 Code Only</button>
-        <button class="btn" onclick="copyActiveCode()">Copy Code</button>
-        <button class="btn" onclick="window.print()">Export</button>
+    <!-- Draggable Resize Splitter Handle -->
+    <div id="resizer" class="resizer" title="Drag to resize sidebar"></div>
+  </aside>
+
+  <!-- Main Content Workspace -->
+  <main id="main-container">
+    <header class="top-toolbar">
+      <div class="toolbar-left">
+        <button class="toggle-sidebar-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle Sidebar (Cmd+B / Ctrl+B)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z"></path>
+          </svg>
+        </button>
+        <div class="breadcrumb" id="itemBreadcrumb">Loading...</div>
       </div>
-    </div>
+
+      <div class="toolbar-right">
+        <div class="segmented-control" id="viewSwitcher">
+          <button class="seg-btn active" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
+            <span>◫</span>
+            <span class="seg-label">Split</span>
+          </button>
+          <button class="seg-btn" id="btnNotes" onclick="setViewMode('notes')" title="Notes Only">
+            <span>📝</span>
+            <span class="seg-label">Notes</span>
+          </button>
+          <button class="seg-btn" id="btnCode" onclick="setViewMode('code')" title="Code Only">
+            <span>🐍</span>
+            <span class="seg-label">Code</span>
+          </button>
+        </div>
+
+        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution">
+          <span>📋</span>
+          <span id="copyBtnLabel">Copy Code</span>
+        </button>
+      </div>
+    </header>
 
     <div id="workspace">
       <!-- Left Pane: Notes & Walkthrough -->
-      <div class="pane" id="left-pane">
+      <section class="pane" id="left-pane">
         <div class="markdown-body" id="notesViewer">
           <!-- Markdown Rendered Here -->
         </div>
-      </div>
+      </section>
 
       <!-- Right Pane: Syntax-Highlighted Code -->
-      <div class="pane" id="right-pane">
+      <section class="pane" id="right-pane">
         <div class="pane-header">
-          <span class="pane-title" id="codePaneTitle">🐍 Solution Source Code</span>
-          <button class="btn" onclick="copyActiveCode()">Copy Python</button>
+          <span class="pane-title">🐍 Solution Source Code</span>
+          <button class="action-btn" onclick="copyActiveCode()">Copy Python</button>
         </div>
         <div class="code-viewer">
           <pre><code class="language-python" id="codeViewer"># Solution code</code></pre>
         </div>
-      </div>
+      </section>
     </div>
-  </div>
+  </main>
 
   <script>
     const items = {items_json};
     let currentKey = "README.md";
-    let activeTrack = "all";
-    let activeDiff = "All";
     let viewMode = "dual"; // 'dual', 'notes', 'code'
-    const collapsedCategories = {{}};
+    const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{{}}");
     const reviewedSet = new Set(JSON.parse(localStorage.getItem("reviewedProblems") || "[]"));
+
+    // Check initial URL hash
+    if (window.location.hash && window.location.hash.length > 1) {{
+      const hashKey = decodeURIComponent(window.location.hash.substring(1));
+      if (items[hashKey]) {{
+        currentKey = hashKey;
+      }}
+    }}
+
+    // Tree folder structure definitions
+    const treeStructure = [
+      {{
+        id: "overview",
+        name: "📖 Overview",
+        icon: "📄",
+        filter: k => k === "README.md"
+      }},
+      {{
+        id: "problem-index",
+        name: "🎯 Problem Index",
+        icon: "📁",
+        filter: k => k.startsWith("topic-")
+      }},
+      {{
+        id: "top-100",
+        name: "🔥 top-100",
+        icon: "📁",
+        filter: k => k.startsWith("top-100/")
+      }},
+      {{
+        id: "luffy",
+        name: "📚 luffy (01-42)",
+        icon: "📁",
+        filter: k => k.startsWith("luffy/")
+      }},
+      {{
+        id: "daily-practice",
+        name: "📅 daily-practice",
+        icon: "📁",
+        filter: k => k.startsWith("daily-practice/")
+      }}
+    ];
 
     function saveReviewed() {{
       localStorage.setItem("reviewedProblems", JSON.stringify(Array.from(reviewedSet)));
@@ -731,7 +1017,7 @@ def build_index_html():
         reviewedSet.add(key);
       }}
       saveReviewed();
-      renderNav();
+      renderTree();
     }}
 
     function updateProgressBadge() {{
@@ -766,115 +1052,101 @@ def build_index_html():
       }}
     }}
 
-    function setTrackFilter(track) {{
-      activeTrack = track;
-      document.querySelectorAll(".sidebar-header .filter-pills:first-of-type .pill").forEach(p => {{
-        const text = p.innerText.toLowerCase();
-        if (track === 'all' && text === 'all') {{
-          p.classList.add('active');
-        }} else if (track !== 'all' && text.includes(track.replace('-', ' '))) {{
-          p.classList.add('active');
-        }} else {{
-          p.classList.remove('active');
-        }}
+    function toggleFolder(folderId) {{
+      collapsedFolders[folderId] = !collapsedFolders[folderId];
+      localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
+      renderTree();
+    }}
+
+    function expandAllFolders() {{
+      treeStructure.forEach(folder => {{
+        collapsedFolders[folder.id] = false;
       }});
-      renderNav();
-      filterItems();
+      localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
+      renderTree();
     }}
 
-    function setDiffFilter(diff) {{
-      activeDiff = diff;
-      document.querySelectorAll(".sidebar-header .filter-pills:last-of-type .pill").forEach(p => {{
-        p.classList.toggle("active", p.innerText.includes(diff));
+    function collapseAllFolders() {{
+      treeStructure.forEach(folder => {{
+        collapsedFolders[folder.id] = true;
       }});
-      renderNav();
-      filterItems();
+      localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
+      renderTree();
     }}
 
-    function toggleCategory(groupName) {{
-      collapsedCategories[groupName] = !collapsedCategories[groupName];
-      renderNav();
-    }}
-
-    function expandAllCategories() {{
-      for (const k in collapsedCategories) {{
-        collapsedCategories[k] = false;
-      }}
-      renderNav();
-    }}
-
-    function collapseAllCategories() {{
-      const groups = [
-        "🎯 Problem Index",
-        "📖 Overview",
-        "🔥 Top 100 Liked Track",
-        "📅 Daily Practice Track",
-        "📚 Luffy Curriculum (01-42)"
-      ];
-      groups.forEach(g => collapsedCategories[g] = true);
-      renderNav();
-    }}
-
-    function renderNav() {{
-      const navList = document.getElementById("navList");
-      const groups = {{
-        "🎯 Problem Index": Object.keys(items).filter(k => k.startsWith("topic-")),
-        "📖 Overview": Object.keys(items).filter(k => k === "README.md"),
-        "🔥 Top 100 Liked Track": Object.keys(items).filter(k => k.startsWith("top-100/")),
-        "📅 Daily Practice Track": Object.keys(items).filter(k => k.startsWith("daily-practice/")),
-        "📚 Luffy Curriculum (01-42)": Object.keys(items).filter(k => k.startsWith("luffy/"))
-      }};
-
+    function renderTree(searchQuery = "") {{
+      const treeRoot = document.getElementById("treeRoot");
+      const q = searchQuery.toLowerCase().trim();
       let html = "";
-      for (const [groupName, keys] of Object.entries(groups)) {{
-        const filteredKeys = keys.filter(k => {{
-          const item = items[k];
-          const matchTrack = activeTrack === 'all' || 
-            (activeTrack === 'problem-index' && k.startsWith("topic-")) ||
-            k.startsWith(activeTrack);
-          const matchDiff = activeDiff === 'All' || item.diff === activeDiff || item.diff === 'All';
-          return matchTrack && matchDiff;
-        }});
 
-        if (filteredKeys.length === 0) continue;
+      treeStructure.forEach(folder => {{
+        const allKeys = Object.keys(items).filter(folder.filter);
+        const matchingKeys = q
+          ? allKeys.filter(k => {{
+              const item = items[k];
+              return (item.title && item.title.toLowerCase().includes(q)) ||
+                     (item.short && item.short.toLowerCase().includes(q)) ||
+                     k.toLowerCase().includes(q);
+            }})
+          : allKeys;
 
-        const isCollapsed = !!collapsedCategories[groupName];
+        if (matchingKeys.length === 0) return;
+
+        // Auto expand if search active, else respect saved state
+        const isCollapsed = q ? false : !!collapsedFolders[folder.id];
         const collapseClass = isCollapsed ? "collapsed" : "";
+        const folderIcon = isCollapsed ? "📁" : "📂";
 
         html += `
-          <div class="section-group ${{collapseClass}}" id="group-${{groupName.replace(/[^a-zA-Z0-9]/g, '_')}}">
-            <div class="section-title" onclick="toggleCategory('${{groupName}}')">
-              <div class="section-title-left">
-                <span class="chevron">▼</span>
-                <span>${{groupName}}</span>
-              </div>
-              <span class="count-badge">${{filteredKeys.length}}</span>
+          <div class="tree-folder ${{collapseClass}}" id="folder-${{folder.id}}">
+            <div class="tree-folder-header" onclick="toggleFolder('${{folder.id}}')">
+              <span class="tree-chevron">▼</span>
+              <span class="tree-folder-icon">${{folder.id === 'overview' ? '📄' : folderIcon}}</span>
+              <span class="tree-folder-name">${{folder.name}}</span>
+              <span class="tree-count-badge">${{matchingKeys.length}}</span>
             </div>
-            <div class="section-items">
+            <div class="tree-children">
         `;
 
-        for (const k of filteredKeys) {{
+        matchingKeys.forEach(k => {{
           const item = items[k];
-          const activeClass = k === currentKey ? "active" : "";
+          const isActive = k === currentKey;
+          const activeClass = isActive ? "active" : "";
           const isReviewed = reviewedSet.has(k);
           const checkedClass = isReviewed ? "checked" : "";
-          const diffClass = `diff-${{item.diff}}`;
+          const diffClass = item.diff && item.diff !== "All" ? `diff-${{item.diff}}` : "diff-All";
+          const fileIcon = item.type === "doc" ? "📝" : "🐍";
 
           html += `
-            <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" data-title="${{item.title}}" data-track="${{item.path.split('/')[0]}}" data-diff="${{item.diff}}">
-              ${{item.type === 'problem' ? `<span class="check-box ${{checkedClass}}" onclick="toggleReviewed(event, '${{k}}')" title="Mark as reviewed">✓</span>` : ''}}
-              <span class="diff-dot ${{diffClass}}"></span>
-              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${{item.short}}</span>
+            <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
+              ${{item.type === 'problem' ? `<span class="tree-check ${{checkedClass}}" onclick="toggleReviewed(event, '${{k}}')" title="Mark as reviewed">✓</span>` : ''}}
+              <span class="tree-file-icon">${{fileIcon}}</span>
+              <span class="tree-title">${{item.short}}</span>
+              <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
             </div>
           `;
-        }}
+        }});
 
         html += `
             </div>
           </div>
         `;
-      }}
-      navList.innerHTML = html;
+      }});
+
+      treeRoot.innerHTML = html;
+    }}
+
+    function handleSearch(val) {{
+      const clearBtn = document.getElementById("searchClear");
+      if (clearBtn) clearBtn.style.display = val.trim() ? "block" : "none";
+      renderTree(val);
+    }}
+
+    function clearSearch() {{
+      const input = document.getElementById("search");
+      input.value = "";
+      handleSearch("");
+      input.focus();
     }}
 
     function switchItem(key) {{
@@ -882,20 +1154,50 @@ def build_index_html():
       currentKey = key;
       const item = items[key];
 
-      // Auto expand category
-      if (item.category && collapsedCategories[item.category]) {{
-        collapsedCategories[item.category] = false;
-        renderNav();
+      // Update URL hash
+      if (history.replaceState) {{
+        history.replaceState(null, null, "#" + key);
+      }} else {{
+        window.location.hash = "#" + key;
       }}
 
-      document.querySelectorAll(".nav-item").forEach(el => {{
-        el.classList.toggle("active", el.dataset.key === key);
+      // Ensure parent folder is expanded
+      treeStructure.forEach(folder => {{
+        if (folder.filter(key) && collapsedFolders[folder.id]) {{
+          collapsedFolders[folder.id] = false;
+          localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
+        }}
       }});
 
-      // Top Toolbar Metadata
-      document.getElementById("itemMeta").innerHTML = `
-        <span>📁 <strong>${{item.path}}</strong></span>
-        ${{item.diff !== 'All' ? `<span class="diff-dot diff-${{item.diff}}"></span><span style="font-size: 11px; color: var(--text-muted);">${{item.diff}}</span>` : ''}}
+      // Re-render tree highlight
+      renderTree(document.getElementById("search").value);
+
+      // Auto close sidebar on mobile upon item selection
+      if (window.innerWidth <= 768) {{
+        toggleSidebar(false);
+      }}
+
+      // Scroll active item smoothly into view
+      setTimeout(() => {{
+        const activeEl = document.querySelector(`.nav-item[data-key="${{CSS.escape(key)}}"]`);
+        if (activeEl) {{
+          activeEl.scrollIntoView({{ block: "nearest", behavior: "smooth" }});
+        }}
+      }}, 50);
+
+      // Top Toolbar Breadcrumb
+      const pathParts = item.path.split("/");
+      const folderPart = pathParts.length > 1 ? pathParts[0] : "root";
+      const filePart = pathParts.length > 1 ? pathParts.slice(1).join("/") : pathParts[0];
+      const diffBadge = item.diff && item.diff !== "All"
+        ? `<span class="diff-badge diff-${{item.diff}}">${{item.diff}}</span>`
+        : "";
+
+      document.getElementById("itemBreadcrumb").innerHTML = `
+        <span class="breadcrumb-folder">${{folderPart}}</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-file">${{filePart}}</span>
+        ${{diffBadge}}
       `;
 
       // Auto view mode: Full width for docs/overview, dual for problems
@@ -903,13 +1205,15 @@ def build_index_html():
         setViewMode("notes");
         document.getElementById("btnDual").style.display = "none";
         document.getElementById("btnCode").style.display = "none";
+        document.getElementById("copyBtn").style.display = "none";
       }} else {{
-        document.getElementById("btnDual").style.display = "flex";
-        document.getElementById("btnCode").style.display = "flex";
+        document.getElementById("btnDual").style.display = "inline-flex";
+        document.getElementById("btnCode").style.display = "inline-flex";
+        document.getElementById("copyBtn").style.display = "inline-flex";
         setViewMode("dual");
       }}
 
-      // Render Markdown
+      // Render Markdown Notes
       marked.setOptions({{
         highlight: function(code, lang) {{
           const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -940,7 +1244,7 @@ def build_index_html():
       delete codeEl.dataset.highlighted;
       hljs.highlightElement(codeEl);
 
-      // Smart link interception: clicking internal markdown links navigates inside SPA!
+      // Smart link interception: clicking internal markdown links navigates inside SPA
       document.querySelectorAll('#notesViewer a').forEach(a => {{
         const href = a.getAttribute('href');
         if (!href) return;
@@ -972,64 +1276,110 @@ def build_index_html():
       document.getElementById("right-pane").scrollTop = 0;
     }}
 
-    function filterItems() {{
-      const q = document.getElementById("search").value.toLowerCase();
-      document.querySelectorAll(".nav-item").forEach(item => {{
-        const title = item.dataset.title.toLowerCase();
-        const key = item.dataset.key.toLowerCase();
-        const diff = item.dataset.diff;
-        const matchSearch = title.includes(q) || key.includes(q);
-        const matchDiff = activeDiff === 'All' || diff === activeDiff || diff === 'All';
-        
-        let matchTrack = false;
-        if (activeTrack === 'all') {{
-          matchTrack = true;
-        }} else if (activeTrack === 'problem-index') {{
-          matchTrack = item.dataset.track === 'problem-index';
-        }} else {{
-          matchTrack = item.dataset.track === activeTrack;
-        }}
-
-        if (matchSearch && matchTrack && matchDiff) {{
-          item.style.display = "flex";
-        }} else {{
-          item.style.display = "none";
-        }}
-      }});
-
-      // Auto expand categories when search query entered
-      if (q.trim().length > 0) {{
-        document.querySelectorAll(".section-group").forEach(group => {{
-          group.classList.remove("collapsed");
-        }});
-      }}
-    }}
-
     function copyActiveCode() {{
       const item = items[currentKey];
       if (!item || !item.code) return;
       navigator.clipboard.writeText(item.code).then(() => {{
-        const btn = document.querySelector("#right-pane .pane-header button");
-        if (btn) {{
-          btn.innerText = "✓ Copied!";
-          setTimeout(() => btn.innerText = "Copy Python", 1500);
+        const label = document.getElementById("copyBtnLabel");
+        if (label) {{
+          const original = label.innerText;
+          label.innerText = "Copied!";
+          setTimeout(() => label.innerText = original, 1500);
         }}
       }});
     }}
 
-    // Global keyboard shortcuts
+    // Sidebar Toggle & Collapse
+    function toggleSidebar(forceState) {{
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebar-backdrop");
+      const isMobile = window.innerWidth <= 768;
+
+      if (isMobile) {{
+        const willOpen = forceState !== undefined ? forceState : !sidebar.classList.contains("mobile-open");
+        sidebar.classList.toggle("mobile-open", willOpen);
+        backdrop.classList.toggle("active", willOpen);
+      }} else {{
+        const isCollapsed = forceState !== undefined ? !forceState : !sidebar.classList.contains("collapsed");
+        sidebar.classList.toggle("collapsed", isCollapsed);
+        localStorage.setItem("sidebarCollapsed", isCollapsed);
+      }}
+    }}
+
+    // Draggable Resizer Logic
+    (function initResizer() {{
+      const resizer = document.getElementById("resizer");
+      const sidebar = document.getElementById("sidebar");
+      let isResizing = false;
+
+      // Restore saved width
+      const savedWidth = localStorage.getItem("sidebarWidth");
+      if (savedWidth && window.innerWidth > 768) {{
+        sidebar.style.width = savedWidth + "px";
+        sidebar.style.minWidth = savedWidth + "px";
+      }}
+
+      // Restore collapsed state on desktop
+      const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+      if (isCollapsed && window.innerWidth > 768) {{
+        sidebar.classList.add("collapsed");
+      }}
+
+      resizer.addEventListener("mousedown", (e) => {{
+        if (window.innerWidth <= 768) return;
+        isResizing = true;
+        resizer.classList.add("dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+      }});
+
+      window.addEventListener("mousemove", (e) => {{
+        if (!isResizing) return;
+        const newWidth = Math.min(Math.max(e.clientX, 220), 650);
+        sidebar.style.width = newWidth + "px";
+        sidebar.style.minWidth = newWidth + "px";
+      }});
+
+      window.addEventListener("mouseup", () => {{
+        if (isResizing) {{
+          isResizing = false;
+          resizer.classList.remove("dragging");
+          document.body.style.cursor = "";
+          document.body.style.userSelect = "";
+          const width = parseInt(sidebar.style.width);
+          if (width) localStorage.setItem("sidebarWidth", width);
+        }}
+      }});
+    }})();
+
+    // Global Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {{
-      if (e.key === "/" && document.activeElement.tagName !== "INPUT") {{
+      // Cmd+B / Ctrl+B: Toggle sidebar
+      if ((e.metaKey || e.ctrlKey) && (e.key === "b" || e.key === "B")) {{
         e.preventDefault();
-        document.getElementById("search").focus();
-      }} else if (e.key === "Escape") {{
-        document.getElementById("search").value = "";
-        document.getElementById("search").blur();
-        filterItems();
+        toggleSidebar();
+      }}
+      // /: Focus search
+      else if (e.key === "/" && document.activeElement.tagName !== "INPUT") {{
+        e.preventDefault();
+        const searchInput = document.getElementById("search");
+        if (document.getElementById("sidebar").classList.contains("collapsed")) {{
+          toggleSidebar(true);
+        }}
+        searchInput.focus();
+      }}
+      // Escape: Clear search & blur
+      else if (e.key === "Escape") {{
+        const searchInput = document.getElementById("search");
+        if (document.activeElement === searchInput) {{
+          clearSearch();
+          searchInput.blur();
+        }}
       }}
     }});
 
-    renderNav();
+    // Initialize
+    renderTree();
     updateProgressBadge();
     switchItem(currentKey);
   </script>
