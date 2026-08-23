@@ -52,10 +52,6 @@ Welcome to the **LeetCode Self-Practices** repository! This repository contains 
 ```tree
 leetcode-sh/
 ├── luffy/                        # Core structured curriculum (categorized 01-42)
-│   ├── 01-___BASICS___.txt       # Topic division markers
-│   ├── 02-___ARRAYS_AND_STRINGS___.txt
-│   ├── 07-___BINARY_SEARCH___.txt
-│   ├── ...
 │   ├── file_topics.txt           # Topic index reference
 │   └── *.py                      # Python solution implementations
 ├── top-100/                      # Top 100 Liked Problems & Notes
