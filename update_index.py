@@ -700,15 +700,19 @@ def build_index_html():
     }}
     #left-pane {{
       flex: 1;
-      background-color: var(--bg-main);
-      border-right: 1px solid var(--border-color);
-    }}
-    #right-pane {{
-      flex: 1;
       background-color: var(--bg-panel);
       display: flex;
       flex-direction: column;
       padding: 20px 24px;
+      border-right: 1px solid var(--border-color);
+      min-width: 0;
+    }}
+    #right-pane {{
+      flex: 1;
+      background-color: var(--bg-main);
+      overflow-y: auto;
+      padding: 28px 36px;
+      min-width: 0;
     }}
     .pane-header {{
       display: flex;
@@ -935,21 +939,21 @@ def build_index_html():
     </header>
 
     <div id="workspace">
-      <!-- Left Pane: Notes & Walkthrough -->
+      <!-- Left Pane: Syntax-Highlighted Code -->
       <section class="pane" id="left-pane">
-        <div class="markdown-body" id="notesViewer">
-          <!-- Markdown Rendered Here -->
-        </div>
-      </section>
-
-      <!-- Right Pane: Syntax-Highlighted Code -->
-      <section class="pane" id="right-pane">
         <div class="pane-header">
           <span class="pane-title">🐍 Solution Source Code</span>
           <button class="action-btn" onclick="copyActiveCode()">Copy Python</button>
         </div>
         <div class="code-viewer">
           <pre><code class="language-python" id="codeViewer"># Solution code</code></pre>
+        </div>
+      </section>
+
+      <!-- Right Pane: Notes & Walkthrough -->
+      <section class="pane" id="right-pane">
+        <div class="markdown-body" id="notesViewer">
+          <!-- Markdown Rendered Here -->
         </div>
       </section>
     </div>
@@ -1037,18 +1041,18 @@ def build_index_html():
       document.getElementById("btnCode").classList.toggle("active", mode === "code");
 
       if (mode === "dual") {{
-        leftPane.style.display = "block";
+        leftPane.style.display = "flex";
         leftPane.style.flex = "1";
-        rightPane.style.display = "flex";
+        rightPane.style.display = "block";
         rightPane.style.flex = "1";
       }} else if (mode === "notes") {{
-        leftPane.style.display = "block";
+        leftPane.style.display = "none";
+        rightPane.style.display = "block";
+        rightPane.style.flex = "1";
+      }} else if (mode === "code") {{
+        leftPane.style.display = "flex";
         leftPane.style.flex = "1";
         rightPane.style.display = "none";
-      }} else if (mode === "code") {{
-        leftPane.style.display = "none";
-        rightPane.style.display = "flex";
-        rightPane.style.flex = "1";
       }}
     }}
 
