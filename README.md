@@ -71,6 +71,8 @@ leetcode-sh/
 │   ├── lc-0713-subarray-product-less-than-k.py
 │   └── lc-0713-subarray-product-less-than-k.md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
+│   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
+│   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
 │   ├── lc-2029-stone-game-ix.py
 │   ├── lc-2029-stone-game-ix.md
 │   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.py
@@ -142,6 +144,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 | # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
 | :-: | :--- | :-: | :--- | :-: | :--- |
+| **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
 | **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py)<br>[`daily-practice/lc-2029-stone-game-ix.md`](daily-practice/lc-2029-stone-game-ix.md) | Medium | Modulo 3 Arithmetic / Game Theory |
 | **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)<br>[`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md) | Easy | Sliding Window / Frequency Map |
 | **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`daily-practice/lc-3471-find-the-largest-almost-missing-integer.py`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)<br>[`daily-practice/lc-3471-find-the-largest-almost-missing-integer.md`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.md) | Easy | Fixed Sliding Window + Frequency Hashing |
@@ -175,6 +178,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | # | Problem Title | LeetCode Link | Solution Code & Notes | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
 | **34** | Find First and Last Position of Element in Sorted Array | [LC 34](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/) | [`top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py`](top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py)<br>[`top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.md`](top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.md) | Medium | Binary Search (`lower_bound`) | Use `lower_bound(target)` for start and `lower_bound(target + 1) - 1` for end in $O(\log n)$. |
+| **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Array (`nums[-1]`) | Compare `nums[mid]` with `nums[-1]`; identify left/right step segment in $O(\log n)$. |
 | **162** | Find Peak Element | [LC 162](https://leetcode.com/problems/find-peak-element/) | [`top-100/lc-0162-find-peak-element.py`](top-100/lc-0162-find-peak-element.py)<br>[`top-100/lc-0162-find-peak-element.md`](top-100/lc-0162-find-peak-element.md) | Medium | Binary Search (Slope Peak / Open Interval) | Check `nums[mid] > nums[mid+1]` slope; shrink search space via Red-Blue framework in $O(\log n)$. |
 | **704** | Binary Search | [LC 704](https://leetcode.com/problems/binary-search/) | [`luffy/07-lc-0704-binary-search.py`](luffy/07-lc-0704-binary-search.py) | Easy | Binary Search (Closed Interval) | `left <= right` with `mid = left + (right - left) // 2` to prevent overflow. |
 
