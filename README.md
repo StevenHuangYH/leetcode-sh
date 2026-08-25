@@ -54,10 +54,14 @@ leetcode-sh/
 │   ├── lc-0011-container-with-most-water.md
 │   ├── lc-0015-3sum.py
 │   ├── lc-0015-3sum.md
+│   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.py
+│   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.md
 │   ├── lc-0042-trapping-rain-water.py
 │   ├── lc-0042-trapping-rain-water.md
 │   ├── lc-0053-maximum-subarray.py
 │   ├── lc-0053-maximum-subarray.md
+│   ├── lc-0162-find-peak-element.py
+│   ├── lc-0162-find-peak-element.md
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.py
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.md
 │   ├── lc-0209-minimum-size-subarray-sum.py
@@ -115,6 +119,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py)<br>[`luffy/17-lc-0141-linked-list-cycle.md`](luffy/17-lc-0141-linked-list-cycle.md) | Easy | Floyd's Fast & Slow Pointers |
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.md`](luffy/18-lc-0142-linked-list-cycle-ii.md) | Medium | Fast/Slow Pointer + Mathematical Collision Entry |
 | **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-0155-min-stack.py`](luffy/21-lc-0155-min-stack.py)<br>[`luffy/21-lc-0155-min-stack.md`](luffy/21-lc-0155-min-stack.md) | Medium | Auxiliary Min Stack |
+| **162** | Find Peak Element | [LC 162](https://leetcode.com/problems/find-peak-element/) | [`top-100/lc-0162-find-peak-element.py`](top-100/lc-0162-find-peak-element.py)<br>[`top-100/lc-0162-find-peak-element.md`](top-100/lc-0162-find-peak-element.md) | Medium | Binary Search on Slope / Red-Blue Interval |
 | **167** | Two Sum II - Sorted Array | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/lc-0167-two-sum-ii-input-array-is-sorted.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)<br>[`top-100/lc-0167-two-sum-ii-input-array-is-sorted.md`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.md) | Medium | Sorted Array Inward Two Pointers |
 | **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`luffy/38-lc-0200-number-of-islands.py`](luffy/38-lc-0200-number-of-islands.py)<br>[`luffy/38-lc-0200-number-of-islands.md`](luffy/38-lc-0200-number-of-islands.md) | Medium | 2D Grid Sink Islands (DFS / BFS) |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py)<br>[`luffy/15-lc-0206-reverse-linked-list.md`](luffy/15-lc-0206-reverse-linked-list.md) | Easy | In-Place 3-Pointer Iteration (`prev, curr, nxt`) |
@@ -166,6 +171,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | # | Problem Title | LeetCode Link | Solution Code & Notes | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
 | **34** | Find First and Last Position of Element in Sorted Array | [LC 34](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/) | [`top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py`](top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py)<br>[`top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.md`](top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.md) | Medium | Binary Search (`lower_bound`) | Use `lower_bound(target)` for start and `lower_bound(target + 1) - 1` for end in $O(\log n)$. |
+| **162** | Find Peak Element | [LC 162](https://leetcode.com/problems/find-peak-element/) | [`top-100/lc-0162-find-peak-element.py`](top-100/lc-0162-find-peak-element.py)<br>[`top-100/lc-0162-find-peak-element.md`](top-100/lc-0162-find-peak-element.md) | Medium | Binary Search (Slope Peak / Open Interval) | Check `nums[mid] > nums[mid+1]` slope; shrink search space via Red-Blue framework in $O(\log n)$. |
 | **704** | Binary Search | [LC 704](https://leetcode.com/problems/binary-search/) | [`luffy/07-lc-0704-binary-search.py`](luffy/07-lc-0704-binary-search.py) | Easy | Binary Search (Closed Interval) | `left <= right` with `mid = left + (right - left) // 2` to prevent overflow. |
 
 ---
