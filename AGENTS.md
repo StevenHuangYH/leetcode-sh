@@ -10,11 +10,11 @@ This file establishes the operational rules and standards for all AI coding assi
 * **`luffy/`**: Structured 42-topic algorithmic curriculum problems and notes.
 * **`daily-practice/`**: Daily challenges, contest problems, and algorithmic practice.
 * **`index.html`**: Self-contained Single Page App (SPA) study station with dual split-pane viewer.
-* **`update_index.py`**: Automated script that scans the repository, pairs `.py` and `.md` files, and generates `index.html`.
+* **`update_index.py`**: Automated script that scans the repository, pairs `.py` and `.md` files, and compiles `index.html`.
 
 ---
 
-## 🔒 Core Rule: Strict Immutability of Original Python (`.py`) Files
+## 🔒 Core Rule 1: Strict Immutability of Original Python (`.py`) Files
 
 > [!IMPORTANT]
 > **When creating, updating, or explaining notes (`.md` files), the corresponding Python (`.py`) file is STRICTLY READ-ONLY.**
@@ -33,7 +33,7 @@ This file establishes the operational rules and standards for all AI coding assi
 
 ---
 
-## 📝 Standard 7-Section Structure for Companion `.md` Notes
+## 📝 Core Rule 2: Standard 7-Section Structure for Companion `.md` Notes
 
 Every companion `.md` note must adhere to the standard 7-section structure:
 
@@ -54,11 +54,46 @@ Every companion `.md` note must adhere to the standard 7-section structure:
 
 ---
 
-## ⚙️ Automated Companion Pipeline
+## 🚀 Core Rule 3: Mandatory 4-Step Push & Walkthrough Protocol
 
-Whenever a problem solution or companion note is added or updated:
-1. Ensure both `.py` and `.md` use the standardized zero-padded format: `lc-{4-digit-id}-{problem-slug}.(py|md)`.
-2. Update the corresponding tracking table(s) in [`README.md`](README.md):
-   * `## 🔥 Top 100 Liked Track`
-   * `## 📚 Topic-Wise Curriculum & Problem Index`
-3. Execute `python3 update_index.py` to rebuild and synchronize [`index.html`](index.html).
+Whenever creating a note, implementing a solution, or preparing to push to GitHub, AI assistants **MUST execute the following 4-step protocol in exact sequence**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 1. Note Creation / Verification                                         │
+│    • Generate/update companion .md note (strictly preserve .py).        │
+│    • Ensure standard zero-padded format: lc-{4-digit-id}-{slug}.(py|md) │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 2. README.md Synchronization                                            │
+│    • Update tracking table in ## 🔥 Top 100 Liked Track or Daily Track.  │
+│    • Update topic catalog in ## 📚 Topic-Wise Curriculum Index.         │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 3. Mandatory index.html Rebuild (update_index.py)                       │
+│    • Execute: python3 update_index.py                                   │
+│    • VERIFY that the new/updated problem is compiled into index.html.   │
+│    • NEVER commit or push if index.html has not been regenerated.       │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 4. Stage, Commit & Push                                                 │
+│    • git add -A                                                         │
+│    • git commit -m "<type>(<scope>): <clear description>"               │
+│    • git push origin main                                               │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📊 Post-Push Completion Report Standard
+
+Whenever a push is executed, the assistant must provide a structured confirmation report to the user containing:
+1. **Commit & Remote Status**: Commit hash, branch target (`main -> origin/main`), and list of modified files.
+2. **Viewer Navigation Path**: The exact sidebar path in `index.html` where the note/solution can be viewed (e.g., `📅 Daily Practice Track -> LC 0153 find minimum in rotated sorted array`).
+3. **Browser Cache Invalidation Reminder**: Explicit instructions to hard-refresh the browser tab (`Ctrl + Shift + R` or `Cmd + Shift + R`) to bypass cached HTML.
