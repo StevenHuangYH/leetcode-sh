@@ -227,18 +227,30 @@ def build_index_html():
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE & Edge */
     }}
-    *::-webkit-scrollbar, html::-webkit-scrollbar, body::-webkit-scrollbar {{
-      display: none; /* Chrome, Safari, Edge Chromium, Opera */
-      width: 0px;
-      height: 0px;
-      background: transparent;
+    /* Modern Minimalist Dark Theme Scrollbars (Fits Total Document Length) */
+    ::-webkit-scrollbar {{
+      width: 7px;
+      height: 7px;
+      background-color: transparent;
     }}
-    html, body {{
-      scrollbar-width: none;
-      -ms-overflow-style: none;
+    ::-webkit-scrollbar-track {{
+      background-color: transparent;
+    }}
+    ::-webkit-scrollbar-thumb {{
+      background-color: rgba(139, 148, 158, 0.28);
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background-clip: padding-box;
+      transition: background-color 0.2s ease;
+    }}
+    ::-webkit-scrollbar-thumb:hover {{
+      background-color: rgba(139, 148, 158, 0.55);
+    }}
+    /* Firefox */
+    * {{
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139, 148, 158, 0.28) transparent;
     }}
     body {{
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
@@ -697,6 +709,7 @@ def build_index_html():
       display: flex;
       overflow: hidden;
       height: calc(100vh - 46px);
+      position: relative;
     }}
     .pane {{
       overflow-y: auto;
@@ -704,20 +717,32 @@ def build_index_html():
       padding: 28px 36px;
     }}
     #left-pane {{
-      flex: 1;
+      width: calc(50% - 2.5px);
       background-color: var(--bg-panel);
       display: flex;
       flex-direction: column;
       padding: 20px 24px;
-      border-right: 1px solid var(--border-color);
-      min-width: 0;
+      min-width: 150px;
+    }}
+    /* Draggable Splitter between Code & Notes */
+    .workspace-resizer {{
+      width: 5px;
+      background-color: var(--border-color);
+      cursor: col-resize;
+      transition: background-color 0.15s ease;
+      z-index: 20;
+      flex-shrink: 0;
+      user-select: none;
+    }}
+    .workspace-resizer:hover, .workspace-resizer.dragging {{
+      background-color: var(--accent);
     }}
     #right-pane {{
-      flex: 1;
+      width: calc(50% - 2.5px);
       background-color: var(--bg-main);
       overflow-y: auto;
       padding: 28px 36px;
-      min-width: 0;
+      min-width: 150px;
     }}
     .pane-header {{
       display: flex;
@@ -955,6 +980,9 @@ def build_index_html():
         </div>
       </section>
 
+      <!-- Draggable Splitter between Code & Notes -->
+      <div id="workspace-resizer" class="workspace-resizer" title="Drag to adjust split (Double-click to reset 50/50)"></div>
+
       <!-- Right Pane: Notes & Walkthrough -->
       <section class="pane" id="right-pane">
         <div class="markdown-body" id="notesViewer">
@@ -968,6 +996,7 @@ def build_index_html():
     const items = {items_json};
     let currentKey = "README.md";
     let viewMode = "notes"; // 'dual', 'notes', 'code'
+    let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{{}}");
 
     // Check initial URL hash
@@ -1012,10 +1041,24 @@ def build_index_html():
       document.getElementById("progressStats").innerText = `${{problemKeys.length}} Problems`;
     }}
 
+    function applyWorkspaceSplit(ratio) {{
+      const leftPane = document.getElementById("left-pane");
+      const rightPane = document.getElementById("right-pane");
+      if (!leftPane || !rightPane) return;
+      if (viewMode === "dual") {{
+        const clamped = Math.max(15, Math.min(85, ratio));
+        leftPane.style.width = `calc(${{clamped}}% - 2.5px)`;
+        leftPane.style.flex = "none";
+        rightPane.style.width = `calc(${{100 - clamped}}% - 2.5px)`;
+        rightPane.style.flex = "none";
+      }}
+    }}
+
     function setViewMode(mode) {{
       viewMode = mode;
       const leftPane = document.getElementById("left-pane");
       const rightPane = document.getElementById("right-pane");
+      const wsResizer = document.getElementById("workspace-resizer");
       
       document.getElementById("btnDual").classList.toggle("active", mode === "dual");
       document.getElementById("btnNotes").classList.toggle("active", mode === "notes");
@@ -1023,16 +1066,20 @@ def build_index_html():
 
       if (mode === "dual") {{
         leftPane.style.display = "flex";
-        leftPane.style.flex = "1";
+        if (wsResizer) wsResizer.style.display = "block";
         rightPane.style.display = "block";
-        rightPane.style.flex = "1";
+        applyWorkspaceSplit(workspaceSplitRatio);
       }} else if (mode === "notes") {{
         leftPane.style.display = "none";
+        if (wsResizer) wsResizer.style.display = "none";
         rightPane.style.display = "block";
+        rightPane.style.width = "100%";
         rightPane.style.flex = "1";
       }} else if (mode === "code") {{
         leftPane.style.display = "flex";
+        leftPane.style.width = "100%";
         leftPane.style.flex = "1";
+        if (wsResizer) wsResizer.style.display = "none";
         rightPane.style.display = "none";
       }}
     }}
@@ -1340,6 +1387,49 @@ def build_index_html():
           document.body.style.userSelect = "";
           const width = parseInt(sidebar.style.width);
           if (width) localStorage.setItem("sidebarWidth", width);
+        }}
+      }});
+    }})();
+
+    // Workspace Split Resizer (Between Code & Notes in Dual View)
+    (function initWorkspaceResizer() {{
+      const resizer = document.getElementById("workspace-resizer");
+      const workspace = document.getElementById("workspace");
+      if (!resizer || !workspace) return;
+
+      let isResizing = false;
+
+      resizer.addEventListener("mousedown", (e) => {{
+        if (viewMode !== "dual") return;
+        isResizing = true;
+        resizer.classList.add("dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+      }});
+
+      resizer.addEventListener("dblclick", () => {{
+        workspaceSplitRatio = 50;
+        localStorage.setItem("workspaceSplitRatio", "50");
+        applyWorkspaceSplit(50);
+      }});
+
+      window.addEventListener("mousemove", (e) => {{
+        if (!isResizing) return;
+        const wsRect = workspace.getBoundingClientRect();
+        const newRatio = ((e.clientX - wsRect.left) / wsRect.width) * 100;
+        if (newRatio >= 15 && newRatio <= 85) {{
+          workspaceSplitRatio = newRatio;
+          applyWorkspaceSplit(newRatio);
+        }}
+      }});
+
+      window.addEventListener("mouseup", () => {{
+        if (isResizing) {{
+          isResizing = false;
+          resizer.classList.remove("dragging");
+          document.body.style.cursor = "";
+          document.body.style.userSelect = "";
+          localStorage.setItem("workspaceSplitRatio", workspaceSplitRatio.toString());
         }}
       }});
     }})();
