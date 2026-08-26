@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 25 | ~33% | 24 |
-| **Medium** | 48 | ~63% | 138 |
+| **Easy** | 25 | ~32% | 24 |
+| **Medium** | 49 | ~64% | 139 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **76 In-Depth Notes** | **100%** | **165 Problem Entities** |
+| **Total** | **77 In-Depth Notes** | **100%** | **166 Problem Entities** |
 
 ---
 
@@ -87,6 +87,8 @@ leetcode-sh/
 │   ├── lc-0143-reorder-list.md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
+│   ├── lc-0237-delete-node-in-a-linked-list.py
+│   ├── lc-0237-delete-node-in-a-linked-list.md
 │   ├── lc-0876-middle-of-the-linked-list.py
 │   ├── lc-0876-middle-of-the-linked-list.md
 │   ├── lc-2029-stone-game-ix.py
@@ -165,6 +167,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Dummy Node + Local Segment Reversal (`p0`, `pre`, `cur`) |
 | **143** | Reorder List | [LC 143](https://leetcode.com/problems/reorder-list/) | [`daily-practice/lc-0143-reorder-list.py`](daily-practice/lc-0143-reorder-list.py)<br>[`daily-practice/lc-0143-reorder-list.md`](daily-practice/lc-0143-reorder-list.md) | Medium | Fast/Slow Mid (LC 876) + Reverse 2nd Half (LC 206) + Zip-Merge |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
+| **237** | Delete Node in a Linked List | [LC 237](https://leetcode.com/problems/delete-node-in-a-linked-list/) | [`daily-practice/lc-0237-delete-node-in-a-linked-list.py`](daily-practice/lc-0237-delete-node-in-a-linked-list.py)<br>[`daily-practice/lc-0237-delete-node-in-a-linked-list.md`](daily-practice/lc-0237-delete-node-in-a-linked-list.md) | Medium | Scapegoat Value Copy + Bypass Next Node |
 | **876** | Middle of the Linked List | [LC 876](https://leetcode.com/problems/middle-of-the-linked-list/) | [`daily-practice/lc-0876-middle-of-the-linked-list.py`](daily-practice/lc-0876-middle-of-the-linked-list.py)<br>[`daily-practice/lc-0876-middle-of-the-linked-list.md`](daily-practice/lc-0876-middle-of-the-linked-list.md) | Easy | Fast & Slow Pointers (`slow=1`, `fast=2`) |
 | **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py)<br>[`daily-practice/lc-2029-stone-game-ix.md`](daily-practice/lc-2029-stone-game-ix.md) | Medium | Modulo 3 Arithmetic / Game Theory |
 | **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)<br>[`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md) | Easy | Sliding Window / Frequency Map |
@@ -236,6 +239,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`top-100/lc-0142-linked-list-cycle-ii.py`](top-100/lc-0142-linked-list-cycle-ii.py)<br>[`top-100/lc-0142-linked-list-cycle-ii.md`](top-100/lc-0142-linked-list-cycle-ii.md)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py) | Medium | Floyd's Algorithm + Math | Reset head upon collision; both advance by 1 step ($a=c$) to meet at cycle entry in $O(n)$ time and $O(1)$ space. |
 | **143** | Reorder List | [LC 143](https://leetcode.com/problems/reorder-list/) | [`daily-practice/lc-0143-reorder-list.py`](daily-practice/lc-0143-reorder-list.py)<br>[`daily-practice/lc-0143-reorder-list.md`](daily-practice/lc-0143-reorder-list.md) | Medium | Mid + Reverse + Zip-Merge | Find mid, reverse second half, and interleave merge both halves with `while head2.next:` in $O(n)$ time and $O(1)$ space. |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`top-100/lc-0206-reverse-linked-list.py`](top-100/lc-0206-reverse-linked-list.py)<br>[`top-100/lc-0206-reverse-linked-list.md`](top-100/lc-0206-reverse-linked-list.md)<br>[`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | Iterative Pointer Reversal | Maintain `prev`, `curr`, and `nxt` pointers to reverse next links in-place in $O(n)$ time and $O(1)$ space. |
+| **237** | Delete Node in a Linked List | [LC 237](https://leetcode.com/problems/delete-node-in-a-linked-list/) | [`daily-practice/lc-0237-delete-node-in-a-linked-list.py`](daily-practice/lc-0237-delete-node-in-a-linked-list.py)<br>[`daily-practice/lc-0237-delete-node-in-a-linked-list.md`](daily-practice/lc-0237-delete-node-in-a-linked-list.md) | Medium | Scapegoat Node Overwrite | Overwrite node's value with next node's value (`node.val = node.next.val`) and bypass next node in $O(1)$ time and $O(1)$ space. |
 | **876** | Middle of the Linked List | [LC 876](https://leetcode.com/problems/middle-of-the-linked-list/) | [`daily-practice/lc-0876-middle-of-the-linked-list.py`](daily-practice/lc-0876-middle-of-the-linked-list.py)<br>[`daily-practice/lc-0876-middle-of-the-linked-list.md`](daily-practice/lc-0876-middle-of-the-linked-list.md) | Easy | Fast & Slow Pointers (2:1 Speed) | `slow` moves 1 step, `fast` moves 2 steps; when `fast` finishes, `slow` is at middle. |
 
 ---
