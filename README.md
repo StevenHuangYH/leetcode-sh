@@ -9,13 +9,13 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
-1. [Practice Statistics & Summary](#-practice-statistics--summary)
-2. [Repository Structure](#-repository-structure)
-3. [🔥 Top 100 Liked Track](#-top-100-liked-track)
-4. [📅 Daily Practice Track](#-daily-practice-track)
-5. [📚 Topic-Wise Curriculum & Problem Index](#-topic-wise-curriculum--problem-index)
+1. [Practice Statistics & Summary](#practice-statistics--summary)
+2. [Repository Structure](#repository-structure)
+3. [Top 100 Liked Track](#top-100-liked-track)
+4. [Daily Practice Track](#daily-practice-track)
+5. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
    - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
    - [2. Binary Search](#2-binary-search)
    - [3. Prefix Sum & Difference Arrays](#3-prefix-sum--difference-arrays)
@@ -27,23 +27,23 @@ Welcome to my personal LeetCode question cracking collections. This repository i
    - [9. Graph Algorithms (DFS, BFS, Topological Sort)](#9-graph-algorithms-dfs-bfs-topological-sort)
    - [10. Dynamic Programming & Math / Game Theory](#10-dynamic-programming--math--game-theory)
    - [11. Object-Oriented Programming (OOP) & Foundations](#11-object-oriented-programming-oop--foundations)
-6. [Interactive Web Viewer & Study Station](#-interactive-web-viewer--study-station)
-7. [How to Run & Practice](#-how-to-run--practice)
+6. [Interactive Web Viewer & Study Station](#interactive-web-viewer--study-station)
+7. [How to Run & Practice](#how-to-run--practice)
 
 ---
 
-## 📊 Practice Statistics & Summary
+## Practice Statistics & Summary
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| 🟢 **Easy** | 23 | ~32% | 23 |
-| 🟡 **Medium** | 46 | ~65% | 137 |
-| 🔴 **Hard** | 2 | ~3% | 2 |
+| **Easy** | 23 | ~32% | 23 |
+| **Medium** | 46 | ~65% | 137 |
+| **Hard** | 2 | ~3% | 2 |
 | **Total** | **71 In-Depth Notes** | **100%** | **162 Problem Entities** |
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```tree
 leetcode-sh/
@@ -98,7 +98,7 @@ leetcode-sh/
 
 ---
 
-## 🔥 Top 100 Liked Track
+## Top 100 Liked Track
 
 A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Interview** problems implemented in this repository.
 
@@ -145,7 +145,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 
 ---
 
-## 📅 Daily Practice Track
+## Daily Practice Track
 
 Tracking daily challenge questions, weekly contest problems, and algorithmic practice.
 
@@ -160,7 +160,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 ---
 
-## 📚 Topic-Wise Curriculum & Problem Index
+## Topic-Wise Curriculum & Problem Index
 
 ### 1. Arrays, Strings, Two Pointers & Sliding Window
 
@@ -297,12 +297,12 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 ---
 
-## 🖥️ Interactive Web Viewer & Study Station
+## Interactive Web Viewer & Study Station
 
 This repository features an automated, standalone single-page application (`index.html`) designed for distraction-free local study:
 
 * **Dual Split-Pane Layout**: Read detailed Markdown explanations on the left while simultaneously reviewing syntax-highlighted Python solutions on the right.
-* **View Mode Controls**: Switch instantly between `[◫ Split View]`, `[📝 Notes Only]`, and `[🐍 Code Only]`.
+* **View Mode Controls**: Switch instantly between `[Split View]`, `[Notes Only]`, and `[Code Only]`.
 * **Category Accordion**: Collapse / expand categories (`Top 100`, `Daily Practice`, `Luffy Curriculum`, `Topic Index`) or use `Expand All` / `Fold All`.
 * **Difficulty & Pattern Filter Pills**: Filter by `Easy`, `Medium`, `Hard`, or specific algorithmic patterns.
 * **Review Checkmarks**: Track your problem review status with checkmarks stored in browser `localStorage`.
@@ -310,7 +310,7 @@ This repository features an automated, standalone single-page application (`inde
 
 ---
 
-## 🚀 How to Run & Practice
+## How to Run & Practice
 
 ### 1. Launch the Interactive Study Station
 Open `index.html` in your default browser:

@@ -72,7 +72,7 @@ def collect_workspace_documents():
             ("topic-11-oop", "11. OOP & Foundations", "11. OOP & Foundations", "### 11. OOP & Foundations"),
         ]
 
-        sec5_match = re.search(r'(## 📚 Topic-Wise Curriculum & Problem Index.*?)(\n## 🖥️ Interactive Web Viewer|\n## 🚀 How to Run)', readme_text, re.DOTALL)
+        sec5_match = re.search(r'(## (?:📚 )?Topic-Wise Curriculum & Problem Index.*?)(\n## (?:🖥️ )?Interactive Web Viewer|\n## (?:🚀 )?How to Run)', readme_text, re.DOTALL)
         sec5_text = sec5_match.group(1) if sec5_match else readme_text
 
         for key, title, short, header in topic_sections:
