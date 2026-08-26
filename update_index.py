@@ -113,14 +113,51 @@ def collect_workspace_documents():
         }
     }
 
+    # Canonical difficulty dictionary for known LeetCode problems
+    KNOWN_DIFFICULTIES = {
+        1: "Easy", 2: "Medium", 3: "Medium", 4: "Hard", 5: "Medium",
+        10: "Hard", 11: "Medium", 15: "Medium", 16: "Medium", 17: "Medium",
+        19: "Medium", 20: "Easy", 21: "Easy", 22: "Medium", 23: "Hard",
+        25: "Hard", 26: "Easy", 31: "Medium", 32: "Hard", 33: "Medium",
+        34: "Medium", 39: "Medium", 41: "Hard", 42: "Hard", 46: "Medium",
+        48: "Medium", 49: "Medium", 53: "Medium", 55: "Medium", 56: "Medium",
+        62: "Medium", 64: "Medium", 70: "Easy", 72: "Hard", 75: "Medium",
+        76: "Hard", 78: "Medium", 79: "Medium", 84: "Hard", 85: "Hard",
+        92: "Medium", 94: "Easy", 96: "Medium", 98: "Medium", 101: "Easy",
+        102: "Medium", 104: "Easy", 105: "Medium", 114: "Medium", 121: "Easy",
+        124: "Hard", 128: "Medium", 131: "Medium", 136: "Easy", 139: "Medium",
+        141: "Easy", 142: "Medium", 143: "Medium", 146: "Medium", 148: "Medium",
+        152: "Medium", 153: "Medium", 155: "Medium", 160: "Easy", 162: "Medium",
+        167: "Medium", 169: "Easy", 198: "Medium", 200: "Medium", 206: "Easy",
+        207: "Medium", 208: "Medium", 209: "Medium", 215: "Medium", 221: "Medium",
+        226: "Easy", 227: "Medium", 232: "Easy", 234: "Easy", 236: "Medium",
+        238: "Medium", 239: "Hard", 240: "Medium", 279: "Medium", 283: "Easy",
+        287: "Medium", 297: "Hard", 300: "Medium", 301: "Hard", 309: "Medium",
+        312: "Hard", 322: "Medium", 337: "Medium", 338: "Easy", 347: "Medium",
+        394: "Medium", 399: "Medium", 406: "Medium", 416: "Medium", 437: "Medium",
+        438: "Medium", 448: "Easy", 494: "Medium", 538: "Medium", 543: "Easy",
+        560: "Medium", 581: "Medium", 617: "Easy", 621: "Medium", 647: "Medium",
+        713: "Medium", 739: "Medium", 876: "Easy", 994: "Medium", 2029: "Medium",
+        2235: "Easy", 3090: "Easy", 3471: "Easy"
+    }
+
     # 3. Helper to detect difficulty from markdown content or filename
     def extract_difficulty(text: str, filename: str) -> str:
-        if "Hard" in text:
-            return "Hard"
-        elif "Easy" in text:
-            return "Easy"
-        elif "Medium" in text:
-            return "Medium"
+        # Priority 1: Match explicit Difficulty line in Markdown metadata
+        match = re.search(r'\*\*Difficulty:\*\*\s*(Easy|Medium|Hard)', text, re.IGNORECASE)
+        if match:
+            return match.group(1).capitalize()
+        match = re.search(r'Difficulty[:\s\*]+(Easy|Medium|Hard)', text, re.IGNORECASE)
+        if match:
+            return match.group(1).capitalize()
+
+        # Priority 2: Extract LC problem ID from filename (e.g. lc-0206-..., 15-lc-0206-...)
+        id_match = re.search(r'(?:lc-)?(\d{4})', filename)
+        if id_match:
+            lc_num = int(id_match.group(1))
+            if lc_num in KNOWN_DIFFICULTIES:
+                return KNOWN_DIFFICULTIES[lc_num]
+
         return "Medium"
 
     # 4. Process Problem Tracks (top-100, daily-practice, luffy)
