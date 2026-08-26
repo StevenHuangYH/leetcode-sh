@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 
-
+# 在不断缩短区间，根据l和r哪边来缩进行分条件
 
 class Solution:
     def search(self, nums: List[int], target: int) -> int:

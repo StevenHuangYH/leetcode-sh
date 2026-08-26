@@ -75,6 +75,8 @@ leetcode-sh/
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
+│   ├── lc-0206-reversed-linked-list.py
+│   ├── lc-0206-reversed-linked-list.md
 │   ├── lc-2029-stone-game-ix.py
 │   ├── lc-2029-stone-game-ix.md
 │   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.py
@@ -148,6 +150,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
 | :-: | :--- | :-: | :--- | :-: | :--- |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
+| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`daily-practice/lc-0206-reversed-linked-list.py`](daily-practice/lc-0206-reversed-linked-list.py)<br>[`daily-practice/lc-0206-reversed-linked-list.md`](daily-practice/lc-0206-reversed-linked-list.md) | Easy | 3-Pointer Pointer Reversal (`pre`, `cur`, `nxt`) |
 | **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py)<br>[`daily-practice/lc-2029-stone-game-ix.md`](daily-practice/lc-2029-stone-game-ix.md) | Medium | Modulo 3 Arithmetic / Game Theory |
 | **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)<br>[`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md) | Easy | Sliding Window / Frequency Map |
 | **3471** | Find the Largest Almost Missing Integer | [LC 3471](https://leetcode.com/problems/find-the-largest-almost-missing-integer/) | [`daily-practice/lc-3471-find-the-largest-almost-missing-integer.py`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)<br>[`daily-practice/lc-3471-find-the-largest-almost-missing-integer.md`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.md) | Easy | Fixed Sliding Window + Frequency Hashing |
