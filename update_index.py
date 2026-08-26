@@ -223,7 +223,23 @@ def build_index_html():
       --diff-hard: #f85149;
       --sidebar-width: 320px;
     }}
-    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    * {{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE & Edge */
+    }}
+    *::-webkit-scrollbar, html::-webkit-scrollbar, body::-webkit-scrollbar {{
+      display: none; /* Chrome, Safari, Edge Chromium, Opera */
+      width: 0px;
+      height: 0px;
+      background: transparent;
+    }}
+    html, body {{
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }}
     body {{
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
       background-color: var(--bg-main);
@@ -906,11 +922,11 @@ def build_index_html():
 
       <div class="toolbar-right">
         <div class="segmented-control" id="viewSwitcher">
-          <button class="seg-btn active" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
+          <button class="seg-btn" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
             <span class="seg-label">Split</span>
           </button>
-          <button class="seg-btn" id="btnNotes" onclick="setViewMode('notes')" title="Notes Only">
+          <button class="seg-btn active" id="btnNotes" onclick="setViewMode('notes')" title="Notes Only">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             <span class="seg-label">Notes</span>
           </button>
@@ -951,7 +967,7 @@ def build_index_html():
   <script>
     const items = {items_json};
     let currentKey = "README.md";
-    let viewMode = "dual"; // 'dual', 'notes', 'code'
+    let viewMode = "notes"; // 'dual', 'notes', 'code'
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{{}}");
 
     // Check initial URL hash
@@ -1176,7 +1192,7 @@ def build_index_html():
         ${{diffBadge}}
       `;
 
-      // Auto view mode: Full width for docs/overview, dual for problems
+      // Auto view mode: Full width for docs/overview, notes view by default for problems
       if (item.type === "doc" || !item.code) {{
         setViewMode("notes");
         document.getElementById("btnDual").style.display = "none";
@@ -1186,7 +1202,7 @@ def build_index_html():
         document.getElementById("btnDual").style.display = "inline-flex";
         document.getElementById("btnCode").style.display = "inline-flex";
         document.getElementById("copyBtn").style.display = "inline-flex";
-        setViewMode("dual");
+        setViewMode(viewMode || "notes");
       }}
 
       // Render Markdown Notes
