@@ -122,7 +122,7 @@ def collect_workspace_documents():
         34: "Medium", 39: "Medium", 41: "Hard", 42: "Hard", 46: "Medium",
         48: "Medium", 49: "Medium", 53: "Medium", 55: "Medium", 56: "Medium",
         62: "Medium", 64: "Medium", 70: "Easy", 72: "Hard", 75: "Medium",
-        76: "Hard", 78: "Medium", 79: "Medium", 84: "Hard", 85: "Hard",
+        76: "Hard", 78: "Medium", 79: "Medium", 83: "Easy", 84: "Hard", 85: "Hard",
         92: "Medium", 94: "Easy", 96: "Medium", 98: "Medium", 101: "Easy",
         102: "Medium", 104: "Easy", 105: "Medium", 114: "Medium", 121: "Easy",
         124: "Hard", 128: "Medium", 131: "Medium", 136: "Easy", 139: "Medium",
