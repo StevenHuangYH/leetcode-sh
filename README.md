@@ -2,7 +2,7 @@
 
 [![Python 3.x](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
-[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-160+-brightgreen.svg)]()
+[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-162+-brightgreen.svg)]()
 [![Interactive Viewer](https://img.shields.io/badge/Web_Viewer-index.html-blueviolet.svg)]()
 
 Welcome to my personal LeetCode question cracking collections. This repository is where I store my solutions, and categorize my various data structures or problem sets.
@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| 🟢 **Easy** | 23 | ~33% | 23 |
-| 🟡 **Medium** | 45 | ~64% | 136 |
+| 🟢 **Easy** | 23 | ~32% | 23 |
+| 🟡 **Medium** | 46 | ~65% | 137 |
 | 🔴 **Hard** | 2 | ~3% | 2 |
-| **Total** | **70 In-Depth Notes** | **100%** | **161 Problem Entities** |
+| **Total** | **71 In-Depth Notes** | **100%** | **162 Problem Entities** |
 
 ---
 
@@ -73,6 +73,8 @@ leetcode-sh/
 │   ├── lc-0713-subarray-product-less-than-k.py
 │   └── lc-0713-subarray-product-less-than-k.md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
+│   ├── lc-0092-reversed-linked-list-2.py
+│   ├── lc-0092-reversed-linked-list-2.md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
 │   ├── lc-0206-reversed-linked-list.py
