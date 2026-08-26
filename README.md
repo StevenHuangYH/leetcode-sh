@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 25 | ~34% | 24 |
-| **Medium** | 46 | ~62% | 137 |
+| **Easy** | 25 | ~33% | 24 |
+| **Medium** | 47 | ~63% | 137 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **74 In-Depth Notes** | **100%** | **164 Problem Entities** |
+| **Total** | **75 In-Depth Notes** | **100%** | **164 Problem Entities** |
 
 ---
 
@@ -66,6 +66,8 @@ leetcode-sh/
 │   ├── lc-0053-maximum-subarray.md
 │   ├── lc-0141-linked-list-cycle.py
 │   ├── lc-0141-linked-list-cycle.md
+│   ├── lc-0142-linked-list-cycle-ii.py
+│   ├── lc-0142-linked-list-cycle-ii.md
 │   ├── lc-0162-find-peak-element.py
 │   ├── lc-0162-find-peak-element.md
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.py
@@ -135,7 +137,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **105** | Construct Tree from Pre & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py)<br>[`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.md`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.md) | Medium | Preorder Root + Inorder Subtree Splitting |
 | **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py)<br>[`luffy/36-lc-0131-palindrome-partitioning.md`](luffy/36-lc-0131-palindrome-partitioning.md) | Medium | Backtracking + Palindrome Verification |
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`top-100/lc-0141-linked-list-cycle.py`](top-100/lc-0141-linked-list-cycle.py)<br>[`top-100/lc-0141-linked-list-cycle.md`](top-100/lc-0141-linked-list-cycle.md)<br>[`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py) | Easy | Floyd's Fast & Slow Pointers (2:1 Speed Collision) |
-| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.md`](luffy/18-lc-0142-linked-list-cycle-ii.md) | Medium | Fast/Slow Pointer + Mathematical Collision Entry |
+| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`top-100/lc-0142-linked-list-cycle-ii.py`](top-100/lc-0142-linked-list-cycle-ii.py)<br>[`top-100/lc-0142-linked-list-cycle-ii.md`](top-100/lc-0142-linked-list-cycle-ii.md)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py) | Medium | Fast/Slow Pointer + Mathematical Collision Entry ($a = c$) |
 | **155** | Min Stack | [LC 155](https://leetcode.com/problems/min-stack/) | [`luffy/21-lc-0155-min-stack.py`](luffy/21-lc-0155-min-stack.py)<br>[`luffy/21-lc-0155-min-stack.md`](luffy/21-lc-0155-min-stack.md) | Medium | Auxiliary Min Stack |
 | **162** | Find Peak Element | [LC 162](https://leetcode.com/problems/find-peak-element/) | [`top-100/lc-0162-find-peak-element.py`](top-100/lc-0162-find-peak-element.py)<br>[`top-100/lc-0162-find-peak-element.md`](top-100/lc-0162-find-peak-element.md) | Medium | Binary Search on Slope / Red-Blue Interval |
 | **167** | Two Sum II - Sorted Array | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/lc-0167-two-sum-ii-input-array-is-sorted.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)<br>[`top-100/lc-0167-two-sum-ii-input-array-is-sorted.md`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.md) | Medium | Sorted Array Inward Two Pointers |
@@ -229,7 +231,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **25** | Reverse Nodes in k-Group | [LC 25](https://leetcode.com/problems/reverse-nodes-in-k-group/) | [`daily-practice/lc-0025-reverse-nodes-in-k-group.py`](daily-practice/lc-0025-reverse-nodes-in-k-group.py)<br>[`daily-practice/lc-0025-reverse-nodes-in-k-group.md`](daily-practice/lc-0025-reverse-nodes-in-k-group.md) | Hard | Length Check + k-Group In-Place Reversal | Precompute length $n$; reverse $k$ nodes iteratively; 4-step stitch and advance $p_0$ in $O(n)$ time and $O(1)$ space. |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Sentinel Dummy + 3-Pointer Reversal | Advance $p_0$ to $left-1$, reverse $right-left+1$ nodes, reconnect tail/head in $O(n)$ time. |
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`top-100/lc-0141-linked-list-cycle.py`](top-100/lc-0141-linked-list-cycle.py)<br>[`top-100/lc-0141-linked-list-cycle.md`](top-100/lc-0141-linked-list-cycle.md)<br>[`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py) | Easy | Floyd's Fast & Slow Pointers | Fast moves 2 steps, slow moves 1 step; relative speed 1 guarantees collision in cycle. |
-| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.md`](luffy/18-lc-0142-linked-list-cycle-ii.md) | Medium | Floyd's Algorithm + Math | Reset one pointer to head upon collision; both advance by 1 to meet at cycle entry. |
+| **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`top-100/lc-0142-linked-list-cycle-ii.py`](top-100/lc-0142-linked-list-cycle-ii.py)<br>[`top-100/lc-0142-linked-list-cycle-ii.md`](top-100/lc-0142-linked-list-cycle-ii.md)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py) | Medium | Floyd's Algorithm + Math | Reset head upon collision; both advance by 1 step ($a=c$) to meet at cycle entry in $O(n)$ time and $O(1)$ space. |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | Iterative Pointer Reversal | Maintain `prev`, `curr`, and `next` pointers to reverse next links in-place. |
 | **876** | Middle of the Linked List | [LC 876](https://leetcode.com/problems/middle-of-the-linked-list/) | [`daily-practice/lc-0876-middle-of-the-linked-list.py`](daily-practice/lc-0876-middle-of-the-linked-list.py)<br>[`daily-practice/lc-0876-middle-of-the-linked-list.md`](daily-practice/lc-0876-middle-of-the-linked-list.md) | Easy | Fast & Slow Pointers (2:1 Speed) | `slow` moves 1 step, `fast` moves 2 steps; when `fast` finishes, `slow` is at middle. |
 
