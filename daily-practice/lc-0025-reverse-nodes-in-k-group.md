@@ -26,17 +26,55 @@
 
 ---
 
-## 2. Core Idea & Mathematical Intuition / 核心解法思路与数学原理
+## 2. Problem Blueprint & Core Invariant / 题意考点蓝图与核心不变量
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎯 考试与面试考察核心蓝图 (Interview Blueprint)                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. 哨兵哑节点机制 (Sentinel Dummy): 抹平 head 前驱缺失的特例处理。          │
+│ 2. 三指针滑动反转 (3-Pointer In-Place Slide): 局部 k 节点无额外空间翻转。    │
+│ 3. 跨组四步缝合口诀: 存新尾 -> 连后驱 -> 连前驱 -> 推进锚点。                │
+│ 4. 剩余节点保序判定: 严控剩余长度 n >= k，不足 k 节点绝不破坏原有结构。     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
+
+### 🧠 反转链表算法思维谱系演化树 (Pattern Lineage)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🧠 Linked List Reversal Pattern Lineage (反转链表思维谱系演化树)             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Level 1 (Primitive): LC 206 Reverse Linked List                            │
+│  └─ 不变量 (Invariant): 三指针 (pre, cur, nxt) 就地翻转 100% 链表节点。       │
+│        │                                                                    │
+│        ▼ [演进 Twist: 引入边界范围 [left, right]]                            │
+│  Level 2 (Bounded):   LC 92 Reverse Linked List II                          │
+│  └─ 不变量 (Invariant): 哨兵 dummy + 锚点 p0 定位在 left-1，单次局部缝合。    │
+│        │                                                                    │
+│        ▼ [演进 Twist: 循环 ⌊n/k⌋ 次 + 动态锚点滚动前移 (p0 步进)]             │
+│  Level 3 (Cyclic):    LC 25 Reverse Nodes in k-Group (★ 本题)               │
+│  └─ 不变量 (Invariant): 预判总长 n + while n>=k 循环翻转 + 动态前驱缝合。    │
+│        │                                                                    │
+│        ▼ [演进 Twist: 与树/图结合或复杂分组]                                 │
+│  Level 4 (Advanced):  LC 24 (两两交换/k=2) / LC 430 扁平化多级链表          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
 
 ### 💡 核心机制：哨兵哑节点 (`dummyNode`) + 长度预判 + 循环三指针反转与锚点步进 (`p0`)
-
-本题是 **LeetCode 92 (反转链表 II)** 的高阶泛化版。在 LeetCode 92 中，我们只需对单一局部区间 $[left, right]$ 反转一次；而在本题中，我们需要 **连续循环执行 $\lfloor n / k \rfloor$ 次局部反转**，并将各组无缝缝合。
 
 整个算法的三个核心逻辑支柱：
 1. **支柱 1：先探明链表总长度 $n$**
    * 遍历一次链表得到长度 $n$。
-   * 每次处理一组时，先检查剩余节点数是否满足 $n \ge k$。
-   * 若 $n < k$，说明最后一组不足 $k$ 个节点，无需反转，直接终止循环并保留原有顺序。
+   * 每次处理一组时，先检查剩余节点数是否满足 $n \ge k$。若 $n < k$，直接终止循环并保留原有顺序。
 2. **支柱 2：局部标准 $k$ 节点反转**
    * 维护一个前驱锚点指针 `p0`（初始位于 `dummyNode`）。
    * `cur = p0.next`，`pre = None`，循环 $k$ 次执行经典三指针翻转（`nxt = cur.next; cur.next = pre; pre = cur; cur = nxt`）。
@@ -98,7 +136,7 @@ dummy -> [2] -> [1] -> [4] -> [3] -> [5] -> None
 
 ---
 
-## 3. Step-by-Step Code Walkthrough / 代码逐行详解
+## 4. Step-by-Step Code Walkthrough / 代码逐行详解
 
 基于你在 `daily-practice/lc-0025-reverse-nodes-in-k-group.py` 中的经典实现：
 
@@ -189,50 +227,134 @@ class Solution:
 
 ---
 
-## 4. Alternative Paradigms & Comparative Study / 算法范式对比
+## 5. Interview Simulation & Follow-Up Pivots / 面试官现场追问演练
 
-```
-范式 1: 长度预判 + 迭代缝合 (当前解法)          范式 2: 递归分治反转 (Recursion)
-p0 -> [Group 1] -> [Group 2] -> [Remainder]      head -> [Reverse k] -> reverseKGroup(next_head, k)
-循环迭代，空间严格 O(1)                           自顶向下递归，调用栈占用 O(n/k) 空间
+### 🎤 追问 1：如果面试官要求“单次遍历 (One-Pass)，禁止预先扫描统计总长度 $n$”，你该如何破局？
+
+* **面试官意图**：考察你是否具备 **“向前探路探测法 (Lookahead Probe)”** 的能力，即在不知道长度的情况下，如何保证剩余不足 $k$ 个节点不被误翻转。
+* **破局解法（探路探测法）**：
+  * 在翻转每一组前，先用探针指针向前走 $k$ 步。
+  * 若中途遇到 `None`，说明剩余不足 $k$ 个节点，直接退出循环！
+
+```python
+# 单趟遍历探路法 (One-Pass Lookahead Probe)
+class SolutionLookahead:
+    def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        dummy = ListNode(next=head)
+        p0 = dummy
+
+        while True:
+            # 1. 探路：向前走 k 步检测是否存在完整的一组
+            probe = p0
+            for _ in range(k):
+                probe = probe.next
+                if not probe:
+                    return dummy.next  # 剩余不足 k 个，直接返回
+
+            # 2. 存在完整的一组，执行三指针就地翻转
+            pre = None
+            cur = p0.next
+            for _ in range(k):
+                nxt = cur.next
+                cur.next = pre
+                pre = cur
+                cur = nxt
+
+            # 3. 缝合与锚点步进
+            nxt = p0.next
+            p0.next.next = cur
+            p0.next = pre
+            p0 = nxt
 ```
 
-| 维度 | 范式 1：长度预判 + 迭代缝合 (推荐) | 范式 2：区间探测 + 迭代反转 | 范式 3：递归分治法 (Recursion) |
+---
+
+### 🎤 追问 2：如果面试官要求用“递归分治法 (Recursion)”实现，代码结构是怎样的？有什么代价？
+
+* **面试官意图**：考察你对递归调用栈与分治思想的理解，以及能否指出其在内存空间上的权衡代价。
+* **破局解法（递归分治法）**：
+  * 先探测前 $k$ 个节点，不够则递归基返回 `head`。
+  * 翻转前 $k$ 个节点后，原头节点 `head` 变为尾节点，其 `head.next` 指向 `self.reverseKGroup(next_head, k)` 的递归结果。
+* **代价分析**：递归栈深度为 $\mathcal{O}(n/k)$，当 $n = 5000, k = 1$ 时消耗 $\mathcal{O}(n)$ 栈空间，违背进阶 $\mathcal{O}(1)$ 空间的要求。
+
+```python
+# 递归分治法 (Recursive Approach)
+class SolutionRecursion:
+    def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        # 1. 探路 k 步
+        cur = head
+        for _ in range(k):
+            if not cur:
+                return head
+            cur = cur.next
+
+        # 2. 翻转当前 k 节点
+        pre, node = None, head
+        for _ in range(k):
+            nxt = node.next
+            node.next = pre
+            pre = node
+            node = nxt
+
+        # 3. 递归连接后续子链表
+        head.next = self.reverseKGroup(cur, k)
+        return pre
+```
+
+---
+
+### 📊 算法范式横向对比矩阵
+
+| 维度 | 范式 1：长度预判 + 迭代缝合 (当前解法 - 推荐) | 范式 2：探路探测 + 迭代翻转 (One-Pass) | 范式 3：递归分治法 (Recursion) |
 | :--- | :--- | :--- | :--- |
-| **核心机制** | 先求总长 $n$，`while n >= k` 循环缝合 | 每轮向前走 $k$ 步探路，够 $k$ 步再翻转 | 翻转前 $k$ 个节点，递归调用处理后续链表 |
+| **核心机制** | 先求总长 $n$，`while n >= k` 循环缝合 | 每轮向前探路 $k$ 步，够 $k$ 步再翻转 | 翻转前 $k$ 个节点，递归解决后续链表 |
 | **空间复杂度** | $\mathcal{O}(1)$ (严格常数内存) | $\mathcal{O}(1)$ (严格常数内存) | $\mathcal{O}(n/k)$ (系统递归调用栈) |
 | **时间复杂度** | $\mathcal{O}(n)$ (总计遍历节点 $< 2n$) | $\mathcal{O}(n)$ (探路 + 翻转各 1 次) | $\mathcal{O}(n)$ |
-| **代码优雅度** | ⭐️⭐️⭐️⭐️⭐️ (复用 LC 92 模版，逻辑极为规整) | ⭐️⭐️⭐️⭐️ (多一层探路判断) | ⭐️⭐️⭐️ (简洁但违背进阶 $\mathcal{O}(1)$ 要求) |
+| **代码优雅度** | ⭐️⭐️⭐️⭐️⭐️ (复用 LC 92 模版，逻辑最为工整) | ⭐️⭐️⭐️⭐️ (多一层探测循环) | ⭐️⭐️⭐️ (简洁但消耗栈空间) |
 
 ---
 
-## 5. Key FAQs & Edge Cases / 常见疑难与边界排查
+## 6. The Error Log & Dry-Run / 错题排查与实例推演
 
-### ❓ Q1: 为什么必须用临时变量 `nxt` 暂存 `p0.next`？
-* **解答**：
-  * 在执行 `p0.next = pre` 之后，`p0.next` 会被立刻改写为 `pre`（新头部）。
-  * 如果没有提前暂存 `nxt = p0.next`，你就永远失去了本组尾节点的指针，导致无法执行 `p0 = nxt` 推进锚点！
-  * **四步黄金口诀**：
-    1. 存尾 (`nxt = p0.next`)
-    2. 连后 (`p0.next.next = cur`)
-    3. 连前 (`p0.next = pre`)
-    4. 步进 (`p0 = nxt`)
+### ⚠️ 错题排查与反模式诊断 (The Error Log: Anti-Patterns & Defensive Fixes)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ⚠️ 反模式 1：缝合时先改写 p0.next，导致新尾节点指针丢失                                                      │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ❌ 错误写法:                                                                                                │
+│    p0.next = pre        # 错误：先将 p0.next 指向了新头节点 pre                                             │
+│    p0.next.next = cur   # 灾难：此时 p0.next 是 pre，pre.next 变成了 cur，前 k 个节点的翻转结构瞬间被毁！    │
+│    p0 = nxt             # 且此时 nxt 未定义或指向错误                                                       │
+│                                                                                                             │
+│ 🎯 翻车机理 (Root Cause):                                                                                   │
+│    翻转后，原本的 p0.next 是这一组的【新尾部】。一旦先给 p0.next 赋值，就永远失去了对新尾部的引用！          │
+│                                                                                                             │
+│ 🛡️ 防御口诀 (Gold Standard Invariant):                                                                     │
+│    ① 存尾 (nxt = p0.next) -> ② 连后 (p0.next.next = cur) -> ③ 连前 (p0.next = pre) -> ④ 步进 (p0 = nxt)  │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| :--- | :--- | :--- | :--- |
+| **未提前缓存 `p0.next` 即改写** | 链表成环死循环，或仅返回前 2 个节点 | 改写 `p0.next` 破坏了对本组尾部的引用 | 必须在任何指针改写前用 `nxt = p0.next` 暂存尾节点 |
+| **反转内部循环计数用 `while cur:`** | 末尾不足 $k$ 个的节点也被强行翻转 | 题目明确要求剩余节点保序 | 严格使用 `while n >= k:` 或探路 probe 控制翻转次数 |
+| **忘了更新 `n -= k`** | `while n >= k` 陷入无限死循环 | 计数器未按步长衰减 | 在每组翻转开始时立即执行 `n -= k` |
 
 ---
 
-### ❓ Q2: 当 $k = 1$ 时会发生什么？
-* 每一轮 $k = 1$，反转单节点子区间。
-* 链表结构在逻辑上被完全原样重构，返回与原链表完全相同的顺序，不会出现死循环或空指针异常。
+### ❓ 常见疑难与边界排查 (Boundary FAQs)
+
+* **Q1: 当 $k = 1$ 时会发生什么？**
+  * 每一轮 $k = 1$，反转单节点子区间。链表结构在逻辑上被完全原样重构，返回与原链表完全相同的顺序，不会出现死循环或空指针异常。
+* **Q2: 当 $k = n$ 时会发生什么？**
+  * $n \ge k$ 仅成立 1 次。整个链表被作为单一组整体反转，直接返回完全翻转后的单链表。
+* **Q3: 当 $k > n$ 时会发生什么？**
+  * 初始 $n \ge k$ 为 False，`while` 循环直接不执行，返回 `dummyNode.next` 即原始链表，完美符合题目要求。
 
 ---
 
-### ❓ Q3: 当 $k = n$ 时会发生什么？
-* $n \ge k$ 仅成立 1 次。
-* 整个链表被作为单一组整体反转，直接返回完全翻转后的单链表。
-
----
-
-## 6. Complete Step-by-Step Dry-Run / 实例全程推演
+### 🎨 实例全程推演表 (Complete Dry-Run)
 
 **输入**：`head = [1, 2, 3, 4, 5]`, `k = 2`
 

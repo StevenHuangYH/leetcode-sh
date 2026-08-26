@@ -33,24 +33,28 @@ This file establishes the operational rules and standards for all AI coding assi
 
 ---
 
-## 📝 Core Rule 2: Standard 7-Section Structure for Companion `.md` Notes
+## 📝 Core Rule 2: Standard 7-Section Structure for Companion `.md` Notes (Active & Exam-Oriented Standard)
 
-Every companion `.md` note must adhere to the standard 7-section structure:
+Every companion `.md` note must adhere to the standard 7-section structure, designed around active recall, mental model mapping, and exam/interview readiness:
 
 1. **Header & File Links**:
    * Problem number, English & Chinese title, difficulty rating, tags, and clickable markdown link to the corresponding `.py` file.
 2. **Problem Statement & Constraints (Bilingual)**:
    * English (`[EN]`) and Chinese (`[CN]`) problem statements, plus complete input constraints and edge assumptions.
-3. **Core Idea & Intuition (Visuals / Mathematical Principles)**:
-   * Core insight, slope theorems, mathematical proofs, ASCII diagrams, and pattern classifications (e.g., Red-Blue binary search coloring, two-pointer inward narrowing).
+3. **Core Idea, Mental Model & Pattern Lineage (Visuals & Mathematics)**:
+   * **ASCII Pattern Lineage Map (算法思维谱系演化图)**: Visually show how the current problem inherits from foundational primitives (e.g. `LC 206 → LC 92 → LC 25`) and what new twist was introduced.
+   * Core insights, mathematical proofs, invariants, and multi-stage ASCII diagrams.
 4. **Step-by-Step Code Walkthrough**:
    * Line-by-line breakdown based **strictly on the user's original `.py` implementation**, explaining the rationale, variable roles, and loop invariants.
-5. **Alternative Paradigms & Optimizations**:
-   * Comparative tables and clean code snippets for alternative templates (e.g. Closed, Left-closed Right-open, Open intervals) or advanced pruning.
-6. **Key FAQs & Edge Cases**:
-   * Detailed answers to common pitfalls, boundary edge cases (single-element arrays, duplicates, out-of-bounds safety), and step-by-step dry runs on representative examples.
+5. **Interview Simulation: Alternative Paradigms & Follow-up Pivots (面试官追问演练)**:
+   * Framed as real-world **Interviewer Follow-ups** (e.g. *"Interviewer: Can you do this in one pass without length pre-counting?"* or *"Interviewer: How would you solve this recursively?"*).
+   * Comparative tables and clean code snippets for alternative templates.
+6. **The Error Log & Complete Dry-Run (错题排查与实例推演)**:
+   * **⚠️ The Error Log: Anti-Patterns & Defensive Fixes (反模式诊断表)**: 4-column matrix (*Buggy Pattern / Traps* $\rightarrow$ *Symptom & Fail Case* $\rightarrow$ *Root Cause* $\rightarrow$ *Defensive Fix & Invariant*).
+   * Complete step-by-step dry-run table on representative inputs.
+   * Key boundary FAQs (single elements, $k=1$, $k=n$, duplicates, empty lists).
 7. **Complexity Analysis**:
-   * Markdown table detailing Time Complexity and Space Complexity with clear rationales.
+   * Markdown table detailing Time Complexity and Space Complexity with rigorous mathematical rationales.
 
 ---
 
