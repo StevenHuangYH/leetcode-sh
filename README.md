@@ -72,6 +72,8 @@ leetcode-sh/
 │   ├── lc-0162-find-peak-element.md
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.py
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.md
+│   ├── lc-0206-reverse-linked-list.py
+│   ├── lc-0206-reverse-linked-list.md
 │   ├── lc-0209-minimum-size-subarray-sum.py
 │   ├── lc-0209-minimum-size-subarray-sum.md
 │   ├── lc-0713-subarray-product-less-than-k.py
@@ -83,8 +85,6 @@ leetcode-sh/
 │   ├── lc-0092-reversed-linked-list-2.md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
-│   ├── lc-0206-reversed-linked-list.py
-│   ├── lc-0206-reversed-linked-list.md
 │   ├── lc-0876-middle-of-the-linked-list.py
 │   ├── lc-0876-middle-of-the-linked-list.md
 │   ├── lc-2029-stone-game-ix.py
@@ -142,7 +142,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **162** | Find Peak Element | [LC 162](https://leetcode.com/problems/find-peak-element/) | [`top-100/lc-0162-find-peak-element.py`](top-100/lc-0162-find-peak-element.py)<br>[`top-100/lc-0162-find-peak-element.md`](top-100/lc-0162-find-peak-element.md) | Medium | Binary Search on Slope / Red-Blue Interval |
 | **167** | Two Sum II - Sorted Array | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/lc-0167-two-sum-ii-input-array-is-sorted.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)<br>[`top-100/lc-0167-two-sum-ii-input-array-is-sorted.md`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.md) | Medium | Sorted Array Inward Two Pointers |
 | **200** | Number of Islands | [LC 200](https://leetcode.com/problems/number-of-islands/) | [`luffy/38-lc-0200-number-of-islands.py`](luffy/38-lc-0200-number-of-islands.py)<br>[`luffy/38-lc-0200-number-of-islands.md`](luffy/38-lc-0200-number-of-islands.md) | Medium | 2D Grid Sink Islands (DFS / BFS) |
-| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py)<br>[`luffy/15-lc-0206-reverse-linked-list.md`](luffy/15-lc-0206-reverse-linked-list.md) | Easy | In-Place 3-Pointer Iteration (`prev, curr, nxt`) |
+| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`top-100/lc-0206-reverse-linked-list.py`](top-100/lc-0206-reverse-linked-list.py)<br>[`top-100/lc-0206-reverse-linked-list.md`](top-100/lc-0206-reverse-linked-list.md)<br>[`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | In-Place 3-Pointer Iteration (`prev, curr, nxt`) |
 | **207** | Course Schedule | [LC 207](https://leetcode.com/problems/course-schedule/) | [`luffy/42-lc-0207-course-schedule.py`](luffy/42-lc-0207-course-schedule.py)<br>[`luffy/42-lc-0207-course-schedule.md`](luffy/42-lc-0207-course-schedule.md) | Medium | Topological Sort (Kahn's BFS / DFS) |
 | **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/lc-0209-minimum-size-subarray-sum.py`](top-100/lc-0209-minimum-size-subarray-sum.py)<br>[`top-100/lc-0209-minimum-size-subarray-sum.md`](top-100/lc-0209-minimum-size-subarray-sum.md) | Medium | Dynamic Sliding Window |
 | **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py)<br>[`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.md`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.md) | Medium | Postorder DFS |
@@ -232,7 +232,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Sentinel Dummy + 3-Pointer Reversal | Advance $p_0$ to $left-1$, reverse $right-left+1$ nodes, reconnect tail/head in $O(n)$ time. |
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`top-100/lc-0141-linked-list-cycle.py`](top-100/lc-0141-linked-list-cycle.py)<br>[`top-100/lc-0141-linked-list-cycle.md`](top-100/lc-0141-linked-list-cycle.md)<br>[`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py) | Easy | Floyd's Fast & Slow Pointers | Fast moves 2 steps, slow moves 1 step; relative speed 1 guarantees collision in cycle. |
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`top-100/lc-0142-linked-list-cycle-ii.py`](top-100/lc-0142-linked-list-cycle-ii.py)<br>[`top-100/lc-0142-linked-list-cycle-ii.md`](top-100/lc-0142-linked-list-cycle-ii.md)<br>[`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py) | Medium | Floyd's Algorithm + Math | Reset head upon collision; both advance by 1 step ($a=c$) to meet at cycle entry in $O(n)$ time and $O(1)$ space. |
-| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | Iterative Pointer Reversal | Maintain `prev`, `curr`, and `next` pointers to reverse next links in-place. |
+| **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`top-100/lc-0206-reverse-linked-list.py`](top-100/lc-0206-reverse-linked-list.py)<br>[`top-100/lc-0206-reverse-linked-list.md`](top-100/lc-0206-reverse-linked-list.md)<br>[`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | Iterative Pointer Reversal | Maintain `prev`, `curr`, and `nxt` pointers to reverse next links in-place in $O(n)$ time and $O(1)$ space. |
 | **876** | Middle of the Linked List | [LC 876](https://leetcode.com/problems/middle-of-the-linked-list/) | [`daily-practice/lc-0876-middle-of-the-linked-list.py`](daily-practice/lc-0876-middle-of-the-linked-list.py)<br>[`daily-practice/lc-0876-middle-of-the-linked-list.md`](daily-practice/lc-0876-middle-of-the-linked-list.md) | Easy | Fast & Slow Pointers (2:1 Speed) | `slow` moves 1 step, `fast` moves 2 steps; when `fast` finishes, `slow` is at middle. |
 
 ---
