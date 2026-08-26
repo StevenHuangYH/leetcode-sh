@@ -2,7 +2,7 @@
 
 [![Python 3.x](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
-[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-53+-brightgreen.svg)]()
+[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-160+-brightgreen.svg)]()
 [![Interactive Viewer](https://img.shields.io/badge/Web_Viewer-index.html-blueviolet.svg)]()
 
 Welcome to my personal LeetCode question cracking collections. This repository is where I store my solutions, and categorize my various data structures or problem sets.
@@ -34,12 +34,12 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ## 📊 Practice Statistics & Summary
 
-| Difficulty | Count | Percentage | Companion Notes Coverage |
+| Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| 🟢 **Easy** | 18 | ~34% | 100% |
-| 🟡 **Medium** | 33 | ~62% | 100% |
-| 🔴 **Hard** | 2 | ~4% | 100% |
-| **Total** | **53+ Solutions** | **100%** | **100% Dual `.py` & `.md`** |
+| 🟢 **Easy** | 23 | ~33% | 23 |
+| 🟡 **Medium** | 45 | ~64% | 136 |
+| 🔴 **Hard** | 2 | ~3% | 2 |
+| **Total** | **70 In-Depth Notes** | **100%** | **161 Problem Entities** |
 
 ---
 
