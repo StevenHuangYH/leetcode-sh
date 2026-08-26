@@ -91,15 +91,15 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 
 ---
 
-## 🎨 Core Rule 4: Visual & Emoji Styling Standard
+## 🎨 Core Rule 4: Visual & Iconography Standards
 
-1. **Strict Prohibition of Distracting Emojis in README**:
+1. **Strict Prohibition of Distracting Emojis in README & Documentation**:
    * **Zero Distracting Emojis**: NEVER use decorative, random, or distracting emojis in `README.md` (e.g., no emojis in section titles, headings, table headers, table cells, or bullet points such as `🔥`, `🚀`, `✨`, `📁`, `📊`, `📑`, `🟢`, `🟡`, `🔴`).
-   * Keep `README.md` strictly clean, minimal, typography-focused, and professional.
+   * Keep `README.md` and repository documents strictly clean, minimal, typography-focused, and professional.
 
-2. **Unified & Harmonized Emoji Styling on `index.html`**:
-   * Emojis ARE permitted in the web viewer (`index.html`) and automated generator (`update_index.py`) for category tabs, accordion tracks, and UI navigation items.
-   * **Consistent Color & Visual Harmony**: Emojis used in the UI must adhere to a cohesive, harmonious palette that complements the GitHub Dark UI theme (`#0d1117` / `#161b22`), avoiding jarring visual mismatches.
+2. **Clean Monochromatic SVG Iconography on `index.html`**:
+   * The web viewer (`index.html`) and automated generator (`update_index.py`) use clean, theme-matched SVG / monochrome icons (VS Code / GitHub Dark aesthetic).
+   * **No Multi-Colored Platform Emojis**: Category labels, accordion folders, and navigation nodes must avoid platform-dependent multi-colored emojis to ensure a consistent, developer-focused IDE aesthetic across all operating systems.
 
 ---
 
@@ -107,6 +107,6 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 
 Whenever a push is executed, the assistant must provide a structured confirmation report to the user containing:
 1. **Commit & Remote Status**: Commit hash, branch target (`main -> origin/main`), and list of modified files.
-2. **Viewer Navigation Path**: The exact sidebar path in `index.html` where the note/solution can be viewed (e.g., `📅 Daily Practice Track -> LC 0153 find minimum in rotated sorted array`).
+2. **Viewer Navigation Path**: The exact sidebar path in `index.html` where the note/solution can be viewed (e.g., `Daily Practice Track -> LC 0153 find minimum in rotated sorted array`).
 3. **Browser Cache Invalidation Reminder**: Explicit instructions to hard-refresh the browser tab (`Ctrl + Shift + R` or `Cmd + Shift + R`) to bypass cached HTML.
 

@@ -88,7 +88,7 @@ def collect_workspace_documents():
 
             topic_docs[key] = {
                 "key": key,
-                "category": "🎯 Problem Index",
+                "category": "Problem Index",
                 "title": title,
                 "short": short,
                 "path": f"problem-index/{key}",
@@ -102,7 +102,7 @@ def collect_workspace_documents():
     overview_docs = {
         "README.md": {
             "key": "README.md",
-            "category": "📖 Overview",
+            "category": "Overview",
             "title": "LeetCode Self-Practices Overview (README)",
             "short": "README.md",
             "path": "README.md",
@@ -125,9 +125,9 @@ def collect_workspace_documents():
 
     # 4. Process Problem Tracks (top-100, daily-practice, luffy)
     tracks = [
-        ("top-100", "🔥 Top 100 Liked Track"),
-        ("daily-practice", "📅 Daily Practice Track"),
-        ("luffy", "📚 Luffy Curriculum (01-42)"),
+        ("top-100", "Top 100 Liked Track"),
+        ("daily-practice", "Daily Practice Track"),
+        ("luffy", "Luffy Curriculum (01-42)"),
     ]
 
     for dir_name, cat_title in tracks:
@@ -435,21 +435,34 @@ def build_index_html():
       color: var(--text-bright);
     }}
     .tree-chevron {{
-      font-size: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 12px;
-      text-align: center;
       color: var(--text-muted);
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-block;
       flex-shrink: 0;
     }}
     .tree-folder.collapsed .tree-chevron {{
       transform: rotate(-90deg);
     }}
-    .tree-folder-icon {{
-      font-size: 13px;
-      line-height: 1;
+    .tree-folder-icon, .tree-file-icon {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      color: var(--text-muted);
+    }}
+    .tree-file-icon.code-icon {{
+      color: #58a6ff;
+    }}
+    .tree-file-icon.doc-icon {{
+      color: #8b949e;
+    }}
+    .pane-svg {{
+      color: var(--accent);
+      vertical-align: middle;
+      margin-right: 4px;
     }}
     .tree-folder-name {{
       flex: 1;
@@ -501,11 +514,6 @@ def build_index_html():
       background-color: rgba(56, 139, 253, 0.15);
       color: var(--accent);
       font-weight: 600;
-    }}
-    .tree-file-icon {{
-      font-size: 12px;
-      opacity: 0.85;
-      flex-shrink: 0;
     }}
     .tree-title {{
       flex: 1;
@@ -856,13 +864,13 @@ def build_index_html():
     <div class="sidebar-header">
       <div class="header-brand">
         <div class="brand-title">
-          <span class="brand-icon">📚</span>
+          <svg class="brand-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
           <span>LeetCode Station</span>
         </div>
         <span class="progress-badge" id="progressStats" title="Total Indexed Problems">0 Problems</span>
       </div>
       <div class="search-box-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <input type="text" id="search" class="search-box" placeholder="Search problems, patterns... (/)" oninput="handleSearch(this.value)">
         <button id="searchClear" class="search-clear-btn" onclick="clearSearch()" title="Clear search (Esc)">✕</button>
       </div>
@@ -899,21 +907,21 @@ def build_index_html():
       <div class="toolbar-right">
         <div class="segmented-control" id="viewSwitcher">
           <button class="seg-btn active" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
-            <span>◫</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
             <span class="seg-label">Split</span>
           </button>
           <button class="seg-btn" id="btnNotes" onclick="setViewMode('notes')" title="Notes Only">
-            <span>📝</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             <span class="seg-label">Notes</span>
           </button>
           <button class="seg-btn" id="btnCode" onclick="setViewMode('code')" title="Code Only">
-            <span>🐍</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
             <span class="seg-label">Code</span>
           </button>
         </div>
 
         <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution">
-          <span>📋</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           <span id="copyBtnLabel">Copy Code</span>
         </button>
       </div>
@@ -923,7 +931,7 @@ def build_index_html():
       <!-- Left Pane: Syntax-Highlighted Code -->
       <section class="pane" id="left-pane">
         <div class="pane-header">
-          <span class="pane-title">🐍 Solution Source Code</span>
+          <span class="pane-title"><svg class="pane-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>Solution Source Code</span>
           <button class="action-btn" onclick="copyActiveCode()">Copy Python</button>
         </div>
         <div class="code-viewer">
@@ -958,33 +966,28 @@ def build_index_html():
     const treeStructure = [
       {{
         id: "overview",
-        name: "📖 Overview",
-        icon: "📄",
+        name: "Overview",
         filter: k => k === "README.md"
       }},
       {{
         id: "problem-index",
-        name: "🎯 Problem Index",
-        icon: "📁",
+        name: "Problem Index",
         filter: k => k.startsWith("topic-")
       }},
       {{
         id: "top-100",
-        name: "🔥 top-100",
-        icon: "📁",
+        name: "Top 100 Liked Track",
         filter: k => k.startsWith("top-100/")
       }},
       {{
-        id: "luffy",
-        name: "📚 luffy (01-42)",
-        icon: "📁",
-        filter: k => k.startsWith("luffy/")
+        id: "daily-practice",
+        name: "Daily Practice Track",
+        filter: k => k.startsWith("daily-practice/")
       }},
       {{
-        id: "daily-practice",
-        name: "📅 daily-practice",
-        icon: "📁",
-        filter: k => k.startsWith("daily-practice/")
+        id: "luffy",
+        name: "Luffy Curriculum (01-42)",
+        filter: k => k.startsWith("luffy/")
       }}
     ];
 
@@ -1045,6 +1048,10 @@ def build_index_html():
       const q = searchQuery.toLowerCase().trim();
       let html = "";
 
+      const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+      const codeSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
+      const chevronSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
       treeStructure.forEach(folder => {{
         const allKeys = Object.keys(items).filter(folder.filter);
         const matchingKeys = q
@@ -1061,13 +1068,17 @@ def build_index_html():
         // Auto expand if search active, else respect saved state
         const isCollapsed = q ? false : !!collapsedFolders[folder.id];
         const collapseClass = isCollapsed ? "collapsed" : "";
-        const folderIcon = isCollapsed ? "📁" : "📂";
+        const folderSvg = isCollapsed
+          ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`
+          : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"></path></svg>`;
+
+        const folderIconHtml = folder.id === 'overview' ? docSvg : folderSvg;
 
         html += `
           <div class="tree-folder ${{collapseClass}}" id="folder-${{folder.id}}">
             <div class="tree-folder-header" onclick="toggleFolder('${{folder.id}}')">
-              <span class="tree-chevron">▼</span>
-              <span class="tree-folder-icon">${{folder.id === 'overview' ? '📄' : folderIcon}}</span>
+              <span class="tree-chevron">${{chevronSvg}}</span>
+              <span class="tree-folder-icon">${{folderIconHtml}}</span>
               <span class="tree-folder-name">${{folder.name}}</span>
               <span class="tree-count-badge">${{matchingKeys.length}}</span>
             </div>
@@ -1079,11 +1090,13 @@ def build_index_html():
           const isActive = k === currentKey;
           const activeClass = isActive ? "active" : "";
           const diffClass = item.diff && item.diff !== "All" ? `diff-${{item.diff}}` : "diff-All";
-          const fileIcon = item.type === "doc" ? "📝" : "🐍";
+          const fileIconHtml = item.type === "doc"
+            ? `<span class="tree-file-icon doc-icon">${{docSvg}}</span>`
+            : `<span class="tree-file-icon code-icon">${{codeSvg}}</span>`;
 
           html += `
             <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
-              <span class="tree-file-icon">${{fileIcon}}</span>
+              ${{fileIconHtml}}
               <span class="tree-title">${{item.short}}</span>
               <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
             </div>
