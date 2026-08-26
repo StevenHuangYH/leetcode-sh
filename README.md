@@ -305,7 +305,6 @@ This repository features an automated, standalone single-page application (`inde
 * **View Mode Controls**: Switch instantly between `[Split View]`, `[Notes Only]`, and `[Code Only]`.
 * **Category Accordion**: Collapse / expand categories (`Top 100`, `Daily Practice`, `Luffy Curriculum`, `Topic Index`) or use `Expand All` / `Fold All`.
 * **Difficulty & Pattern Filter Pills**: Filter by `Easy`, `Medium`, `Hard`, or specific algorithmic patterns.
-* **Review Checkmarks**: Track your problem review status with checkmarks stored in browser `localStorage`.
 * **Keyboard Shortcuts**: Press `/` to focus the search box, `Esc` to clear.
 
 ---

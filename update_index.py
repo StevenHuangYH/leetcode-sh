@@ -12,7 +12,7 @@ Features:
 - View mode switcher (Dual Split, Notes Only, Code Only) with resizable pane
 - Category Accordions with Expand/Fold All controls
 - Difficulty filter tags (Easy, Medium, Hard)
-- LocalStorage persistent review checkmarks & progress counter
+- Dynamic indexed problem count badge
 - Keyboard shortcuts (/ for search, Esc to clear)
 - Automated Git pre-commit hook integration
 =============================================================================
@@ -502,25 +502,6 @@ def build_index_html():
       color: var(--accent);
       font-weight: 600;
     }}
-    .tree-check {{
-      width: 13px;
-      height: 13px;
-      border: 1px solid var(--border-color);
-      border-radius: 3px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      flex-shrink: 0;
-      color: transparent;
-      transition: all 0.15s;
-    }}
-    .tree-check.checked {{
-      background: #238636;
-      border-color: #2ea043;
-      color: #fff;
-    }}
     .tree-file-icon {{
       font-size: 12px;
       opacity: 0.85;
@@ -878,7 +859,7 @@ def build_index_html():
           <span class="brand-icon">📚</span>
           <span>LeetCode Station</span>
         </div>
-        <span class="progress-badge" id="progressStats" title="Solved / Total Problems">0 / 0 Done</span>
+        <span class="progress-badge" id="progressStats" title="Total Indexed Problems">0 Problems</span>
       </div>
       <div class="search-box-wrapper">
         <span class="search-icon">🔍</span>
@@ -964,7 +945,6 @@ def build_index_html():
     let currentKey = "README.md";
     let viewMode = "dual"; // 'dual', 'notes', 'code'
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{{}}");
-    const reviewedSet = new Set(JSON.parse(localStorage.getItem("reviewedProblems") || "[]"));
 
     // Check initial URL hash
     if (window.location.hash && window.location.hash.length > 1) {{
@@ -1008,27 +988,9 @@ def build_index_html():
       }}
     ];
 
-    function saveReviewed() {{
-      localStorage.setItem("reviewedProblems", JSON.stringify(Array.from(reviewedSet)));
-      updateProgressBadge();
-    }}
-
-    function toggleReviewed(e, key) {{
-      e.stopPropagation();
-      if (reviewedSet.has(key)) {{
-        reviewedSet.delete(key);
-      }} else {{
-        reviewedSet.add(key);
-      }}
-      saveReviewed();
-      renderTree();
-    }}
-
     function updateProgressBadge() {{
       const problemKeys = Object.keys(items).filter(k => items[k].type === "problem");
-      const doneCount = problemKeys.filter(k => reviewedSet.has(k)).length;
-      const pct = problemKeys.length ? Math.round((doneCount / problemKeys.length) * 100) : 0;
-      document.getElementById("progressStats").innerText = `${{doneCount}} / ${{problemKeys.length}} (${{pct}}%)`;
+      document.getElementById("progressStats").innerText = `${{problemKeys.length}} Problems`;
     }}
 
     function setViewMode(mode) {{
@@ -1116,14 +1078,11 @@ def build_index_html():
           const item = items[k];
           const isActive = k === currentKey;
           const activeClass = isActive ? "active" : "";
-          const isReviewed = reviewedSet.has(k);
-          const checkedClass = isReviewed ? "checked" : "";
           const diffClass = item.diff && item.diff !== "All" ? `diff-${{item.diff}}` : "diff-All";
           const fileIcon = item.type === "doc" ? "📝" : "🐍";
 
           html += `
             <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
-              ${{item.type === 'problem' ? `<span class="tree-check ${{checkedClass}}" onclick="toggleReviewed(event, '${{k}}')" title="Mark as reviewed">✓</span>` : ''}}
               <span class="tree-file-icon">${{fileIcon}}</span>
               <span class="tree-title">${{item.short}}</span>
               <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
