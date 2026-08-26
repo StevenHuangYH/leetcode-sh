@@ -2,7 +2,7 @@
 
 [![Python 3.x](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
-[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-162+-brightgreen.svg)]()
+[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-163+-brightgreen.svg)]()
 [![Interactive Viewer](https://img.shields.io/badge/Web_Viewer-index.html-blueviolet.svg)]()
 
 Welcome to my personal LeetCode question cracking collections. This repository is where I store my solutions, and categorize my various data structures or problem sets.
@@ -37,9 +37,9 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
 | **Easy** | 23 | ~32% | 23 |
-| **Medium** | 46 | ~65% | 137 |
-| **Hard** | 2 | ~3% | 2 |
-| **Total** | **71 In-Depth Notes** | **100%** | **162 Problem Entities** |
+| **Medium** | 46 | ~64% | 137 |
+| **Hard** | 3 | ~4% | 3 |
+| **Total** | **72 In-Depth Notes** | **100%** | **163 Problem Entities** |
 
 ---
 
@@ -73,6 +73,8 @@ leetcode-sh/
 │   ├── lc-0713-subarray-product-less-than-k.py
 │   └── lc-0713-subarray-product-less-than-k.md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
+│   ├── lc-0025-reverse-nodes-in-k-group.py
+│   ├── lc-0025-reverse-nodes-in-k-group.md
 │   ├── lc-0092-reversed-linked-list-2.py
 │   ├── lc-0092-reversed-linked-list-2.md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
@@ -151,6 +153,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 | # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
 | :-: | :--- | :-: | :--- | :-: | :--- |
+| **25** | Reverse Nodes in k-Group | [LC 25](https://leetcode.com/problems/reverse-nodes-in-k-group/) | [`daily-practice/lc-0025-reverse-nodes-in-k-group.py`](daily-practice/lc-0025-reverse-nodes-in-k-group.py)<br>[`daily-practice/lc-0025-reverse-nodes-in-k-group.md`](daily-practice/lc-0025-reverse-nodes-in-k-group.md) | Hard | Sentinel Dummy + k-Group Reversal (`p0`, `pre`, `cur`) |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Dummy Node + Local Segment Reversal (`p0`, `pre`, `cur`) |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`daily-practice/lc-0206-reversed-linked-list.py`](daily-practice/lc-0206-reversed-linked-list.py)<br>[`daily-practice/lc-0206-reversed-linked-list.md`](daily-practice/lc-0206-reversed-linked-list.md) | Easy | 3-Pointer Pointer Reversal (`pre`, `cur`, `nxt`) |
@@ -218,6 +221,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | # | Problem Title | LeetCode Link | Solution Code & Notes | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
 | **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-0021-merge-two-sorted-lists.py`](luffy/16-lc-0021-merge-two-sorted-lists.py) | Easy | Dummy Head + Two Pointers | Build new list with dummy head, appending the smaller node at each step. |
+| **25** | Reverse Nodes in k-Group | [LC 25](https://leetcode.com/problems/reverse-nodes-in-k-group/) | [`daily-practice/lc-0025-reverse-nodes-in-k-group.py`](daily-practice/lc-0025-reverse-nodes-in-k-group.py)<br>[`daily-practice/lc-0025-reverse-nodes-in-k-group.md`](daily-practice/lc-0025-reverse-nodes-in-k-group.md) | Hard | Length Check + k-Group In-Place Reversal | Precompute length $n$; reverse $k$ nodes iteratively; 4-step stitch and advance $p_0$ in $O(n)$ time and $O(1)$ space. |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Sentinel Dummy + 3-Pointer Reversal | Advance $p_0$ to $left-1$, reverse $right-left+1$ nodes, reconnect tail/head in $O(n)$ time. |
 | **141** | Linked List Cycle | [LC 141](https://leetcode.com/problems/linked-list-cycle/) | [`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py) | Easy | Floyd's Fast & Slow Pointers | Fast moves 2 steps, slow moves 1 step; collision indicates cycle. |
 | **142** | Linked List Cycle II | [LC 142](https://leetcode.com/problems/linked-list-cycle-ii/) | [`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py) | Medium | Floyd's Algorithm + Math | Reset one pointer to head upon collision; both advance by 1 to meet at cycle entry. |
