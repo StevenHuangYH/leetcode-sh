@@ -37,9 +37,9 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
 | **Easy** | 25 | ~32% | 24 |
-| **Medium** | 49 | ~64% | 139 |
+| **Medium** | 50 | ~64% | 139 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **77 In-Depth Notes** | **100%** | **166 Problem Entities** |
+| **Total** | **78 In-Depth Notes** | **100%** | **166 Problem Entities** |
 
 ---
 
@@ -121,6 +121,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/lc-0011-container-with-most-water.py`](top-100/lc-0011-container-with-most-water.py)<br>[`top-100/lc-0011-container-with-most-water.md`](top-100/lc-0011-container-with-most-water.md) | Medium | Two Pointers (Greedy Shorter Line) |
 | **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/lc-0015-3sum.py`](top-100/lc-0015-3sum.py)<br>[`top-100/lc-0015-3sum.md`](top-100/lc-0015-3sum.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
 | **16** | 3Sum Closest | [LC 16](https://leetcode.com/problems/3sum-closest/) | [`top-100/lc-0016-3-sum-closest.py`](top-100/lc-0016-3-sum-closest.py)<br>[`top-100/lc-0016-3-sum-closest.md`](top-100/lc-0016-3-sum-closest.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
+| **19** | Remove Nth Node From End of List | [LC 19](https://leetcode.com/problems/remove-nth-node-from-end-of-list/) | [`top-100/lc-0019-remove-nth-node-from-end-of-list.py`](top-100/lc-0019-remove-nth-node-from-end-of-list.py)<br>[`top-100/lc-0019-remove-nth-node-from-end-of-list.md`](top-100/lc-0019-remove-nth-node-from-end-of-list.md) | Medium | Dummy Node + Fixed-Gap Two Pointers ($n$ steps) |
 | **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)<br>[`luffy/19-lc-0020-valid-parentheses.md`](luffy/19-lc-0020-valid-parentheses.md) | Easy | Stack Matching |
 | **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-0021-merge-two-sorted-lists.py`](luffy/16-lc-0021-merge-two-sorted-lists.py)<br>[`luffy/16-lc-0021-merge-two-sorted-lists.md`](luffy/16-lc-0021-merge-two-sorted-lists.md) | Easy | Dummy Head + Two Pointers |
 | **26** | Remove Duplicates from Sorted Array | [LC 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | [`luffy/05-lc-0026-remove-duplicates-from-sorted-array.py`](luffy/05-lc-0026-remove-duplicates-from-sorted-array.py)<br>[`luffy/05-lc-0026-remove-duplicates-from-sorted-array.md`](luffy/05-lc-0026-remove-duplicates-from-sorted-array.md) | Easy | Slow/Fast Two Pointers (In-place) |
@@ -232,6 +233,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 | # | Problem Title | LeetCode Link | Solution Code & Notes | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **19** | Remove Nth Node From End of List | [LC 19](https://leetcode.com/problems/remove-nth-node-from-end-of-list/) | [`top-100/lc-0019-remove-nth-node-from-end-of-list.py`](top-100/lc-0019-remove-nth-node-from-end-of-list.py)<br>[`top-100/lc-0019-remove-nth-node-from-end-of-list.md`](top-100/lc-0019-remove-nth-node-from-end-of-list.md) | Medium | Dummy + Fixed-Gap Two Pointers | Advance `right` by $n$ steps from `dummy`, then move `left` and `right` synchronously until `right.next` is `None`; delete `left.next` in $O(L)$ time and $O(1)$ space. |
 | **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-0021-merge-two-sorted-lists.py`](luffy/16-lc-0021-merge-two-sorted-lists.py) | Easy | Dummy Head + Two Pointers | Build new list with dummy head, appending the smaller node at each step. |
 | **25** | Reverse Nodes in k-Group | [LC 25](https://leetcode.com/problems/reverse-nodes-in-k-group/) | [`daily-practice/lc-0025-reverse-nodes-in-k-group.py`](daily-practice/lc-0025-reverse-nodes-in-k-group.py)<br>[`daily-practice/lc-0025-reverse-nodes-in-k-group.md`](daily-practice/lc-0025-reverse-nodes-in-k-group.md) | Hard | Length Check + k-Group In-Place Reversal | Precompute length $n$; reverse $k$ nodes iteratively; 4-step stitch and advance $p_0$ in $O(n)$ time and $O(1)$ space. |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Sentinel Dummy + 3-Pointer Reversal | Advance $p_0$ to $left-1$, reverse $right-left+1$ nodes, reconnect tail/head in $O(n)$ time. |
