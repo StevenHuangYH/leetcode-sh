@@ -235,8 +235,8 @@ class SolutionBFS:
 | :--- | :--- | :--- | :--- | :---: |
 | **空树 `root = []`** | 无任何节点 | `f(None, 0)` 直接 return | `ans = []` | `[]` |
 | **单节点 `[1]`** | 仅根节点 | 访问 `(1, depth=0)` | `[1]` | `[1]` |
-| **左斜树较深 `[1,2,null,3]`** | 右子树为空，左子树伸展 | 访问 `1 (d=0)` $ightarrow$ 访问 `2 (d=1)` $ightarrow$ 访问 `3 (d=2)` | `[]` $ightarrow$ `[1]` $ightarrow$ `[1,2]` $ightarrow$ `[1,2,3]` | `[1, 2, 3]` |
-| **标准用例 `[1,2,3,null,5,null,4]`** | 左右子树均有分支 | `1(d=0)` $ightarrow$ `3(d=1)` $ightarrow$ `4(d=2)` $ightarrow$ `2(d=1,跳过)` $ightarrow$ `5(d=2,跳过)` | `[1]` $ightarrow$ `[1,3]` $ightarrow$ `[1,3,4]` | `[1, 3, 4]` |
+| **左斜树较深 `[1,2,null,3]`** | 右子树为空，左子树伸展 | 访问 `1 (d=0)` $\rightarrow$ 访问 `2 (d=1)` $\rightarrow$ 访问 `3 (d=2)` | `[]` $\rightarrow$ `[1]` $\rightarrow$ `[1,2]` $\rightarrow$ `[1,2,3]` | `[1, 2, 3]` |
+| **标准用例 `[1,2,3,null,5,null,4]`** | 左右子树均有分支 | `1(d=0)` $\rightarrow$ `3(d=1)` $\rightarrow$ `4(d=2)` $\rightarrow$ `2(d=1,跳过)` $\rightarrow$ `5(d=2,跳过)` | `[1]` $\rightarrow$ `[1,3]` $\rightarrow$ `[1,3,4]` | `[1, 3, 4]` |
 
 ---
 
