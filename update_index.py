@@ -86,11 +86,18 @@ def collect_workspace_documents():
                 else:
                     topic_content = f"# Problem Index — {title}\n\nNo content parsed."
 
+            clean_topic_slug = re.sub(r"^\d+\.\s*", "", title).lower().replace("-", " ")
+            topic_search_blob = f"{title} {short} {clean_topic_slug} problem index topic curriculum {topic_content[:600]}".lower()
             topic_docs[key] = {
                 "key": key,
                 "category": "Problem Index",
                 "title": title,
                 "short": short,
+                "slug": clean_topic_slug,
+                "cn_title": "",
+                "tags": "topic curriculum problem index",
+                "lc_num": "",
+                "search_blob": topic_search_blob,
                 "path": f"problem-index/{key}",
                 "type": "doc",
                 "notes": topic_content,
@@ -99,12 +106,18 @@ def collect_workspace_documents():
             }
 
     # 2. Overview Document (README.md)
+    readme_search_blob = "leetcode self-practices overview readme 项目总览 根文档 " + readme_text[:600].lower()
     overview_docs = {
         "README.md": {
             "key": "README.md",
             "category": "Overview",
             "title": "LeetCode Self-Practices Overview (README)",
             "short": "README.md",
+            "slug": "readme overview",
+            "cn_title": "项目总览",
+            "tags": "readme overview index",
+            "lc_num": "",
+            "search_blob": readme_search_blob,
             "path": "README.md",
             "type": "doc",
             "notes": readme_text,
@@ -217,15 +230,25 @@ def collect_workspace_documents():
 
             id_match = re.search(r"lc-?(\d+)", stem)
             lc_num_str = str(int(id_match.group(1))) if id_match else ""
+            
+            # Clean slug without prefix digits or lc markers
+            clean_slug = re.sub(r"^(?:\d+-)?lc-\d+-?", "", stem).replace("-", " ")
+            if not clean_slug:
+                clean_slug = stem.replace("-", " ")
+
+            notes_snippet = re.sub(r"```.*?```", "", md_content[:800], flags=re.DOTALL) if md_content else ""
+            search_blob = f"{short_name} {cn_title} {tags} {clean_slug} {diff} {notes_snippet}".lower()
 
             problems[problem_key] = {
                 "key": problem_key,
                 "category": cat_title,
                 "title": f"{cat_title}: {short_name}",
                 "short": short_name,
+                "slug": clean_slug,
                 "cn_title": cn_title,
                 "tags": tags,
                 "lc_num": lc_num_str,
+                "search_blob": search_blob,
                 "path": f"{dir_name}/{stem}",
                 "type": "problem",
                 "notes": md_content,
@@ -1283,53 +1306,38 @@ def build_index_html():
       renderTree();
     }}
 
-    function buildItemSearchText(item, itemKey) {{
-      const pureSlug = itemKey.split("/").pop().replace(/^lc-?/i, "").replace(/-/g, " ");
-      const lcNum = item.lc_num || (itemKey.match(/lc-?(\\d+)/i) ? parseInt(itemKey.match(/lc-?(\\d+)/i)[1], 10).toString() : "");
-      
-      const parts = [
-        item.short || "",
-        item.cn_title || "",
-        item.tags || "",
-        pureSlug,
-        item.diff || "",
-        (item.notes || "").slice(0, 800)
-      ];
-      return parts.join(" ").toLowerCase();
-    }}
-
-    function matchesSearchQuery(item, itemKey, query) {{
-      if (!query) return true;
+    function matchesSearchQuery(item, query) {{
+      if (!query || !item) return true;
       const normalizedQuery = query.toLowerCase().replace(/\\blc\\s+(\\d+)\\b/g, "lc$1").trim();
       const tokens = normalizedQuery.split(/\\s+/).filter(Boolean);
       if (!tokens.length) return true;
 
-      const searchText = buildItemSearchText(item, itemKey);
-      const pureSlug = itemKey.split("/").pop().replace(/^lc-?/i, "").replace(/-/g, " ").toLowerCase();
-      const lcNum = item.lc_num || (itemKey.match(/lc-?(\\d+)/i) ? parseInt(itemKey.match(/lc-?(\\d+)/i)[1], 10).toString() : "");
+      const searchBlob = item.search_blob || (item.title + " " + item.short).toLowerCase();
+      const lcNum = item.lc_num || "";
+      const slug = item.slug || "";
 
       return tokens.every(token => {{
-        // Ignore standalone "lc" prefix if combined with other words
+        // Ignore standalone "lc" if accompanied by other keywords
         if (token === "lc" && tokens.length > 1) return true;
 
-        // Exact problem ID match for numeric token (e.g. "1" matches LC 1, "100" matches LC 100)
+        // Numeric token (e.g. "1", "100", "104") -> exact problem ID match or standalone digit word in slug
         if (/^\\d+$/.test(token)) {{
           if (lcNum && lcNum === parseInt(token, 10).toString()) return true;
-          // Match explicit digit token in title (e.g. 3sum, 2sum)
-          const slugTokens = pureSlug.split(/[^a-z0-9]+/);
-          if (slugTokens.includes(token) || pureSlug.includes(token + "sum")) return true;
+          // Match standalone digit word in slug (e.g. 3sum, 2sum)
+          const regex = new RegExp(`(^|[^a-z0-9])${{token}}([^a-z0-9]|$)`, "i");
+          if (regex.test(slug)) return true;
           return false;
         }}
 
-        // Prefixed problem ID match (e.g. "lc100", "lc-100", "lc 100")
+        // Prefixed problem ID (e.g. "lc1", "lc100", "lc-100") -> exact problem ID match
         if (/^lc-?\\d+$/i.test(token)) {{
           const num = token.replace(/\\D/g, "");
           if (lcNum && lcNum === parseInt(num, 10).toString()) return true;
           return false;
         }}
 
-        // Textual token match in enriched metadata (title, short, Chinese name, tags, diff, notes snippet)
-        return searchText.includes(token);
+        // Text token match in enriched search blob (bilingual titles, tags, diff, keywords)
+        return searchBlob.includes(token);
       }});
     }}
 
@@ -1361,7 +1369,7 @@ def build_index_html():
           const itemKey = "README.md";
           if (items[itemKey]) {{
             const item = items[itemKey];
-            if (!matchesSearchQuery(item, itemKey, query)) return;
+            if (!matchesSearchQuery(item, query)) return;
 
             totalRenderedItems++;
             const isActive = itemKey === currentKey;
@@ -1378,7 +1386,7 @@ def build_index_html():
 
         const allKeys = Object.keys(items).filter(folder.filter);
         const matchingKeys = query
-          ? allKeys.filter(itemKey => matchesSearchQuery(items[itemKey], itemKey, query))
+          ? allKeys.filter(itemKey => matchesSearchQuery(items[itemKey], query))
           : allKeys;
 
         if (matchingKeys.length === 0) return;
@@ -1445,27 +1453,33 @@ def build_index_html():
       treeRoot.innerHTML = html;
     }}
 
+    let searchDebounceTimer = null;
+
     function handleSearch(val) {{
       const clearBtn = document.getElementById("searchClear");
       if (clearBtn) clearBtn.style.display = val.trim() ? "block" : "none";
       renderTree(val);
 
+      clearTimeout(searchDebounceTimer);
       const query = val.toLowerCase().trim();
       if (query) {{
-        // Auto-navigate and switch to first matched problem if currentKey not in search results
-        const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
-        if (firstMatchEl) {{
-          const firstKey = firstMatchEl.getAttribute("data-key");
-          if (firstKey && items[firstKey]) {{
-            if (!matchesSearchQuery(items[currentKey], currentKey, query)) {{
-              switchItem(firstKey, false);
+        // Lightweight 150ms debounced auto-navigation to eliminate typing flicker
+        searchDebounceTimer = setTimeout(() => {{
+          const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
+          if (firstMatchEl) {{
+            const firstKey = firstMatchEl.getAttribute("data-key");
+            if (firstKey && items[firstKey]) {{
+              if (!matchesSearchQuery(items[currentKey], query)) {{
+                switchItem(firstKey, false);
+              }}
             }}
           }}
-        }}
+        }}, 150);
       }}
     }}
 
     function clearSearch() {{
+      clearTimeout(searchDebounceTimer);
       const input = document.getElementById("search");
       input.value = "";
       handleSearch("");
@@ -1746,12 +1760,18 @@ def build_index_html():
       }}
       // Enter in search: focus note viewer
       else if (e.key === "Enter" && document.activeElement === document.getElementById("search")) {{
+        clearTimeout(searchDebounceTimer);
         const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
         if (firstMatchEl) {{
           const firstKey = firstMatchEl.getAttribute("data-key");
-          if (firstKey) switchItem(firstKey);
+          if (firstKey) switchItem(firstKey, true);
         }}
         document.getElementById("search").blur();
+        const notesPane = document.getElementById("notesPane");
+        if (notesPane) {{
+          notesPane.setAttribute("tabindex", "-1");
+          notesPane.focus();
+        }}
       }}
       // Escape: Clear search & blur
       else if (e.key === "Escape") {{
