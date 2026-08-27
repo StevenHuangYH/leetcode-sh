@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 28 | ~34% | 24 |
-| **Medium** | 51 | ~62% | 139 |
+| **Easy** | 29 | ~35% | 25 |
+| **Medium** | 51 | ~61% | 139 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **82 In-Depth Notes** | **100%** | **167 Problem Entities** |
+| **Total** | **83 In-Depth Notes** | **100%** | **168 Problem Entities** |
 
 ---
 
@@ -72,6 +72,7 @@ leetcode-sh/
 │   ├── lc-0083-remove-duplicates-from-sorted-list.py / .md
 │   ├── lc-0092-reversed-linked-list-2.py / .md
 │   ├── lc-0100-same-tree.py / .md
+│   ├── lc-0110-balanced-binary-tree.py / .md
 │   ├── lc-0143-reorder-list.py / .md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py / .md
 │   ├── lc-0237-delete-node-in-a-linked-list.py / .md
@@ -152,6 +153,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **83** | Remove Duplicates from Sorted List | [LC 83](https://leetcode.com/problems/remove-duplicates-from-sorted-list/) | [`daily-practice/lc-0083-remove-duplicates-from-sorted-list.py`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.py)<br>[`daily-practice/lc-0083-remove-duplicates-from-sorted-list.md`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.md) | Easy | In-Place Adjacent Deduplication (`cur.next = cur.next.next`) |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Dummy Node + Local Segment Reversal (`p0`, `pre`, `cur`) |
 | **100** | Same Tree | [LC 100](https://leetcode.com/problems/same-tree/) | [`daily-practice/lc-0100-same-tree.py`](daily-practice/lc-0100-same-tree.py)<br>[`daily-practice/lc-0100-same-tree.md`](daily-practice/lc-0100-same-tree.md) | Easy | Dual Tree Synchronous Recursion (`p is q`, `p.val == q.val`, `left`, `right`) |
+| **110** | Balanced Binary Tree | [LC 110](https://leetcode.com/problems/balanced-binary-tree/) | [`daily-practice/lc-0110-balanced-binary-tree.py`](daily-practice/lc-0110-balanced-binary-tree.py)<br>[`daily-practice/lc-0110-balanced-binary-tree.md`](daily-practice/lc-0110-balanced-binary-tree.md) | Easy | Post-Order Bottom-Up Height + Short-Circuit Sentinel (`-1`) |
 | **143** | Reorder List | [LC 143](https://leetcode.com/problems/reorder-list/) | [`daily-practice/lc-0143-reorder-list.py`](daily-practice/lc-0143-reorder-list.py)<br>[`daily-practice/lc-0143-reorder-list.md`](daily-practice/lc-0143-reorder-list.md) | Medium | Fast/Slow Mid (LC 876) + Reverse 2nd Half (LC 206) + Zip-Merge |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
 | **237** | Delete Node in a Linked List | [LC 237](https://leetcode.com/problems/delete-node-in-a-linked-list/) | [`daily-practice/lc-0237-delete-node-in-a-linked-list.py`](daily-practice/lc-0237-delete-node-in-a-linked-list.py)<br>[`daily-practice/lc-0237-delete-node-in-a-linked-list.md`](daily-practice/lc-0237-delete-node-in-a-linked-list.md) | Medium | Scapegoat Value Copy + Bypass Next Node |
@@ -257,6 +259,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](luffy/28-lc-0102-binary-tree-level-order-traversal.py) | Medium | BFS (Queue) | Level-by-level queue traversal using `len(queue)` snapshots. |
 | **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`top-100/lc-0104-maximum-depth-of-binary-tree.py`](top-100/lc-0104-maximum-depth-of-binary-tree.py)<br>[`top-100/lc-0104-maximum-depth-of-binary-tree.md`](top-100/lc-0104-maximum-depth-of-binary-tree.md)<br>[`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](luffy/26-lc-0104-maximum-depth-of-binary-tree.py) | Easy | Post-order Divide & Conquer | Depth = $1 + \max(\text{left}, \text{right})$; foundational primitive for Tree DP. |
 | **105** | Construct Binary Tree from Preorder & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py) | Medium | Divide & Conquer / Hash Map | Preorder gives root; Inorder splits left and right subtrees. |
+| **110** | Balanced Binary Tree | [LC 110](https://leetcode.com/problems/balanced-binary-tree/) | [`daily-practice/lc-0110-balanced-binary-tree.py`](daily-practice/lc-0110-balanced-binary-tree.py)<br>[`daily-practice/lc-0110-balanced-binary-tree.md`](daily-practice/lc-0110-balanced-binary-tree.md) | Easy | Post-order Bottom-Up Height + Short-Circuit Pruning | Post-order compute height; if left/right subtree is -1 or $|h_l - h_r| > 1$, return -1; else return $\max(h_l, h_r) + 1$ in $O(N)$ time. |
 | **144** | Binary Tree Preorder Traversal | [LC 144](https://leetcode.com/problems/binary-tree-preorder-traversal/) | [`luffy/25-lc-0144-binary-tree-preorder-traversal.py`](luffy/25-lc-0144-binary-tree-preorder-traversal.py) | Easy | DFS (Root, Left, Right) | Root processed before recursive traversal of subtrees. |
 | **145** | Binary Tree Postorder Traversal | [LC 145](https://leetcode.com/problems/binary-tree-postorder-traversal/) | [`luffy/25-lc-0145-binary-tree-postorder-traversal.py`](luffy/25-lc-0145-binary-tree-postorder-traversal.py) | Easy | DFS (Left, Right, Root) | Subtrees processed before processing the root node. |
 | **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py) | Medium | Postorder DFS | If both left and right return non-null, root is the LCA. |
