@@ -202,11 +202,30 @@ def collect_workspace_documents():
             diff = extract_difficulty(md_content, stem)
             problem_key = f"{dir_name}/{stem}"
 
+            # Extract Chinese title and tags from markdown metadata
+            cn_title = ""
+            tags = ""
+            if md_content:
+                cn_match = re.search(r"#\s*LeetCode\s*\d+\.?\s*[^(（\n]*[（(]([^)）\n]+)[)）]", md_content)
+                if cn_match:
+                    cn_title = cn_match.group(1).strip()
+                tag_match = re.search(r"\*\*Tags:\*\*\s*([^\n]+)", md_content, re.IGNORECASE)
+                if not tag_match:
+                    tag_match = re.search(r"Tags:\s*([^\n]+)", md_content, re.IGNORECASE)
+                if tag_match:
+                    tags = tag_match.group(1).strip()
+
+            id_match = re.search(r"lc-?(\d+)", stem)
+            lc_num_str = str(int(id_match.group(1))) if id_match else ""
+
             problems[problem_key] = {
                 "key": problem_key,
                 "category": cat_title,
                 "title": f"{cat_title}: {short_name}",
                 "short": short_name,
+                "cn_title": cn_title,
+                "tags": tags,
+                "lc_num": lc_num_str,
                 "path": f"{dir_name}/{stem}",
                 "type": "problem",
                 "notes": md_content,
@@ -701,6 +720,21 @@ def build_index_html():
       box-shadow: 0 0 5px rgba(248, 81, 73, 0.45);
     }}
     .diff-All {{ display: none; }}
+
+    /* No search results placeholder */
+    .tree-no-results {{
+      padding: 32px 14px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }}
+    .tree-no-results svg {{
+      opacity: 0.5;
+    }}
 
     /* Main Workspace Container */
     #main-container {{
@@ -1249,17 +1283,61 @@ def build_index_html():
       renderTree();
     }}
 
+    function buildItemSearchText(item, itemKey) {{
+      const pureSlug = itemKey.split("/").pop().replace(/^lc-?/i, "").replace(/-/g, " ");
+      const lcNum = item.lc_num || (itemKey.match(/lc-?(\\d+)/i) ? parseInt(itemKey.match(/lc-?(\\d+)/i)[1], 10).toString() : "");
+      
+      const parts = [
+        item.short || "",
+        item.cn_title || "",
+        item.tags || "",
+        pureSlug,
+        item.diff || "",
+        (item.notes || "").slice(0, 800)
+      ];
+      return parts.join(" ").toLowerCase();
+    }}
+
     function matchesSearchQuery(item, itemKey, query) {{
       if (!query) return true;
-      return (item.title && item.title.toLowerCase().includes(query)) ||
-             (item.short && item.short.toLowerCase().includes(query)) ||
-             itemKey.toLowerCase().includes(query);
+      const normalizedQuery = query.toLowerCase().replace(/\\blc\\s+(\\d+)\\b/g, "lc$1").trim();
+      const tokens = normalizedQuery.split(/\\s+/).filter(Boolean);
+      if (!tokens.length) return true;
+
+      const searchText = buildItemSearchText(item, itemKey);
+      const pureSlug = itemKey.split("/").pop().replace(/^lc-?/i, "").replace(/-/g, " ").toLowerCase();
+      const lcNum = item.lc_num || (itemKey.match(/lc-?(\\d+)/i) ? parseInt(itemKey.match(/lc-?(\\d+)/i)[1], 10).toString() : "");
+
+      return tokens.every(token => {{
+        // Ignore standalone "lc" prefix if combined with other words
+        if (token === "lc" && tokens.length > 1) return true;
+
+        // Exact problem ID match for numeric token (e.g. "1" matches LC 1, "100" matches LC 100)
+        if (/^\\d+$/.test(token)) {{
+          if (lcNum && lcNum === parseInt(token, 10).toString()) return true;
+          // Match explicit digit token in title (e.g. 3sum, 2sum)
+          const slugTokens = pureSlug.split(/[^a-z0-9]+/);
+          if (slugTokens.includes(token) || pureSlug.includes(token + "sum")) return true;
+          return false;
+        }}
+
+        // Prefixed problem ID match (e.g. "lc100", "lc-100", "lc 100")
+        if (/^lc-?\\d+$/i.test(token)) {{
+          const num = token.replace(/\\D/g, "");
+          if (lcNum && lcNum === parseInt(num, 10).toString()) return true;
+          return false;
+        }}
+
+        // Textual token match in enriched metadata (title, short, Chinese name, tags, diff, notes snippet)
+        return searchText.includes(token);
+      }});
     }}
 
     function renderTree(searchQuery = "") {{
       const treeRoot = document.getElementById("treeRoot");
       const query = searchQuery.toLowerCase().trim();
       let html = "";
+      let totalRenderedItems = 0;
 
       const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
       const codeSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
@@ -1285,6 +1363,7 @@ def build_index_html():
             const item = items[itemKey];
             if (!matchesSearchQuery(item, itemKey, query)) return;
 
+            totalRenderedItems++;
             const isActive = itemKey === currentKey;
             const activeClass = isActive ? "active" : "";
             html += `
@@ -1303,6 +1382,7 @@ def build_index_html():
           : allKeys;
 
         if (matchingKeys.length === 0) return;
+        totalRenderedItems += matchingKeys.length;
 
         const isCollapsed = query ? false : !!collapsedFolders[folder.id];
         const collapseClass = isCollapsed ? "collapsed" : "";
@@ -1348,6 +1428,15 @@ def build_index_html():
         `;
       }});
 
+      if (query && totalRenderedItems === 0) {{
+        html += `
+          <div class="tree-no-results">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <div>No problems matching "${{query}}"</div>
+          </div>
+        `;
+      }}
+
       html += `
           </div>
         </div>
@@ -1360,6 +1449,20 @@ def build_index_html():
       const clearBtn = document.getElementById("searchClear");
       if (clearBtn) clearBtn.style.display = val.trim() ? "block" : "none";
       renderTree(val);
+
+      const query = val.toLowerCase().trim();
+      if (query) {{
+        // Auto-navigate and switch to first matched problem if currentKey not in search results
+        const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
+        if (firstMatchEl) {{
+          const firstKey = firstMatchEl.getAttribute("data-key");
+          if (firstKey && items[firstKey]) {{
+            if (!matchesSearchQuery(items[currentKey], currentKey, query)) {{
+              switchItem(firstKey, false);
+            }}
+          }}
+        }}
+      }}
     }}
 
     function clearSearch() {{
@@ -1369,7 +1472,7 @@ def build_index_html():
       input.focus();
     }}
 
-    function switchItem(key) {{
+    function switchItem(key, rerenderSearch = true) {{
       if (!items[key]) return;
       currentKey = key;
       const item = items[key];
@@ -1390,7 +1493,17 @@ def build_index_html():
       }});
 
       // Re-render tree highlight
-      renderTree(document.getElementById("search").value);
+      if (rerenderSearch) {{
+        renderTree(document.getElementById("search").value);
+      }} else {{
+        document.querySelectorAll(".nav-item").forEach(el => {{
+          if (el.getAttribute("data-key") === key) {{
+            el.classList.add("active");
+          }} else {{
+            el.classList.remove("active");
+          }}
+        }});
+      }}
 
       // Auto close sidebar on mobile upon item selection
       if (window.innerWidth <= 768) {{
@@ -1630,6 +1743,15 @@ def build_index_html():
           toggleSidebar(true);
         }}
         searchInput.focus();
+      }}
+      // Enter in search: focus note viewer
+      else if (e.key === "Enter" && document.activeElement === document.getElementById("search")) {{
+        const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
+        if (firstMatchEl) {{
+          const firstKey = firstMatchEl.getAttribute("data-key");
+          if (firstKey) switchItem(firstKey);
+        }}
+        document.getElementById("search").blur();
       }}
       // Escape: Clear search & blur
       else if (e.key === "Escape") {{
