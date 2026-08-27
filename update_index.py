@@ -585,7 +585,7 @@ def build_index_html():
       text-overflow: ellipsis;
       white-space: nowrap;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      font-size: 12.5px;
+      font-size: inherit;
     }}
     .tree-count-badge {{
       font-size: 10px;
@@ -1054,15 +1054,19 @@ def build_index_html():
       <div class="search-box-wrapper">
         <span class="search-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <input type="text" id="search" class="search-box" placeholder="Search problems, patterns... (/)" oninput="handleSearch(this.value)">
-        <button id="searchClear" class="search-clear-btn" onclick="clearSearch()" title="Clear search (Esc)">✕</button>
+        <button id="searchClear" class="search-clear-btn" onclick="clearSearch()" title="Clear search (Esc)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
       </div>
     </div>
 
     <div class="explorer-bar">
       <span>EXPLORER</span>
       <div class="explorer-actions">
-        <button class="icon-btn" onclick="expandAllFolders()" title="Expand All Folders">⊞</button>
-        <button class="icon-btn" onclick="collapseAllFolders()" title="Collapse All Folders">⊟</button>
+        <button class="icon-btn" onclick="setAllFoldersCollapsed(false)" title="Expand All Folders">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+        </button>
+        <button class="icon-btn" onclick="setAllFoldersCollapsed(true)" title="Collapse All Folders">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+        </button>
       </div>
     </div>
 
@@ -1237,25 +1241,24 @@ def build_index_html():
       renderTree();
     }}
 
-    function expandAllFolders() {{
+    function setAllFoldersCollapsed(collapsed) {{
       treeStructure.forEach(folder => {{
-        collapsedFolders[folder.id] = false;
+        collapsedFolders[folder.id] = collapsed;
       }});
       localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
       renderTree();
     }}
 
-    function collapseAllFolders() {{
-      treeStructure.forEach(folder => {{
-        collapsedFolders[folder.id] = true;
-      }});
-      localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
-      renderTree();
+    function matchesSearchQuery(item, itemKey, query) {{
+      if (!query) return true;
+      return (item.title && item.title.toLowerCase().includes(query)) ||
+             (item.short && item.short.toLowerCase().includes(query)) ||
+             itemKey.toLowerCase().includes(query);
     }}
 
     function renderTree(searchQuery = "") {{
       const treeRoot = document.getElementById("treeRoot");
-      const q = searchQuery.toLowerCase().trim();
+      const query = searchQuery.toLowerCase().trim();
       let html = "";
 
       const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
@@ -1277,16 +1280,15 @@ def build_index_html():
         const lastFolderClass = isLastFolder ? "last-folder" : "";
 
         if (folder.isLeaf) {{
-          const k = "README.md";
-          if (items[k]) {{
-            const item = items[k];
-            if (q && !(item.title && item.title.toLowerCase().includes(q)) && !(item.short && item.short.toLowerCase().includes(q)) && !k.toLowerCase().includes(q)) {{
-              return;
-            }}
-            const isActive = k === currentKey;
+          const itemKey = "README.md";
+          if (items[itemKey]) {{
+            const item = items[itemKey];
+            if (!matchesSearchQuery(item, itemKey, query)) return;
+
+            const isActive = itemKey === currentKey;
             const activeClass = isActive ? "active" : "";
             html += `
-              <div class="nav-item root-leaf ${{activeClass}} ${{lastFolderClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
+              <div class="nav-item root-leaf ${{activeClass}} ${{lastFolderClass}}" onclick="switchItem('${{itemKey}}')" data-key="${{itemKey}}" title="${{item.title || item.short}}">
                 <span class="tree-file-icon doc-icon">${{docSvg}}</span>
                 <span class="tree-title">${{folder.name}}</span>
               </div>
@@ -1296,18 +1298,13 @@ def build_index_html():
         }}
 
         const allKeys = Object.keys(items).filter(folder.filter);
-        const matchingKeys = q
-          ? allKeys.filter(k => {{
-              const item = items[k];
-              return (item.title && item.title.toLowerCase().includes(q)) ||
-                     (item.short && item.short.toLowerCase().includes(q)) ||
-                     k.toLowerCase().includes(q);
-            }})
+        const matchingKeys = query
+          ? allKeys.filter(itemKey => matchesSearchQuery(items[itemKey], itemKey, query))
           : allKeys;
 
         if (matchingKeys.length === 0) return;
 
-        const isCollapsed = q ? false : !!collapsedFolders[folder.id];
+        const isCollapsed = query ? false : !!collapsedFolders[folder.id];
         const collapseClass = isCollapsed ? "collapsed" : "";
         const hasActive = matchingKeys.includes(currentKey) ? "has-active" : "";
         const folderSvg = isCollapsed
@@ -1325,9 +1322,9 @@ def build_index_html():
             <div class="tree-children">
         `;
 
-        matchingKeys.forEach((k, idx) => {{
-          const item = items[k];
-          const isActive = k === currentKey;
+        matchingKeys.forEach((itemKey, idx) => {{
+          const item = items[itemKey];
+          const isActive = itemKey === currentKey;
           const activeClass = isActive ? "active" : "";
           const isLastItem = idx === matchingKeys.length - 1;
           const lastItemClass = isLastItem ? "last-item" : "";
@@ -1337,7 +1334,7 @@ def build_index_html():
             : `<span class="tree-file-icon code-icon">${{codeSvg}}</span>`;
 
           html += `
-            <div class="nav-item ${{activeClass}} ${{lastItemClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
+            <div class="nav-item ${{activeClass}} ${{lastItemClass}}" onclick="switchItem('${{itemKey}}')" data-key="${{itemKey}}" title="${{item.title || item.short}}">
               ${{fileIconHtml}}
               <span class="tree-title">${{item.short}}</span>
               <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
