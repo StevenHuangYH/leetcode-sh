@@ -69,6 +69,30 @@
 
 ---
 
+### 🧠 二叉树与递归核心思维模型 (Recursive Mental Model & Why It Works)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 💡 如何系统思考二叉树的递归问题 (How to Reason About Tree Recursion)        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. 思考整棵树与其左右子树的关系:                                            │
+│    • 整棵树的最大深度 = max(左子树的最大深度, 右子树的最大深度) + 1         │
+│ 2. 原问题与子问题的自相似性:                                                │
+│    • 原问题: 计算以 root 为根的整棵树的最大深度。                           │
+│    • 子问题: 计算以 root.left 和 root.right 为根的子树的最大深度。          │
+│    • 子问题与原问题在结构上完全相同，执行的代码逻辑也完全一致。             │
+│ 3. 为什么必须使用递归而不是简单循环?                                        │
+│    • 子问题的计算结果必须自底向上【返回给上一级问题】，由父节点聚合决策。   │
+│    • 系统的函数调用栈天然支持“递”下去探索、“归”上来汇总的生命周期。         │
+│ 4. 为什么这样写就一定能正确终止? (Base Case & Invariant):                   │
+│    • 每次递归调用的子问题规模严格比父问题小（节点数减少）。                 │
+│    • 不断向深处“递”下去，终究会到达叶子节点的空指针 (root is None)。         │
+│    • 触发边界条件 (Base Case)，直接返回答案 0，随后逐层“归”并汇总。         │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ### 💡 数学归纳与递推机制 (Mathematical Induction)
 
 设以节点 $u$ 为根的子树深度为 $D(u)$：
@@ -131,18 +155,18 @@ from typing import Optional
 
 class Solution:
     def maxDepth(self, root: Optional[TreeNode]) -> int:
-        # 1. 递归基 (Base Case): 若当前树为空节点，深度贡献为 0
+        # 1. 递归基 (Base Case): 若当前子树为空节点 (root is None)，深度贡献为 0，触底开始“归”
         if not root:
             return 0
         
-        # 2. 递归深入左子树，求解左子树的最大深度 (Left Subtree Height)
+        # 2. 递归深入左子树，求解左子树的最大深度 (Left Subtree Max Depth)
         left_depth = self.maxDepth(root.left)
         
-        # 3. 递归深入右子树，求解右子树的最大深度 (Right Subtree Height)
+        # 3. 递归深入右子树，求解右子树的最大深度 (Right Subtree Max Depth)
         right_depth = self.maxDepth(root.right)
         
         # 4. 后序汇总 (Post-order Conquer): 
-        #    当前子树的最大深度 = 左右子树较大者 + 1 (当前根节点所贡献的 1 层高度)
+        #    当前树的最大深度 = max(左子树深度, 右子树深度) + 1 (当前根节点所贡献的 1 层高度)
         return max(left_depth, right_depth) + 1
 ```
 
