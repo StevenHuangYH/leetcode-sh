@@ -139,18 +139,18 @@ from typing import Optional
 
 class Solution:
     def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
-        # 1. 递归基 (Base Case): 检查是否存在空节点
-        #    - 若 p 与 q 至少有一个为 None:
-        #      只有当 p 与 q 同时为 None 时两树结构全等 (p is q -> True)
-        #      若一空一非空，则结构不对称 (p is q -> False)
+        # 思考逻辑 (Core Cognitive Flow):
+        # 1. the root must be the same (根节点值必须相等)
+        # 2. then check if the left subtrees are the same (随后检验左子树是否相同)
+        # 3. then the right subtrees (最后检验右子树是否相同)
+
+        # base case (递归边界):
+        # 若 p 与 q 至少有一个为 None，仅当两者同为 None (p is q) 时结构匹配
         if p is None or q is None:
             return p is q
         
-        # 2. 分治与短路判定 (Divide & Conquer):
-        #    - 当前节点值必须完全一致 (p.val == q.val)
-        #    - 左子树必须完全相同 (self.isSameTree(p.left, q.left))
-        #    - 右子树必须完全相同 (self.isSameTree(p.right, q.right))
-        #    Python 的 and 运算符天然具备短路求值 (Short-circuit Evaluation) 特性，遇到 False 立即提前退出
+        # 分治与短路求值 (Divide & Conquer with Short-Circuit):
+        # 必须同时满足: 当前根值相等 ∧ 左子树完全相同 ∧ 右子树完全相同
         return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
 ```
 
