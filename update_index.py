@@ -1232,15 +1232,11 @@ def build_index_html():
             ? `<span class="tree-file-icon doc-icon">${{docSvg}}</span>`
             : `<span class="tree-file-icon code-icon">${{codeSvg}}</span>`;
 
-          const diffBadgeHtml = (item.diff && item.diff !== "All")
-            ? `<span class="tree-diff-badge diff-${{item.diff}}">${{item.diff}}</span>`
-            : "";
-
           html += `
             <div class="nav-item ${{activeClass}} ${{lastItemClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
               ${{fileIconHtml}}
               <span class="tree-title">${{item.short}}</span>
-              ${{diffBadgeHtml}}
+              <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
             </div>
           `;
         }});
