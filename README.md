@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 29 | ~35% | 25 |
-| **Medium** | 52 | ~61% | 140 |
+| **Easy** | 29 | ~34% | 25 |
+| **Medium** | 53 | ~62% | 140 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **84 In-Depth Notes** | **100%** | **169 Problem Entities** |
+| **Total** | **85 In-Depth Notes** | **100%** | **169 Problem Entities** |
 
 ---
 
@@ -65,6 +65,7 @@ leetcode-sh/
 │   ├── lc-0167-two-sum-ii-input-array-is-sorted.py / .md
 │   ├── lc-0206-reverse-linked-list.py / .md
 │   ├── lc-0209-minimum-size-subarray-sum.py / .md
+│   ├── lc-0236-lowest-common-ancestor-of-a-binary-tree.py / .md
 │   └── lc-0713-subarray-product-less-than-k.py / .md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
 │   ├── lc-0025-reverse-nodes-in-k-group.py / .md
@@ -135,7 +136,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **206** | Reverse Linked List | [LC 206](https://leetcode.com/problems/reverse-linked-list/) | [`top-100/lc-0206-reverse-linked-list.py`](top-100/lc-0206-reverse-linked-list.py)<br>[`top-100/lc-0206-reverse-linked-list.md`](top-100/lc-0206-reverse-linked-list.md)<br>[`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py) | Easy | In-Place 3-Pointer Iteration (`prev, curr, nxt`) |
 | **207** | Course Schedule | [LC 207](https://leetcode.com/problems/course-schedule/) | [`luffy/42-lc-0207-course-schedule.py`](luffy/42-lc-0207-course-schedule.py)<br>[`luffy/42-lc-0207-course-schedule.md`](luffy/42-lc-0207-course-schedule.md) | Medium | Topological Sort (Kahn's BFS / DFS) |
 | **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/lc-0209-minimum-size-subarray-sum.py`](top-100/lc-0209-minimum-size-subarray-sum.py)<br>[`top-100/lc-0209-minimum-size-subarray-sum.md`](top-100/lc-0209-minimum-size-subarray-sum.md) | Medium | Dynamic Sliding Window |
-| **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py)<br>[`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.md`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.md) | Medium | Postorder DFS |
+| **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py)<br>[`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md)<br>[`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py) | Medium | Post-order Divide & Conquer (4-State Aggregation) |
 | **394** | Decode String | [LC 394](https://leetcode.com/problems/decode-string/) | [`luffy/23-lc-0394-decode-string.py`](luffy/23-lc-0394-decode-string.py)<br>[`luffy/23-lc-0394-decode-string.md`](luffy/23-lc-0394-decode-string.md) | Medium | Dual Stack (Count & String Stacks) |
 | **560** | Subarray Sum Equals K | [LC 560](https://leetcode.com/problems/subarray-sum-equals-k/) | [`luffy/11-lc-0560-subarray-sum-equals-k.py`](luffy/11-lc-0560-subarray-sum-equals-k.py)<br>[`luffy/11-lc-0560-subarray-sum-equals-k.md`](luffy/11-lc-0560-subarray-sum-equals-k.md) | Medium | Prefix Sum + Hash Map |
 | **713** | Subarray Product Less Than K | [LC 713](https://leetcode.com/problems/subarray-product-less-than-k/) | [`top-100/lc-0713-subarray-product-less-than-k.py`](top-100/lc-0713-subarray-product-less-than-k.py)<br>[`top-100/lc-0713-subarray-product-less-than-k.md`](top-100/lc-0713-subarray-product-less-than-k.md) | Medium | Sliding Window & Subarray Counting |
@@ -265,7 +266,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **144** | Binary Tree Preorder Traversal | [LC 144](https://leetcode.com/problems/binary-tree-preorder-traversal/) | [`luffy/25-lc-0144-binary-tree-preorder-traversal.py`](luffy/25-lc-0144-binary-tree-preorder-traversal.py) | Easy | DFS (Root, Left, Right) | Root processed before recursive traversal of subtrees. |
 | **145** | Binary Tree Postorder Traversal | [LC 145](https://leetcode.com/problems/binary-tree-postorder-traversal/) | [`luffy/25-lc-0145-binary-tree-postorder-traversal.py`](luffy/25-lc-0145-binary-tree-postorder-traversal.py) | Easy | DFS (Left, Right, Root) | Subtrees processed before processing the root node. |
 | **199** | Binary Tree Right Side View | [LC 199](https://leetcode.com/problems/binary-tree-right-side-view/) | [`daily-practice/lc-0199-binary-tree-right-side-view.py`](daily-practice/lc-0199-binary-tree-right-side-view.py)<br>[`daily-practice/lc-0199-binary-tree-right-side-view.md`](daily-practice/lc-0199-binary-tree-right-side-view.md) | Medium | DFS Root-Right-Left Traversal | Visit right subtree first; append node value when `depth == len(ans)` in $O(N)$ time and $O(H)$ space. |
-| **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py) | Medium | Postorder DFS | If both left and right return non-null, root is the LCA. |
+| **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py)<br>[`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md)<br>[`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py) | Medium | Postorder Divide & Conquer (4-State Aggregation) | If both left and right return non-null, root is LCA; else propagate non-null child in $O(N)$ time and $O(H)$ space. |
 | **Misc** | Advanced Tree Practices | — | [`luffy/25-tree-traversal-advanced-patterns.py`](luffy/25-tree-traversal-advanced-patterns.py) | Medium | Tree Patterns | Comprehensive tree construction and traversal utilities. |
 
 ---
