@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 27 | ~33% | 24 |
-| **Medium** | 51 | ~63% | 139 |
+| **Easy** | 28 | ~34% | 24 |
+| **Medium** | 51 | ~62% | 139 |
 | **Hard** | 3 | ~4% | 3 |
-| **Total** | **81 In-Depth Notes** | **100%** | **167 Problem Entities** |
+| **Total** | **82 In-Depth Notes** | **100%** | **167 Problem Entities** |
 
 ---
 
@@ -57,6 +57,7 @@ leetcode-sh/
 │   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.py / .md
 │   ├── lc-0042-trapping-rain-water.py / .md
 │   ├── lc-0053-maximum-subarray.py / .md
+│   ├── lc-0101-symmetric-tree.py / .md
 │   ├── lc-0104-maximum-depth-of-binary-tree.py / .md
 │   ├── lc-0141-linked-list-cycle.py / .md
 │   ├── lc-0142-linked-list-cycle-ii.py / .md
@@ -118,6 +119,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py)<br>[`luffy/37-lc-0079-word-search.md`](luffy/37-lc-0079-word-search.md) | Medium | 2D Grid DFS + Backtracking |
 | **94** | Binary Tree Inorder Traversal | [LC 94](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [`luffy/25-lc-0094-binary-tree-inorder-traversal.py`](luffy/25-lc-0094-binary-tree-inorder-traversal.py)<br>[`luffy/25-lc-0094-binary-tree-inorder-traversal.md`](luffy/25-lc-0094-binary-tree-inorder-traversal.md) | Easy | Inorder DFS (L-Root-R) |
 | **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-0098-validate-binary-search-tree-inorder.py`](luffy/29-lc-0098-validate-binary-search-tree-inorder.py)<br>[`luffy/29-lc-0098-validate-binary-search-tree-inorder.md`](luffy/29-lc-0098-validate-binary-search-tree-inorder.md) | Medium | BST Range Bounds & Inorder Monotonicity |
+| **101** | Symmetric Tree | [LC 101](https://leetcode.com/problems/symmetric-tree/) | [`top-100/lc-0101-symmetric-tree.py`](top-100/lc-0101-symmetric-tree.py)<br>[`top-100/lc-0101-symmetric-tree.md`](top-100/lc-0101-symmetric-tree.md) | Easy | Dual-Subtree Mirror Recursion (`isMirror(p.left, q.right)`) |
 | **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](luffy/28-lc-0102-binary-tree-level-order-traversal.py)<br>[`luffy/28-lc-0102-binary-tree-level-order-traversal.md`](luffy/28-lc-0102-binary-tree-level-order-traversal.md) | Medium | Level-by-Level Queue BFS |
 | **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`top-100/lc-0104-maximum-depth-of-binary-tree.py`](top-100/lc-0104-maximum-depth-of-binary-tree.py)<br>[`top-100/lc-0104-maximum-depth-of-binary-tree.md`](top-100/lc-0104-maximum-depth-of-binary-tree.md)<br>[`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](luffy/26-lc-0104-maximum-depth-of-binary-tree.py) | Easy | Divide & Conquer / Post-order Traversal ($1 + \max(l, r)$) |
 | **105** | Construct Tree from Pre & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py)<br>[`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.md`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.md) | Medium | Preorder Root + Inorder Subtree Splitting |
@@ -251,6 +253,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **94** | Binary Tree Inorder Traversal | [LC 94](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [`luffy/25-lc-0094-binary-tree-inorder-traversal.py`](luffy/25-lc-0094-binary-tree-inorder-traversal.py) | Easy | DFS (Left, Root, Right) | Traversal yields sorted order for BSTs; implemented recursively & iteratively. |
 | **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-0098-validate-binary-search-tree-inorder.py`](luffy/29-lc-0098-validate-binary-search-tree-inorder.py) | Medium | BST Range Bounds / Inorder | Validate node with strictly bounded $(min\_val, max\_val)$ interval. |
 | **100** | Same Tree | [LC 100](https://leetcode.com/problems/same-tree/) | [`daily-practice/lc-0100-same-tree.py`](daily-practice/lc-0100-same-tree.py)<br>[`daily-practice/lc-0100-same-tree.md`](daily-practice/lc-0100-same-tree.md) | Easy | Dual-Tree Synchronous Recursion | Both null -> True (`p is q`); values must match and both subtrees match in $O(\min(N, M))$ time. |
+| **101** | Symmetric Tree | [LC 101](https://leetcode.com/problems/symmetric-tree/) | [`top-100/lc-0101-symmetric-tree.py`](top-100/lc-0101-symmetric-tree.py)<br>[`top-100/lc-0101-symmetric-tree.md`](top-100/lc-0101-symmetric-tree.md) | Easy | Dual-Subtree Mirror Recursion | Single tree symmetric ⟺ `isMirror(root.left, root.right)`; cross-match outer `(p.l, q.r)` and inner `(p.r, q.l)` in $O(N)$ time. |
 | **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](luffy/28-lc-0102-binary-tree-level-order-traversal.py) | Medium | BFS (Queue) | Level-by-level queue traversal using `len(queue)` snapshots. |
 | **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`top-100/lc-0104-maximum-depth-of-binary-tree.py`](top-100/lc-0104-maximum-depth-of-binary-tree.py)<br>[`top-100/lc-0104-maximum-depth-of-binary-tree.md`](top-100/lc-0104-maximum-depth-of-binary-tree.md)<br>[`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](luffy/26-lc-0104-maximum-depth-of-binary-tree.py) | Easy | Post-order Divide & Conquer | Depth = $1 + \max(\text{left}, \text{right})$; foundational primitive for Tree DP. |
 | **105** | Construct Binary Tree from Preorder & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py) | Medium | Divide & Conquer / Hash Map | Preorder gives root; Inorder splits left and right subtrees. |
