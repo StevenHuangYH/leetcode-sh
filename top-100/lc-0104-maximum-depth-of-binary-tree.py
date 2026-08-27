@@ -40,3 +40,20 @@ class Solution:
 # 不断递下去，始终会有尽头
 # 这就是递归的 边界条件（base case）
 # 直接返回它的答案 （归）
+
+class Solution2:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+
+
+        ans = 0
+        def f(node, cnt):
+            if root is None:
+                return 0
+            cnt += 1
+            nonlocal ans
+            ans = max(ans,cnt)
+            f(node.left, cnt)
+            f(node.right, cnt)
+        f(root, 0)
+        return ans
+

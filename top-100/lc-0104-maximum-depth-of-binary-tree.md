@@ -141,7 +141,13 @@ Level 1 (根节点):
 
 ## 4. Step-by-Step Code Walkthrough / 代码逐行详解
 
-基于原 Python 文件中的实现进行逐行深入解析：
+本题在 Python 文件中提供了两种互相对偶的经典递归范式：
+
+---
+
+### 范式 1: 自底向上分治后序遍历 (Bottom-Up Post-order / Divide & Conquer)
+
+直接利用函数返回值自底向上层层归并计算子树高度：
 
 ```python
 from typing import Optional
@@ -169,6 +175,40 @@ class Solution:
         #    当前树的最大深度 = max(左子树深度, 右子树深度) + 1 (当前根节点所贡献的 1 层高度)
         return max(left_depth, right_depth) + 1
 ```
+
+---
+
+### 范式 2: 自顶向下前序遍历与外部状态维护 (Top-Down Preorder with State Accumulation)
+
+在参数中自顶向下累加深度 `cnt`，并在遍历过程中动态更新全局最大值 `ans`：
+
+```python
+class Solution2:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        ans = 0
+        
+        def f(node, cnt):
+            # 1. 递归基 (Base Case): 若当前节点为空，直接回退 (防御性修复: 必须检查当前入参 node 而非外部 root)
+            if node is None:
+                return
+            
+            # 2. 前序位置: 访问当前节点，路径深度累加 1
+            cnt += 1
+            nonlocal ans
+            # 3. 动态维护全局最大深度
+            ans = max(ans, cnt)
+            
+            # 4. 向左右子树继续深入传递当前深度 cnt
+            f(node.left, cnt)
+            f(node.right, cnt)
+        
+        f(root, 0)
+        return ans
+```
+
+#### 核心机制与对比总结：
+* **自底向上 (`Solution`)**：关注“子树的高度是多少”，不需要外部变量，由子节点计算出结果后**通过 `return` 向上返回**给父节点，是树形 DP 与分治算法的核心原语。
+* **自顶向下 (`Solution2`)**：关注“从根节点到当前节点的路径深度是多少”，通过**递归入参 `cnt` 向下传递**状态，在前序位置更新全局最优解 `ans`，是回溯与路径搜索的经典范式。
 
 ---
 
@@ -246,6 +286,7 @@ class SolutionIterativeDFS:
 
 | 典型错误模式 (Buggy Pattern) | 触发场景 & 异常表现 (Symptom) | 根因分析 (Root Cause) | 防御性修复与不变量 (Defensive Fix) |
 | :--- | :--- | :--- | :--- |
+| **辅助函数误判根节点 (`if root is None`)** | 自顶向下前序遍历时抛出 `AttributeError: 'NoneType' object has no attribute 'left'` | 在辅助递归函数 `f(node, cnt)` 内误写了 `if root is None`，当 `root` 非空但 `node` 到达叶子空子节点时无法正确触发 Base Case 拦截 | 辅助递归函数首行必须检查当前递归指针：`if node is None: return` |
 | **遗漏空树判空 (`if not root`)** | 输入 `root = []` 时抛出 `AttributeError: 'NoneType' has no attribute 'left'` | 未设置递归终止边界条件，对 `None` 访问子节点 | 递归首行严格保证 `if not root: return 0` |
 | **误将 `+ 1` 写在 `max` 内部** | 代码写为 `max(left + 1, right)` 导致计算结果偏小 | 每一层节点自身的深度贡献应当统一加在左右子树最大值之外 | 严格使用 `1 + max(left_depth, right_depth)` |
 | **全局变量累加被脏数据污染** | 在全局变量 `self.depth` 上累加但未在多用例间重置 | 力扣判题机制复用同一个 `Solution` 类实例，全局状态跨用例残留 | 优先采用函数纯返回值传递分治结果，避免非必要类属性全局状态 |
