@@ -820,6 +820,19 @@
     // Tree folder structure definitions matching README.md repo structure
     const treeStructure = [
       {
+        id: "overview",
+        name: "README.md",
+        label: "Overview",
+        isLeaf: true,
+        filter: k => k === "README.md"
+      },
+      {
+        id: "problem-index",
+        name: "problem-index/",
+        label: "Curriculum Index",
+        filter: k => k.startsWith("topic-")
+      },
+      {
         id: "top-100",
         name: "top-100/",
         label: "Top 100 Liked",
@@ -836,19 +849,6 @@
         name: "luffy/",
         label: "Curriculum (01-42)",
         filter: k => k.startsWith("luffy/")
-      },
-      {
-        id: "problem-index",
-        name: "problem-index/",
-        label: "Curriculum Index",
-        filter: k => k.startsWith("topic-")
-      },
-      {
-        id: "overview",
-        name: "README.md",
-        label: "Overview",
-        isLeaf: true,
-        filter: k => k === "README.md"
       }
     ];
 
