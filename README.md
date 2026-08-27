@@ -48,55 +48,35 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 ```tree
 leetcode-sh/
 ├── top-100/                      # LeetCode Top 100 Liked Problems & In-Depth Notes
-│   ├── lc-0003-longest-substring-without-repeating-characters.py
-│   ├── lc-0003-longest-substring-without-repeating-characters.md
-│   ├── lc-0011-container-with-most-water.py
-│   ├── lc-0011-container-with-most-water.md
-│   ├── lc-0015-3sum.py
-│   ├── lc-0015-3sum.md
-│   ├── lc-0016-3-sum-closest.py
-│   ├── lc-0016-3-sum-closest.md
-│   ├── lc-0033-search-in-rotated-sorted-array.py
-│   ├── lc-0033-search-in-rotated-sorted-array.md
-│   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.py
-│   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.md
-│   ├── lc-0042-trapping-rain-water.py
-│   ├── lc-0042-trapping-rain-water.md
-│   ├── lc-0053-maximum-subarray.py
-│   ├── lc-0053-maximum-subarray.md
-│   ├── lc-0141-linked-list-cycle.py
-│   ├── lc-0141-linked-list-cycle.md
-│   ├── lc-0142-linked-list-cycle-ii.py
-│   ├── lc-0142-linked-list-cycle-ii.md
-│   ├── lc-0162-find-peak-element.py
-│   ├── lc-0162-find-peak-element.md
-│   ├── lc-0167-two-sum-ii-input-array-is-sorted.py
-│   ├── lc-0167-two-sum-ii-input-array-is-sorted.md
-│   ├── lc-0206-reverse-linked-list.py
-│   ├── lc-0206-reverse-linked-list.md
-│   ├── lc-0209-minimum-size-subarray-sum.py
-│   ├── lc-0209-minimum-size-subarray-sum.md
-│   ├── lc-0713-subarray-product-less-than-k.py
-│   └── lc-0713-subarray-product-less-than-k.md
+│   ├── lc-0003-longest-substring-without-repeating-characters.py / .md
+│   ├── lc-0011-container-with-most-water.py / .md
+│   ├── lc-0015-3sum.py / .md
+│   ├── lc-0016-3-sum-closest.py / .md
+│   ├── lc-0019-remove-nth-node-from-end-of-list.py / .md
+│   ├── lc-0033-search-in-rotated-sorted-array.py / .md
+│   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.py / .md
+│   ├── lc-0042-trapping-rain-water.py / .md
+│   ├── lc-0053-maximum-subarray.py / .md
+│   ├── lc-0104-maximum-depth-of-binary-tree.py / .md
+│   ├── lc-0141-linked-list-cycle.py / .md
+│   ├── lc-0142-linked-list-cycle-ii.py / .md
+│   ├── lc-0162-find-peak-element.py / .md
+│   ├── lc-0167-two-sum-ii-input-array-is-sorted.py / .md
+│   ├── lc-0206-reverse-linked-list.py / .md
+│   ├── lc-0209-minimum-size-subarray-sum.py / .md
+│   └── lc-0713-subarray-product-less-than-k.py / .md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
-│   ├── lc-0025-reverse-nodes-in-k-group.py
-│   ├── lc-0025-reverse-nodes-in-k-group.md
-│   ├── lc-0092-reversed-linked-list-2.py
-│   ├── lc-0092-reversed-linked-list-2.md
-│   ├── lc-0143-reorder-list.py
-│   ├── lc-0143-reorder-list.md
-│   ├── lc-0153-find-minimum-in-rotated-sorted-array.py
-│   ├── lc-0153-find-minimum-in-rotated-sorted-array.md
-│   ├── lc-0237-delete-node-in-a-linked-list.py
-│   ├── lc-0237-delete-node-in-a-linked-list.md
-│   ├── lc-0876-middle-of-the-linked-list.py
-│   ├── lc-0876-middle-of-the-linked-list.md
-│   ├── lc-2029-stone-game-ix.py
-│   ├── lc-2029-stone-game-ix.md
-│   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.py
-│   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.md
-│   ├── lc-3471-find-the-largest-almost-missing-integer.py
-│   └── lc-3471-find-the-largest-almost-missing-integer.md
+│   ├── lc-0025-reverse-nodes-in-k-group.py / .md
+│   ├── lc-0082-remove-duplicates-from-sorted-list.py / .md
+│   ├── lc-0083-remove-duplicates-from-sorted-list.py / .md
+│   ├── lc-0092-reversed-linked-list-2.py / .md
+│   ├── lc-0143-reorder-list.py / .md
+│   ├── lc-0153-find-minimum-in-rotated-sorted-array.py / .md
+│   ├── lc-0237-delete-node-in-a-linked-list.py / .md
+│   ├── lc-0876-middle-of-the-linked-list.py / .md
+│   ├── lc-2029-stone-game-ix.py / .md
+│   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.py / .md
+│   └── lc-3471-find-the-largest-almost-missing-integer.py / .md
 ├── luffy/                        # Core 42-Topic Structured Algorithm Curriculum
 │   ├── 01-lc-2235-add-two-integers.py / .md
 │   ├── 02-lc-0001-two-sum.py / .md
