@@ -38,6 +38,59 @@ def get_file_type(filename: str) -> str:
         return "txt"
     return "other"
 
+def normalize_slug(text: str) -> str:
+    """Normalizes a filename stem or section title into a clean search slug."""
+    cleaned = re.sub(r"^(?:\d+[\.\-]\s*|(?:\d+-)?lc-\d+-?)", "", text, flags=re.IGNORECASE)
+    cleaned = cleaned.replace("-", " ").strip().lower()
+    return cleaned if cleaned else text.replace("-", " ").strip().lower()
+
+def build_search_blob(parts: list, notes_text: str = "") -> str:
+    """Builds unified search blob without arbitrary truncation, stripping code blocks."""
+    clean_notes = re.sub(r"```.*?```", "", notes_text, flags=re.DOTALL) if notes_text else ""
+    clean_notes = re.sub(r"\s+", " ", clean_notes).strip()
+    tokens = [str(p).strip() for p in parts if p]
+    if clean_notes:
+        tokens.append(clean_notes)
+    return " ".join(tokens).lower()
+
+def create_document_item(
+    key: str,
+    category: str,
+    title: str,
+    short: str,
+    slug: str,
+    cn_title: str,
+    tags: str,
+    lc_num: str,
+    search_blob: str,
+    path: str,
+    doc_type: str,
+    notes: str,
+    code: str = "",
+    diff: str = "All",
+    py_file: str = "",
+    md_file: str = "",
+) -> dict:
+    """Factory helper to enforce document item schema and eliminate data clumps."""
+    return {
+        "key": key,
+        "category": category,
+        "title": title,
+        "short": short,
+        "slug": slug,
+        "cn_title": cn_title,
+        "tags": tags,
+        "lc_num": lc_num,
+        "search_blob": search_blob,
+        "path": path,
+        "type": doc_type,
+        "notes": notes,
+        "code": code,
+        "diff": diff,
+        "py_file": py_file,
+        "md_file": md_file,
+    }
+
 def collect_workspace_documents():
     """Scans all folders and builds structured problem entities."""
     raw_files = {}
@@ -86,44 +139,48 @@ def collect_workspace_documents():
                 else:
                     topic_content = f"# Problem Index — {title}\n\nNo content parsed."
 
-            clean_topic_slug = re.sub(r"^\d+\.\s*", "", title).lower().replace("-", " ")
-            topic_search_blob = f"{title} {short} {clean_topic_slug} problem index topic curriculum {topic_content[:600]}".lower()
-            topic_docs[key] = {
-                "key": key,
-                "category": "Problem Index",
-                "title": title,
-                "short": short,
-                "slug": clean_topic_slug,
-                "cn_title": "",
-                "tags": "topic curriculum problem index",
-                "lc_num": "",
-                "search_blob": topic_search_blob,
-                "path": f"problem-index/{key}",
-                "type": "doc",
-                "notes": topic_content,
-                "code": "",
-                "diff": "All"
-            }
+            clean_topic_slug = normalize_slug(title)
+            topic_search_blob = build_search_blob(
+                [title, short, clean_topic_slug, "problem index topic curriculum"],
+                topic_content
+            )
+            topic_docs[key] = create_document_item(
+                key=key,
+                category="Problem Index",
+                title=title,
+                short=short,
+                slug=clean_topic_slug,
+                cn_title="",
+                tags="topic curriculum problem index",
+                lc_num="",
+                search_blob=topic_search_blob,
+                path=f"problem-index/{key}",
+                doc_type="doc",
+                notes=topic_content,
+                diff="All",
+            )
 
     # 2. Overview Document (README.md)
-    readme_search_blob = "leetcode self-practices overview readme 项目总览 根文档 " + readme_text[:600].lower()
+    readme_search_blob = build_search_blob(
+        ["LeetCode Self-Practices Overview (README)", "README.md", "readme overview", "项目总览", "readme overview index 根文档"],
+        readme_text
+    )
     overview_docs = {
-        "README.md": {
-            "key": "README.md",
-            "category": "Overview",
-            "title": "LeetCode Self-Practices Overview (README)",
-            "short": "README.md",
-            "slug": "readme overview",
-            "cn_title": "项目总览",
-            "tags": "readme overview index",
-            "lc_num": "",
-            "search_blob": readme_search_blob,
-            "path": "README.md",
-            "type": "doc",
-            "notes": readme_text,
-            "code": "",
-            "diff": "All"
-        }
+        "README.md": create_document_item(
+            key="README.md",
+            category="Overview",
+            title="LeetCode Self-Practices Overview (README)",
+            short="README.md",
+            slug="readme overview",
+            cn_title="项目总览",
+            tags="readme overview index",
+            lc_num="",
+            search_blob=readme_search_blob,
+            path="README.md",
+            doc_type="doc",
+            notes=readme_text,
+            diff="All",
+        )
     }
 
     # Canonical difficulty dictionary for known LeetCode problems
@@ -231,32 +288,30 @@ def collect_workspace_documents():
             id_match = re.search(r"lc-?(\d+)", stem)
             lc_num_str = str(int(id_match.group(1))) if id_match else ""
             
-            # Clean slug without prefix digits or lc markers
-            clean_slug = re.sub(r"^(?:\d+-)?lc-\d+-?", "", stem).replace("-", " ")
-            if not clean_slug:
-                clean_slug = stem.replace("-", " ")
+            clean_slug = normalize_slug(stem)
+            search_blob = build_search_blob(
+                [short_name, cn_title, tags, clean_slug, diff],
+                md_content
+            )
 
-            notes_snippet = re.sub(r"```.*?```", "", md_content[:800], flags=re.DOTALL) if md_content else ""
-            search_blob = f"{short_name} {cn_title} {tags} {clean_slug} {diff} {notes_snippet}".lower()
-
-            problems[problem_key] = {
-                "key": problem_key,
-                "category": cat_title,
-                "title": f"{cat_title}: {short_name}",
-                "short": short_name,
-                "slug": clean_slug,
-                "cn_title": cn_title,
-                "tags": tags,
-                "lc_num": lc_num_str,
-                "search_blob": search_blob,
-                "path": f"{dir_name}/{stem}",
-                "type": "problem",
-                "notes": md_content,
-                "code": py_content,
-                "diff": diff,
-                "py_file": f"{dir_name}/{py_file}" if py_file else "",
-                "md_file": f"{dir_name}/{md_file}" if md_file else ""
-            }
+            problems[problem_key] = create_document_item(
+                key=problem_key,
+                category=cat_title,
+                title=f"{cat_title}: {short_name}",
+                short=short_name,
+                slug=clean_slug,
+                cn_title=cn_title,
+                tags=tags,
+                lc_num=lc_num_str,
+                search_blob=search_blob,
+                path=f"{dir_name}/{stem}",
+                doc_type="problem",
+                notes=md_content,
+                code=py_content,
+                diff=diff,
+                py_file=f"{dir_name}/{py_file}" if py_file else "",
+                md_file=f"{dir_name}/{md_file}" if md_file else "",
+            )
 
     # Aggregate all items
     all_items = {**overview_docs, **topic_docs, **problems}
@@ -1320,13 +1375,12 @@ def build_index_html():
         // Ignore standalone "lc" if accompanied by other keywords
         if (token === "lc" && tokens.length > 1) return true;
 
-        // Numeric token (e.g. "1", "100", "104") -> exact problem ID match or standalone digit word in slug
+        // Numeric token (e.g. "1", "3", "100", "104") -> exact problem ID match or digit bounded by non-digits in slug (e.g. 3sum)
         if (/^\\d+$/.test(token)) {{
           if (lcNum && lcNum === parseInt(token, 10).toString()) return true;
-          // Match standalone digit word in slug (e.g. 3sum, 2sum)
-          const regex = new RegExp(`(^|[^a-z0-9])${{token}}([^a-z0-9]|$)`, "i");
-          if (regex.test(slug)) return true;
-          return false;
+          // Match digit token in slug bounded by non-digits (e.g. 3sum, 2sum, 3-sum)
+          const digitRegex = new RegExp(`(^|\\D)${{token}}(\\D|$)`, "i");
+          return digitRegex.test(slug);
         }}
 
         // Prefixed problem ID (e.g. "lc1", "lc100", "lc-100") -> exact problem ID match
@@ -1764,7 +1818,10 @@ def build_index_html():
         const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
         if (firstMatchEl) {{
           const firstKey = firstMatchEl.getAttribute("data-key");
-          if (firstKey) switchItem(firstKey, true);
+          if (firstKey) {{
+            switchItem(firstKey, true);
+            firstMatchEl.scrollIntoView({{ block: "nearest", behavior: "smooth" }});
+          }}
         }}
         document.getElementById("search").blur();
         const notesPane = document.getElementById("notesPane");
