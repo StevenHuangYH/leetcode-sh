@@ -230,7 +230,7 @@ def build_index_html():
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeetCode Study Station - Split Dual View & Interactive Notes</title>
+  <title>LeetCode-SH</title>
   <!-- Marked for Markdown Rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Highlight.js for Syntax Highlighting -->
@@ -879,8 +879,8 @@ def build_index_html():
     }}
     .code-viewer pre code {{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 13px;
-      line-height: 1.55;
+      font-size: clamp(13px, 0.9vw, 14.5px);
+      line-height: 1.65;
     }}
 
     /* Responsive Breakpoints & Mobile Drawer */
@@ -943,7 +943,7 @@ def build_index_html():
       <div class="header-brand">
         <div class="brand-title">
           <svg class="brand-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-          <span>LeetCode Station</span>
+          <span>LeetCode-SH</span>
         </div>
         <span class="progress-badge" id="progressStats" title="Total Indexed Problems">0 Problems</span>
       </div>
@@ -1044,32 +1044,38 @@ def build_index_html():
       }}
     }}
 
-    // Tree folder structure definitions
+    // Tree folder structure definitions matching README.md repo structure
     const treeStructure = [
       {{
-        id: "overview",
-        name: "Overview",
-        filter: k => k === "README.md"
-      }},
-      {{
-        id: "problem-index",
-        name: "Problem Index",
-        filter: k => k.startsWith("topic-")
-      }},
-      {{
         id: "top-100",
-        name: "Top 100 Liked Track",
+        name: "top-100/",
+        label: "Top 100 Liked",
         filter: k => k.startsWith("top-100/")
       }},
       {{
         id: "daily-practice",
-        name: "Daily Practice Track",
+        name: "daily-practice/",
+        label: "Daily Practice",
         filter: k => k.startsWith("daily-practice/")
       }},
       {{
         id: "luffy",
-        name: "Luffy Curriculum (01-42)",
+        name: "luffy/",
+        label: "Curriculum (01-42)",
         filter: k => k.startsWith("luffy/")
+      }},
+      {{
+        id: "problem-index",
+        name: "problem-index/",
+        label: "Curriculum Index",
+        filter: k => k.startsWith("topic-")
+      }},
+      {{
+        id: "overview",
+        name: "README.md",
+        label: "Overview",
+        isLeaf: true,
+        filter: k => k === "README.md"
       }}
     ];
 
@@ -1151,8 +1157,43 @@ def build_index_html():
       const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
       const codeSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
       const chevronSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+      const repoSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`;
 
-      treeStructure.forEach(folder => {{
+      html += `
+        <div class="tree-root-folder">
+          <div class="tree-root-header" title="Repository Root">
+            <span class="tree-root-icon">${{repoSvg}}</span>
+            <span class="tree-root-name">leetcode-sh/</span>
+          </div>
+          <div class="tree-root-children">
+      `;
+
+      treeStructure.forEach((folder, folderIdx) => {{
+        const isLastFolder = folderIdx === treeStructure.length - 1;
+        const lastFolderClass = isLastFolder ? "last-folder" : "";
+
+        if (folder.isLeaf) {{
+          const k = "README.md";
+          if (items[k]) {{
+            const item = items[k];
+            if (q && !(item.title && item.title.toLowerCase().includes(q)) && !(item.short && item.short.toLowerCase().includes(q)) && !k.toLowerCase().includes(q)) {{
+              return;
+            }}
+            const isActive = k === currentKey;
+            const activeClass = isActive ? "active" : "";
+            html += `
+              <div class="nav-item root-leaf ${{activeClass}} ${{lastFolderClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
+                <span class="tree-file-icon doc-icon">${{docSvg}}</span>
+                <span class="tree-title">${{folder.name}}</span>
+                <div class="tree-badges">
+                  <span class="tree-ext-badge ext-md">md</span>
+                </div>
+              </div>
+            `;
+          }}
+          return;
+        }}
+
         const allKeys = Object.keys(items).filter(folder.filter);
         const matchingKeys = q
           ? allKeys.filter(k => {{
@@ -1165,40 +1206,47 @@ def build_index_html():
 
         if (matchingKeys.length === 0) return;
 
-        // Auto expand if search active, else respect saved state
         const isCollapsed = q ? false : !!collapsedFolders[folder.id];
         const collapseClass = isCollapsed ? "collapsed" : "";
+        const hasActive = matchingKeys.includes(currentKey) ? "has-active" : "";
         const folderSvg = isCollapsed
           ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`
           : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"></path></svg>`;
 
-        const folderIconHtml = folder.id === 'overview' ? docSvg : folderSvg;
-
         html += `
-          <div class="tree-folder ${{collapseClass}}" id="folder-${{folder.id}}">
+          <div class="tree-folder ${{collapseClass}} ${{hasActive}} ${{lastFolderClass}}" id="folder-${{folder.id}}">
             <div class="tree-folder-header" onclick="toggleFolder('${{folder.id}}')">
               <span class="tree-chevron">${{chevronSvg}}</span>
-              <span class="tree-folder-icon">${{folderIconHtml}}</span>
-              <span class="tree-folder-name">${{folder.name}}</span>
+              <span class="tree-folder-icon">${{folderSvg}}</span>
+              <span class="tree-folder-name">${{folder.name}}<span class="tree-folder-label">${{folder.label || ""}}</span></span>
               <span class="tree-count-badge">${{matchingKeys.length}}</span>
             </div>
             <div class="tree-children">
         `;
 
-        matchingKeys.forEach(k => {{
+        matchingKeys.forEach((k, idx) => {{
           const item = items[k];
           const isActive = k === currentKey;
           const activeClass = isActive ? "active" : "";
+          const isLastItem = idx === matchingKeys.length - 1;
+          const lastItemClass = isLastItem ? "last-item" : "";
           const diffClass = item.diff && item.diff !== "All" ? `diff-${{item.diff}}` : "diff-All";
           const fileIconHtml = item.type === "doc"
             ? `<span class="tree-file-icon doc-icon">${{docSvg}}</span>`
             : `<span class="tree-file-icon code-icon">${{codeSvg}}</span>`;
 
+          const hasMd = !!item.md_file || item.type === "doc";
+          const hasPy = !!item.py_file;
+
           html += `
-            <div class="nav-item ${{activeClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
+            <div class="nav-item ${{activeClass}} ${{lastItemClass}}" onclick="switchItem('${{k}}')" data-key="${{k}}" title="${{item.title || item.short}}">
               ${{fileIconHtml}}
               <span class="tree-title">${{item.short}}</span>
-              <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
+              <div class="tree-badges">
+                ${{hasMd ? `<span class="tree-ext-badge ext-md">md</span>` : ""}}
+                ${{hasPy ? `<span class="tree-ext-badge ext-py">py</span>` : ""}}
+                <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
+              </div>
             </div>
           `;
         }});
@@ -1208,6 +1256,11 @@ def build_index_html():
           </div>
         `;
       }});
+
+      html += `
+          </div>
+        </div>
+      `;
 
       treeRoot.innerHTML = html;
     }}
