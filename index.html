@@ -958,9 +958,6 @@
               <div class="nav-item root-leaf ${activeClass} ${lastFolderClass}" onclick="switchItem('${k}')" data-key="${k}" title="${item.title || item.short}">
                 <span class="tree-file-icon doc-icon">${docSvg}</span>
                 <span class="tree-title">${folder.name}</span>
-                <div class="tree-badges">
-                  <span class="tree-ext-badge ext-md">md</span>
-                </div>
               </div>
             `;
           }
@@ -1008,18 +1005,15 @@
             ? `<span class="tree-file-icon doc-icon">${docSvg}</span>`
             : `<span class="tree-file-icon code-icon">${codeSvg}</span>`;
 
-          const hasMd = !!item.md_file || item.type === "doc";
-          const hasPy = !!item.py_file;
+          const diffBadgeHtml = (item.diff && item.diff !== "All")
+            ? `<span class="tree-diff-badge diff-${item.diff}">${item.diff}</span>`
+            : "";
 
           html += `
             <div class="nav-item ${activeClass} ${lastItemClass}" onclick="switchItem('${k}')" data-key="${k}" title="${item.title || item.short}">
               ${fileIconHtml}
               <span class="tree-title">${item.short}</span>
-              <div class="tree-badges">
-                ${hasMd ? `<span class="tree-ext-badge ext-md">md</span>` : ""}
-                ${hasPy ? `<span class="tree-ext-badge ext-py">py</span>` : ""}
-                <span class="tree-diff-dot ${diffClass}" title="${item.diff}"></span>
-              </div>
+              ${diffBadgeHtml}
             </div>
           `;
         });
