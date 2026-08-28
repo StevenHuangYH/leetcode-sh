@@ -37,9 +37,9 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
 | **Easy** | 30 | ~33% | 25 |
-| **Medium** | 57 | ~64% | 142 |
+| **Medium** | 59 | ~64% | 142 |
 | **Hard** | 3 | ~3% | 3 |
-| **Total** | **90 In-Depth Notes** | **100%** | **171 Problem Entities** |
+| **Total** | **92 In-Depth Notes** | **100%** | **171 Problem Entities** |
 
 ---
 
@@ -52,11 +52,13 @@ leetcode-sh/
 │   ├── lc-0011-container-with-most-water.py / .md
 │   ├── lc-0015-3sum.py / .md
 │   ├── lc-0016-3-sum-closest.py / .md
+│   ├── lc-0017-letter-combinations-of-a-phone-number.py / .md
 │   ├── lc-0019-remove-nth-node-from-end-of-list.py / .md
 │   ├── lc-0033-search-in-rotated-sorted-array.py / .md
 │   ├── lc-0034-find-first-and-last-position-of-element-in-sorted-array.py / .md
 │   ├── lc-0042-trapping-rain-water.py / .md
 │   ├── lc-0053-maximum-subarray.py / .md
+│   ├── lc-0078-subsets.py / .md
 │   ├── lc-0101-symmetric-tree.py / .md
 │   ├── lc-0102-binary-tree-level-order-traversal.py / .md
 │   ├── lc-0104-maximum-depth-of-binary-tree.py / .md
@@ -110,6 +112,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **11** | Container With Most Water | [LC 11](https://leetcode.com/problems/container-with-most-water/) | [`top-100/lc-0011-container-with-most-water.py`](top-100/lc-0011-container-with-most-water.py)<br>[`top-100/lc-0011-container-with-most-water.md`](top-100/lc-0011-container-with-most-water.md) | Medium | Two Pointers (Greedy Shorter Line) |
 | **15** | 3Sum | [LC 15](https://leetcode.com/problems/3sum/) | [`top-100/lc-0015-3sum.py`](top-100/lc-0015-3sum.py)<br>[`top-100/lc-0015-3sum.md`](top-100/lc-0015-3sum.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
 | **16** | 3Sum Closest | [LC 16](https://leetcode.com/problems/3sum-closest/) | [`top-100/lc-0016-3-sum-closest.py`](top-100/lc-0016-3-sum-closest.py)<br>[`top-100/lc-0016-3-sum-closest.md`](top-100/lc-0016-3-sum-closest.md) | Medium | Sort + Two Pointers + 2-Way Extreme Pruning |
+| **17** | Letter Combinations of a Phone Number | [LC 17](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) | [`top-100/lc-0017-letter-combinations-of-a-phone-number.py`](top-100/lc-0017-letter-combinations-of-a-phone-number.py)<br>[`top-100/lc-0017-letter-combinations-of-a-phone-number.md`](top-100/lc-0017-letter-combinations-of-a-phone-number.md) | Medium | Backtracking / In-Place Path Array Overwrite |
 | **19** | Remove Nth Node From End of List | [LC 19](https://leetcode.com/problems/remove-nth-node-from-end-of-list/) | [`top-100/lc-0019-remove-nth-node-from-end-of-list.py`](top-100/lc-0019-remove-nth-node-from-end-of-list.py)<br>[`top-100/lc-0019-remove-nth-node-from-end-of-list.md`](top-100/lc-0019-remove-nth-node-from-end-of-list.md) | Medium | Dummy Node + Fixed-Gap Two Pointers ($n$ steps) |
 | **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)<br>[`luffy/19-lc-0020-valid-parentheses.md`](luffy/19-lc-0020-valid-parentheses.md) | Easy | Stack Matching |
 | **21** | Merge Two Sorted Lists | [LC 21](https://leetcode.com/problems/merge-two-sorted-lists/) | [`luffy/16-lc-0021-merge-two-sorted-lists.py`](luffy/16-lc-0021-merge-two-sorted-lists.py)<br>[`luffy/16-lc-0021-merge-two-sorted-lists.md`](luffy/16-lc-0021-merge-two-sorted-lists.md) | Easy | Dummy Head + Two Pointers |
@@ -122,7 +125,7 @@ A dedicated tracking index for **LeetCode Top 100 Liked / High-Frequency Intervi
 | **46** | Permutations | [LC 46](https://leetcode.com/problems/permutations/) | [`luffy/32-lc-0046-permutations.py`](luffy/32-lc-0046-permutations.py)<br>[`luffy/32-lc-0046-permutations.md`](luffy/32-lc-0046-permutations.md) | Medium | Backtracking (`used` array / in-place swap) |
 | **53** | Maximum Subarray | [LC 53](https://leetcode.com/problems/maximum-subarray/) | [`top-100/lc-0053-maximum-subarray.py`](top-100/lc-0053-maximum-subarray.py)<br>[`top-100/lc-0053-maximum-subarray.md`](top-100/lc-0053-maximum-subarray.md) | Medium | Kadane's Algorithm / DP ($O(1)$ space) |
 | **56** | Merge Intervals | [LC 56](https://leetcode.com/problems/merge-intervals/) | [`luffy/13-lc-0056-merge-intervals.py`](luffy/13-lc-0056-merge-intervals.py)<br>[`luffy/13-lc-0056-merge-intervals.md`](luffy/13-lc-0056-merge-intervals.md) | Medium | Interval Sorting & Merging |
-| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py)<br>[`luffy/33-lc-0078-subsets.md`](luffy/33-lc-0078-subsets.md) | Medium | Backtracking / Cascading |
+| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`top-100/lc-0078-subsets.py`](top-100/lc-0078-subsets.py)<br>[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)<br>[`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py) | Medium | Backtracking (0-1 Pick vs Multi-way Loop) / Bitmask |
 | **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py)<br>[`luffy/37-lc-0079-word-search.md`](luffy/37-lc-0079-word-search.md) | Medium | 2D Grid DFS + Backtracking |
 | **94** | Binary Tree Inorder Traversal | [LC 94](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [`luffy/25-lc-0094-binary-tree-inorder-traversal.py`](luffy/25-lc-0094-binary-tree-inorder-traversal.py)<br>[`luffy/25-lc-0094-binary-tree-inorder-traversal.md`](luffy/25-lc-0094-binary-tree-inorder-traversal.md) | Easy | Inorder DFS (L-Root-R) |
 | **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-0098-validate-binary-search-tree-inorder.py`](luffy/29-lc-0098-validate-binary-search-tree-inorder.py)<br>[`luffy/29-lc-0098-validate-binary-search-tree-inorder.md`](luffy/29-lc-0098-validate-binary-search-tree-inorder.md) | Medium | BST Range Bounds & Inorder Monotonicity |
@@ -285,11 +288,12 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 | # | Problem Title | LeetCode Link | Solution Code & Notes | Difficulty | Core Technique | Key Takeaways / Notes |
 | :-: | :--- | :-: | :--- | :-: | :--- | :--- |
+| **17** | Letter Combinations of a Phone Number | [LC 17](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) | [`top-100/lc-0017-letter-combinations-of-a-phone-number.py`](top-100/lc-0017-letter-combinations-of-a-phone-number.py)<br>[`top-100/lc-0017-letter-combinations-of-a-phone-number.md`](top-100/lc-0017-letter-combinations-of-a-phone-number.md) | Medium | Backtracking (Cartesian Product) | Backtracking three-step model; in-place array overwrite `path[i] = char` to enumerate digit letters in $O(4^n \cdot n)$ time. |
 | **39** | Combination Sum | [LC 39](https://leetcode.com/problems/combination-sum/) | [`luffy/34-lc-0039-combination-sum.py`](luffy/34-lc-0039-combination-sum.py) | Medium | Backtracking (Unbounded Choice) | Pass `start_index` to allow reuse of the current element without duplicate permutations. |
 | **40** | Combination Sum II | [LC 40](https://leetcode.com/problems/combination-sum-ii/) | [`luffy/35-lc-0040-combination-sum-ii.py`](luffy/35-lc-0040-combination-sum-ii.py) | Medium | Backtracking + Deduplication | Sort candidates; skip duplicate elements at the same tree depth (`if i > start and nums[i] == nums[i-1]: continue`). |
 | **46** | Permutations | [LC 46](https://leetcode.com/problems/permutations/) | [`luffy/32-lc-0046-permutations.py`](luffy/32-lc-0046-permutations.py) | Medium | Backtracking (Used Array) | Maintain `used` boolean array or swap elements in-place to explore all orderings. |
 | **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`luffy/31-lc-0077-combinations.py`](luffy/31-lc-0077-combinations.py) | Medium | Backtracking + Pruning | Prune search branch if remaining candidates are insufficient to reach size $k$. |
-| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py) | Medium | Backtracking / Cascading | Append path copy at every recursion step; explore subsets of length $0 \dots n$. |
+| **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`top-100/lc-0078-subsets.py`](top-100/lc-0078-subsets.py)<br>[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)<br>[`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py) | Medium | Backtracking (0-1 Pick vs Multi-way Loop) | 0-1 choose/skip binary tree or multi-way start index loop; record `path.copy()` to generate all $2^n$ subsets in $O(2^n \cdot n)$ time. |
 | **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py) | Medium | 2D Grid DFS + Backtracking | Mark visited cells in-place (e.g. `'#'`); restore character on backtracking. |
 | **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py) | Medium | Backtracking + Palindrome Check | Partition string at valid palindrome prefixes; recurse on remaining suffix. |
 
