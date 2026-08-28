@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 30 | ~33% | 25 |
-| **Medium** | 59 | ~64% | 142 |
+| **Easy** | 30 | ~32% | 25 |
+| **Medium** | 60 | ~65% | 142 |
 | **Hard** | 3 | ~3% | 3 |
-| **Total** | **92 In-Depth Notes** | **100%** | **171 Problem Entities** |
+| **Total** | **93 In-Depth Notes** | **100%** | **171 Problem Entities** |
 
 ---
 
@@ -78,6 +78,7 @@ leetcode-sh/
 │   ├── lc-0100-same-tree.py / .md
 │   ├── lc-0103-binary-tree-zigzag-level-order-traversal.py / .md
 │   ├── lc-0110-balanced-binary-tree.py / .md
+│   ├── lc-0131-palindrome-partitioning.py / .md
 │   ├── lc-0143-reorder-list.py / .md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py / .md
 │   ├── lc-0199-binary-tree-right-side-view.py / .md
@@ -164,6 +165,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **100** | Same Tree | [LC 100](https://leetcode.com/problems/same-tree/) | [`daily-practice/lc-0100-same-tree.py`](daily-practice/lc-0100-same-tree.py)<br>[`daily-practice/lc-0100-same-tree.md`](daily-practice/lc-0100-same-tree.md) | Easy | Dual Tree Synchronous Recursion (`p is q`, `p.val == q.val`, `left`, `right`) |
 | **103** | Binary Tree Zigzag Level Order Traversal | [LC 103](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/) | [`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py)<br>[`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md) | Medium | Dual-Buffer BFS + Parity Toggle / Level Reversal |
 | **110** | Balanced Binary Tree | [LC 110](https://leetcode.com/problems/balanced-binary-tree/) | [`daily-practice/lc-0110-balanced-binary-tree.py`](daily-practice/lc-0110-balanced-binary-tree.py)<br>[`daily-practice/lc-0110-balanced-binary-tree.md`](daily-practice/lc-0110-balanced-binary-tree.md) | Easy | Post-Order Bottom-Up Height + Short-Circuit Sentinel (`-1`) |
+| **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`daily-practice/lc-0131-palindrome-partitioning.py`](daily-practice/lc-0131-palindrome-partitioning.py)<br>[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md) | Medium | Backtracking + Substring Palindrome Check (`s[i:j+1]`) |
 | **143** | Reorder List | [LC 143](https://leetcode.com/problems/reorder-list/) | [`daily-practice/lc-0143-reorder-list.py`](daily-practice/lc-0143-reorder-list.py)<br>[`daily-practice/lc-0143-reorder-list.md`](daily-practice/lc-0143-reorder-list.md) | Medium | Fast/Slow Mid (LC 876) + Reverse 2nd Half (LC 206) + Zip-Merge |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
 | **199** | Binary Tree Right Side View | [LC 199](https://leetcode.com/problems/binary-tree-right-side-view/) | [`daily-practice/lc-0199-binary-tree-right-side-view.py`](daily-practice/lc-0199-binary-tree-right-side-view.py)<br>[`daily-practice/lc-0199-binary-tree-right-side-view.md`](daily-practice/lc-0199-binary-tree-right-side-view.md) | Medium | DFS Root-Right-Left Traversal (`depth == len(ans)`) |
@@ -295,7 +297,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`luffy/31-lc-0077-combinations.py`](luffy/31-lc-0077-combinations.py) | Medium | Backtracking + Pruning | Prune search branch if remaining candidates are insufficient to reach size $k$. |
 | **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`top-100/lc-0078-subsets.py`](top-100/lc-0078-subsets.py)<br>[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)<br>[`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py) | Medium | Backtracking (0-1 Pick vs Multi-way Loop) | 0-1 choose/skip binary tree or multi-way start index loop; record `path.copy()` to generate all $2^n$ subsets in $O(2^n \cdot n)$ time. |
 | **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py) | Medium | 2D Grid DFS + Backtracking | Mark visited cells in-place (e.g. `'#'`); restore character on backtracking. |
-| **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py) | Medium | Backtracking + Palindrome Check | Partition string at valid palindrome prefixes; recurse on remaining suffix. |
+| **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`daily-practice/lc-0131-palindrome-partitioning.py`](daily-practice/lc-0131-palindrome-partitioning.py)<br>[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)<br>[`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py) | Medium | Backtracking + Substring Palindrome Check | Partition string into palindromic segments; validate $s[i:j+1] == (s[i:j+1])[::-1]$ and backtrack in $O(n \cdot 2^n)$ time. |
 
 ---
 
