@@ -4,11 +4,11 @@
 
 **Blocked by:** 01: Audit and Tracking Harness
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Upgrade companion notes in `luffy/` (01 to 20) with bilingual problem statements, constraints, and portable relative links
-- [ ] Add ASCII Pattern Lineage Maps showing algorithmic evolution from primitives
-- [ ] Provide line-by-line code breakdowns strictly reflecting original `.py` source files
-- [ ] Add Interview Simulation sections with follow-up pivots and alternative paradigm comparisons
-- [ ] Add Anti-Pattern Error Log tables and complete dry-run tables
-- [ ] Add time and space complexity tables with mathematical proof
+- [x] Upgrade companion notes in `luffy/` (01 to 20) with bilingual problem statements, constraints, and portable relative links
+- [x] Add ASCII Pattern Lineage Maps showing algorithmic evolution from primitives
+- [x] Provide line-by-line code breakdowns strictly reflecting original `.py` source files
+- [x] Add Interview Simulation sections with follow-up pivots and alternative paradigm comparisons
+- [x] Add Anti-Pattern Error Log tables and complete dry-run tables
+- [x] Add time and space complexity tables with mathematical proof
