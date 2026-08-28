@@ -11,7 +11,7 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ## Table of Contents
 
-> 🗺️ **[全景算法路线图与知识图谱 (ROADMAP.md)](ROADMAP.md)**：融合灵茶山艾府基础算法精讲 × labuladong 核心解题框架体系的 5 大阶段 12 核心专题路线图与模板库。
+> **[全景算法路线图与知识图谱 (ROADMAP.md)](ROADMAP.md)**：融合灵茶山艾府基础算法精讲 × labuladong 核心解题框架体系的 5 大阶段 12 核心专题路线图与模板库。
 
 1. [Practice Statistics & Summary](#practice-statistics--summary)
 2. [Repository Structure](#repository-structure)
