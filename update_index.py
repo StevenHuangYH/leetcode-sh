@@ -63,31 +63,31 @@ def read_file(path: Path) -> str:
 
 def parse_curriculum_topics(readme_text: str) -> dict:
     """Extracts curriculum topic document items from README.md Section 5."""
-    topic_sections = [
+    topic_configs = [
         ("topic-all", "Problem Index: Complete Catalog", "All 11 Topics Combined", None),
-        ("topic-01-arrays-sliding-window", "1. Arrays, Strings & Sliding Window", "1. Arrays & Sliding Window", "### 1. Arrays, Strings, Two Pointers & Sliding Window"),
-        ("topic-02-binary-search", "2. Binary Search", "2. Binary Search", "### 2. Binary Search"),
-        ("topic-03-prefix-sum", "3. Prefix Sum & Difference Arrays", "3. Prefix Sum & Difference", "### 3. Prefix Sum & Difference Arrays"),
-        ("topic-04-intervals", "4. Intervals & In-Place Hashing", "4. Intervals & In-Place Hash", "### 4. Intervals & In-Place Array Hashing"),
-        ("topic-05-linked-lists", "5. Linked Lists", "5. Linked Lists", "### 5. Linked Lists"),
-        ("topic-06-stacks-queues", "6. Stacks & Queues", "6. Stacks & Queues", "### 6. Stacks & Queues"),
-        ("topic-07-trees-bst", "7. Trees & Binary Search Trees (BST)", "7. Trees & BST", "### 7. Trees & Binary Search Trees (BST)"),
-        ("topic-08-backtracking", "8. Backtracking & Combinatorics", "8. Backtracking", "### 8. Backtracking & Combinatorics"),
-        ("topic-09-graphs", "9. Graph Algorithms", "9. Graph Algorithms", "### 9. Graph Algorithms"),
-        ("topic-10-dp-math", "10. Dynamic Programming & Math / Game Theory", "10. DP & Game Theory", "### 10. Dynamic Programming & Math / Game Theory"),
-        ("topic-11-oop", "11. OOP & Foundations", "11. OOP & Foundations", "### 11. Object-Oriented Programming (OOP) & Foundations"),
+        ("topic-01-arrays-sliding-window", "1. Arrays, Strings & Sliding Window", "1. Arrays & Sliding Window", r"### 1\.\s+Arrays"),
+        ("topic-02-binary-search", "2. Binary Search", "2. Binary Search", r"### 2\.\s+Binary Search"),
+        ("topic-03-prefix-sum", "3. Prefix Sum & Difference Arrays", "3. Prefix Sum & Difference", r"### 3\.\s+Prefix Sum"),
+        ("topic-04-intervals", "4. Intervals & In-Place Hashing", "4. Intervals & In-Place Hash", r"### 4\.\s+Intervals"),
+        ("topic-05-linked-lists", "5. Linked Lists", "5. Linked Lists", r"### 5\.\s+Linked Lists"),
+        ("topic-06-stacks-queues", "6. Stacks & Queues", "6. Stacks & Queues", r"### 6\.\s+Stacks"),
+        ("topic-07-trees-bst", "7. Trees & Binary Search Trees (BST)", "7. Trees & BST", r"### 7\.\s+Trees"),
+        ("topic-08-backtracking", "8. Backtracking & Combinatorics", "8. Backtracking", r"### 8\.\s+Backtracking"),
+        ("topic-09-graphs", "9. Graph Algorithms", "9. Graph Algorithms", r"### 9\.\s+Graph"),
+        ("topic-10-dp-math", "10. Dynamic Programming & Math / Game Theory", "10. DP & Game Theory", r"### 10\.\s+Dynamic Programming"),
+        ("topic-11-oop", "11. OOP & Foundations", "11. OOP & Foundations", r"### 11\.\s+(?:Object-Oriented|OOP)"),
     ]
     
     sec5_match = re.search(r'(## (?:📚 )?Topic-Wise Curriculum & Problem Index.*?)(\n## (?:🖥️ )?Interactive Web Viewer|\n## (?:🚀 )?How to Run|\Z)', readme_text, re.DOTALL)
     sec5_text = sec5_match.group(1) if sec5_match else readme_text
 
     topic_docs = {}
-    for key, title, short, header in topic_sections:
+    for key, title, short, pattern in topic_configs:
         if key == "topic-all":
             topic_content = f"# Problem Index: Complete Topic-Wise Catalog\n\n{sec5_text}"
         else:
-            match = re.search(re.escape(header) + r'(.*?)(\n### |\n---|\n## |\Z)', readme_text, re.DOTALL)
-            topic_content = f"# Problem Index — {title}\n\n{header}\n{match.group(1).strip()}" if match else f"# Problem Index — {title}\n\nNo content parsed."
+            match = re.search(r'(' + pattern + r'.*?)(?=\n### \d+|\n---|\n## |\Z)', readme_text, re.DOTALL)
+            topic_content = f"# Problem Index — {title}\n\n{match.group(1).strip()}" if match else f"# Problem Index — {title}\n\nNo content parsed."
 
         slug = normalize_slug(title)
         topic_docs[key] = asdict(DocumentEntity(
