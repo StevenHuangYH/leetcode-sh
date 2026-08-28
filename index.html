@@ -1240,7 +1240,7 @@
       }
     }
 
-    function setMainMode(mode) {
+    function setMainMode(mode, triggerSwitch = true) {
       mainMode = mode;
       localStorage.setItem("mainMode", mode);
 
@@ -1253,28 +1253,32 @@
       const breadcrumb = document.getElementById("itemBreadcrumb");
 
       if (mode === "roadmap") {
-        btnRoadmap.classList.add("active");
-        btnWorkspace.classList.remove("active");
-        roadmapView.classList.add("active");
-        workspaceView.classList.add("hidden-view");
-        viewSwitcher.style.display = "none";
-        copyBtn.style.display = "none";
-        breadcrumb.innerHTML = `
-          <span class="breadcrumb-folder">Curriculum</span>
-          <span class="breadcrumb-sep">/</span>
-          <span class="breadcrumb-file">Algorithm Master Roadmap</span>
-        `;
+        if (btnRoadmap) btnRoadmap.classList.add("active");
+        if (btnWorkspace) btnWorkspace.classList.remove("active");
+        if (roadmapView) roadmapView.classList.add("active");
+        if (workspaceView) workspaceView.classList.add("hidden-view");
+        if (viewSwitcher) viewSwitcher.style.display = "none";
+        if (copyBtn) copyBtn.style.display = "none";
+        if (breadcrumb) {
+          breadcrumb.innerHTML = `
+            <span class="breadcrumb-folder">Curriculum</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-file">Algorithm Master Roadmap</span>
+          `;
+        }
         if (history.replaceState) {
           history.replaceState(null, null, "#roadmap");
         }
       } else {
-        btnRoadmap.classList.remove("active");
-        btnWorkspace.classList.add("active");
-        roadmapView.classList.remove("active");
-        workspaceView.classList.remove("hidden-view");
-        viewSwitcher.style.display = "inline-flex";
-        copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
-        switchItem(currentKey, false);
+        if (btnRoadmap) btnRoadmap.classList.remove("active");
+        if (btnWorkspace) btnWorkspace.classList.add("active");
+        if (roadmapView) roadmapView.classList.remove("active");
+        if (workspaceView) workspaceView.classList.remove("hidden-view");
+        if (viewSwitcher) viewSwitcher.style.display = "inline-flex";
+        if (copyBtn) copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
+        if (triggerSwitch) {
+          switchItem(currentKey, false);
+        }
       }
     }
 
@@ -1357,7 +1361,7 @@
     }
 
     function openProblemFromRoadmap(key) {
-      setMainMode("workspace");
+      setMainMode("workspace", false);
       switchItem(key);
     }
 
@@ -1546,7 +1550,7 @@
       currentKey = key;
       const item = items[key];
 
-      setMainMode("workspace");
+      setMainMode("workspace", false);
 
       if (history.replaceState) {
         history.replaceState(null, null, "#" + key);
@@ -1596,23 +1600,58 @@
         codeViewer.textContent = "# No python solution source available for this item.";
       }
 
-      const notesViewer = document.getElementById("notesViewer");
-      if (item.notes) {
-        notesViewer.innerHTML = marked.parse(item.notes);
-        notesViewer.querySelectorAll("pre code").forEach(block => {
-          hljs.highlightElement(block);
-        });
-        renderMathInElement(notesViewer, {
-          delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\\\(", right: "\\\\)", display: false},
-            {left: "\\\\[", right: "\\\\]", display: true}
-          ],
-          throwOnError: false
-        });
+            const notesViewer = document.getElementById("notesViewer");
+      if (item.notes && item.notes.trim().length > 0) {
+        try {
+          if (typeof renderProtectedMarkdown === "function") {
+            notesViewer.innerHTML = renderProtectedMarkdown(item.notes);
+          } else if (typeof marked !== "undefined" && marked.parse) {
+            notesViewer.innerHTML = marked.parse(item.notes);
+          } else {
+            notesViewer.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit;">${item.notes}</pre>`;
+          }
+        } catch (err) {
+          console.error("Markdown parse error:", err);
+          notesViewer.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit;">${item.notes}</pre>`;
+        }
+
+        try {
+          if (typeof hljs !== "undefined") {
+            notesViewer.querySelectorAll("pre code").forEach(block => {
+              hljs.highlightElement(block);
+            });
+          }
+        } catch (e) {
+          console.warn("hljs error:", e);
+        }
+
+        try {
+          if (typeof renderMathInElement === "function") {
+            renderMathInElement(notesViewer, {
+              delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\(", right: "\)", display: false},
+                {left: "\[", right: "\]", display: true}
+              ],
+              throwOnError: false
+            });
+          }
+        } catch (e) {
+          console.warn("KaTeX error:", e);
+        }
+      } else if (item.code) {
+        notesViewer.innerHTML = `
+          <div style="padding: 28px; text-align: center; color: var(--text-muted);">
+            <div style="font-size: 15px; font-weight: 600; color: var(--text-bright); margin-bottom: 8px;">Python Solution Code Available</div>
+            <p style="font-size: 13px; max-width: 460px; margin: 0 auto 16px;">This problem is tracked with verified Python code in the left pane.</p>
+            <button onclick="setViewMode('code')" style="background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-bright); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;">
+              Expand Code Fullscreen
+            </button>
+          </div>
+        `;
       } else {
-        notesViewer.innerHTML = `<p style="color: var(--text-muted);">No documentation notes found for this problem.</p>`;
+        notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">No documentation notes or code found for this problem.</p>`;
       }
 
       const copyBtn = document.getElementById("copyBtn");
@@ -1744,7 +1783,7 @@
     if (mainMode === "roadmap") {
       setMainMode("roadmap");
     } else {
-      setMainMode("workspace");
+      setMainMode("workspace", false);
       switchItem(currentKey);
     }
   </script>
