@@ -4,10 +4,10 @@
 
 **Blocked by:** 02: README Catalog Sync and Metrics Alignment, 04: Luffy Notes Upgrade Part 2 (Topics 21-42)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Remove hardcoded duplicate roadmap and topic dictionaries from `update_index.py`
-- [ ] Bundle loose document item arguments into structured data objects
-- [ ] Rebuild `index.html` via `python3 update_index.py` with zero errors
-- [ ] Run full automated test suite (`unittest discover tests`) ensuring 100% pass rate
-- [ ] Verify clean UI rendering across all tracks in `index.html`
+- [x] Remove hardcoded duplicate roadmap and topic dictionaries from `update_index.py`
+- [x] Bundle loose document item arguments into structured data objects
+- [x] Rebuild `index.html` via `python3 update_index.py` with zero errors
+- [x] Run full automated test suite (`unittest discover tests`) ensuring 100% pass rate
+- [x] Verify clean UI rendering across all tracks in `index.html`

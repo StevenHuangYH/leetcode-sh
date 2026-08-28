@@ -4,10 +4,10 @@
 
 **Blocked by:** 03: Luffy Notes Upgrade Part 1 (Topics 01-20)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Upgrade companion notes in `luffy/` (21 to 42) to the standard 7-section blueprint
-- [ ] Add ASCII Pattern Lineage Maps for tree traversals, backtracking trees, BFS grids, and DP state transitions
-- [ ] Document interviewer follow-ups (e.g. recursion vs iteration, topological sort vs DFS)
-- [ ] Add Anti-Pattern Error Log tables with edge-case defenses (e.g. BST validation bounds, cycle detection)
-- [ ] Ensure strict immutability of all corresponding `.py` solution files
+- [x] Upgrade companion notes in `luffy/` (21 to 42) to the standard 7-section blueprint
+- [x] Add ASCII Pattern Lineage Maps for tree traversals, backtracking trees, BFS grids, and DP state transitions
+- [x] Document interviewer follow-ups (e.g. recursion vs iteration, topological sort vs DFS)
+- [x] Add Anti-Pattern Error Log tables with edge-case defenses (e.g. BST validation bounds, cycle detection)
+- [x] Ensure strict immutability of all corresponding `.py` solution files
