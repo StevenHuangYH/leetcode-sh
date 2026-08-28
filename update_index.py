@@ -1,25 +1,16 @@
 #!/usr/bin/env python3
 """
-=============================================================================
-LeetCode Workspace - Automated index.html Builder & Study Station
-=============================================================================
-This script scans all workspace folders (top-100, daily-practice, luffy,
-README.md), organizes problems into paired (Code + Notes) entities,
-and compiles a standalone, self-contained single-page web app (index.html).
+update_index.py - Automated Compiler for LeetCode Study Station SPA (index.html)
 
 Features:
-- Side-by-side Dual Split View (Left: Markdown Walkthrough, Right: Python Code)
-- View mode switcher (Dual Split, Notes Only, Code Only) with resizable pane
-- Category Accordions with Expand/Fold All controls
-- Difficulty filter tags (Easy, Medium, Hard)
-- Dynamic indexed problem count badge
-- Keyboard shortcuts (/ for search, Esc to clear)
-- Automated Git pre-commit hook integration
-=============================================================================
+- Scans top-100/, daily-practice/, and luffy/ folders.
+- Indexes README.md, ROADMAP.md, and all curriculum topics.
+- Compiles an interactive Visual Roadmap view (inspired by labuladong & EndlessCheng).
+- Dual split-pane viewer (Syntax-highlighted Python + Markdown 7-section notes).
+- Fast client-side fuzzy search, KaTeX math formula rendering, and responsive design.
 """
 
 import os
-import sys
 import re
 import json
 import time
@@ -27,51 +18,26 @@ import argparse
 import subprocess
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
-
-def get_file_type(filename: str) -> str:
-    if filename.endswith(".md") or filename.startswith("topic-"):
-        return "md"
-    elif filename.endswith(".py") or filename.endswith("py"):
-        return "py"
-    elif filename.endswith(".txt"):
-        return "txt"
-    return "other"
+BASE_DIR = Path(__file__).parent.resolve()
 
 def normalize_slug(text: str) -> str:
-    """Normalizes a filename stem or section title into a clean search slug."""
-    cleaned = re.sub(r"^(?:\d+[\.\-]\s*|(?:\d+-)?lc-\d+-?)", "", text, flags=re.IGNORECASE)
-    cleaned = cleaned.replace("-", " ").strip().lower()
-    return cleaned if cleaned else text.replace("-", " ").strip().lower()
+    """Normalizes problem title to a clean slug for searching."""
+    text = re.sub(r'[\(\)\[\]\{\}\.,:;!\?`\'"]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip().lower()
+    return text
 
-def build_search_blob(parts: list, notes_text: str = "") -> str:
-    """Builds unified search blob without arbitrary truncation, stripping code blocks."""
-    clean_notes = re.sub(r"```.*?```", "", notes_text, flags=re.DOTALL) if notes_text else ""
-    clean_notes = re.sub(r"\s+", " ", clean_notes).strip()
-    tokens = [str(p).strip() for p in parts if p]
-    if clean_notes:
-        tokens.append(clean_notes)
-    return " ".join(tokens).lower()
+def build_search_blob(tokens: list, text_content: str = "") -> str:
+    """Builds a normalized, space-separated searchable string."""
+    combined = " ".join(tokens)
+    if text_content:
+        clean_text = re.sub(r'[\r\n\t]+', ' ', text_content)
+        clean_text = re.sub(r'[#\*`_\[\]\(\)\{\}\.,:;!\?\'"]', ' ', clean_text)
+        clean_text = re.sub(r'\s+', ' ', clean_text)
+        combined += " " + clean_text[:3000]
+    return normalize_slug(combined)
 
-def create_document_item(
-    key: str,
-    category: str,
-    title: str,
-    short: str,
-    slug: str,
-    cn_title: str,
-    tags: str,
-    lc_num: str,
-    search_blob: str,
-    path: str,
-    doc_type: str,
-    notes: str,
-    code: str = "",
-    diff: str = "All",
-    py_file: str = "",
-    md_file: str = "",
-) -> dict:
-    """Factory helper to enforce document item schema and eliminate data clumps."""
+def create_document_item(key, category, title, short, slug, cn_title, tags, lc_num, search_blob, path, doc_type="problem", notes="", code="", diff="All", py_file="", md_file=""):
+    """Helper to construct a standardized document metadata item dictionary."""
     return {
         "key": key,
         "category": category,
@@ -160,7 +126,7 @@ def collect_workspace_documents():
                 diff="All",
             )
 
-    # 2. Overview Document (README.md)
+    # 2. Overview Documents (README.md & ROADMAP.md)
     readme_search_blob = build_search_blob(
         ["LeetCode Self-Practices Overview (README)", "README.md", "readme overview", "项目总览", "readme overview index 根文档"],
         readme_text
@@ -183,6 +149,29 @@ def collect_workspace_documents():
         )
     }
 
+    roadmap_path = BASE_DIR / "ROADMAP.md"
+    if roadmap_path.exists():
+        roadmap_text = read_file_content(roadmap_path)
+        roadmap_search_blob = build_search_blob(
+            ["Algorithm Master Roadmap (ROADMAP)", "ROADMAP.md", "roadmap", "全景路线图", "知识图谱", "算法刷题全景路线图"],
+            roadmap_text
+        )
+        overview_docs["ROADMAP.md"] = create_document_item(
+            key="ROADMAP.md",
+            category="Overview",
+            title="Algorithm Master Roadmap (ROADMAP.md)",
+            short="ROADMAP.md",
+            slug="algorithm master roadmap",
+            cn_title="算法全景路线图",
+            tags="roadmap curriculum knowledge graph 路线图",
+            lc_num="",
+            search_blob=roadmap_search_blob,
+            path="ROADMAP.md",
+            doc_type="doc",
+            notes=roadmap_text,
+            diff="All",
+        )
+
     # Canonical difficulty dictionary for known LeetCode problems
     KNOWN_DIFFICULTIES = {
         1: "Easy", 2: "Medium", 3: "Medium", 4: "Hard", 5: "Medium",
@@ -193,27 +182,26 @@ def collect_workspace_documents():
         48: "Medium", 49: "Medium", 53: "Medium", 55: "Medium", 56: "Medium",
         62: "Medium", 64: "Medium", 70: "Easy", 72: "Hard", 75: "Medium",
         76: "Hard", 78: "Medium", 79: "Medium", 82: "Medium", 83: "Easy", 84: "Hard", 85: "Hard",
-        92: "Medium", 94: "Easy", 96: "Medium", 98: "Medium", 101: "Easy",
-        102: "Medium", 104: "Easy", 105: "Medium", 114: "Medium", 121: "Easy",
-        124: "Hard", 128: "Medium", 131: "Medium", 136: "Easy", 139: "Medium",
-        141: "Easy", 142: "Medium", 143: "Medium", 146: "Medium", 148: "Medium",
+        92: "Medium", 94: "Easy", 96: "Medium", 98: "Medium", 100: "Easy", 101: "Easy",
+        102: "Medium", 103: "Medium", 104: "Easy", 105: "Medium", 110: "Easy", 114: "Medium", 121: "Easy",
+        124: "Hard", 128: "Medium", 130: "Medium", 131: "Medium", 136: "Easy", 139: "Medium",
+        141: "Easy", 142: "Medium", 143: "Medium", 144: "Easy", 145: "Easy", 146: "Medium", 148: "Medium",
         152: "Medium", 153: "Medium", 155: "Medium", 160: "Easy", 162: "Medium",
-        167: "Medium", 169: "Easy", 198: "Medium", 200: "Medium", 206: "Easy",
+        167: "Medium", 169: "Easy", 198: "Medium", 199: "Medium", 200: "Medium", 206: "Easy",
         207: "Medium", 208: "Medium", 209: "Medium", 215: "Medium", 221: "Medium",
-        226: "Easy", 227: "Medium", 232: "Easy", 234: "Easy", 236: "Medium",
-        238: "Medium", 239: "Hard", 240: "Medium", 279: "Medium", 283: "Easy",
-        287: "Medium", 297: "Hard", 300: "Medium", 301: "Hard", 309: "Medium",
+        226: "Easy", 227: "Medium", 232: "Easy", 234: "Easy", 235: "Medium", 236: "Medium",
+        237: "Medium", 238: "Medium", 239: "Hard", 240: "Medium", 279: "Medium", 283: "Easy",
+        287: "Medium", 297: "Hard", 300: "Medium", 301: "Hard", 303: "Easy", 309: "Medium",
         312: "Hard", 322: "Medium", 337: "Medium", 338: "Easy", 347: "Medium",
         394: "Medium", 399: "Medium", 406: "Medium", 416: "Medium", 437: "Medium",
-        438: "Medium", 448: "Easy", 494: "Medium", 538: "Medium", 543: "Easy",
+        438: "Medium", 448: "Easy", 494: "Medium", 513: "Medium", 538: "Medium", 543: "Easy",
         560: "Medium", 581: "Medium", 617: "Easy", 621: "Medium", 647: "Medium",
-        713: "Medium", 739: "Medium", 876: "Easy", 994: "Medium", 2029: "Medium",
-        2235: "Easy", 3090: "Easy", 3471: "Easy"
+        704: "Easy", 713: "Medium", 739: "Medium", 876: "Easy", 994: "Medium", 1091: "Medium",
+        1109: "Medium", 2029: "Medium", 2235: "Easy", 3090: "Easy", 3471: "Easy"
     }
 
     # 3. Helper to detect difficulty from markdown content or filename
     def extract_difficulty(text: str, filename: str) -> str:
-        # Priority 1: Match explicit Difficulty line in Markdown metadata
         match = re.search(r'\*\*Difficulty:\*\*\s*(Easy|Medium|Hard)', text, re.IGNORECASE)
         if match:
             return match.group(1).capitalize()
@@ -221,7 +209,6 @@ def collect_workspace_documents():
         if match:
             return match.group(1).capitalize()
 
-        # Priority 2: Extract LC problem ID from filename (e.g. lc-0206-..., 15-lc-0206-...)
         id_match = re.search(r'(?:lc-)?(\d{4})', filename)
         if id_match:
             lc_num = int(id_match.group(1))
@@ -248,61 +235,54 @@ def collect_workspace_documents():
             if f.startswith("__") or f.endswith(".pyc") or f == "file_topics.txt":
                 continue
             stem = f
+            if stem.endswith(".py"):
+                stem = stem[:-3]
+            elif stem.endswith(".md"):
+                stem = stem[:-3]
+            if stem not in stem_groups:
+                stem_groups[stem] = {"py": None, "md": None}
             if f.endswith(".py"):
-                stem = f[:-3]
+                stem_groups[stem]["py"] = f
             elif f.endswith(".md"):
-                stem = f[:-3]
-            stem_groups.setdefault(stem, []).append(f)
+                stem_groups[stem]["md"] = f
 
-        for stem, group_files in stem_groups.items():
-            py_file = next((f for f in group_files if f.endswith(".py")), None)
-            md_file = next((f for f in group_files if f.endswith(".md")), None)
+        for stem, pair in stem_groups.items():
+            py_file = pair["py"]
+            md_file = pair["md"]
 
             py_content = read_file_content(track_dir / py_file) if py_file else ""
             md_content = read_file_content(track_dir / md_file) if md_file else ""
 
-            # Make nice title and short label
-            short_name = stem
-            if short_name.startswith("lc-"):
-                short_name = short_name.replace("lc-", "LC ")
-            elif "-lc-" in short_name:
-                short_name = short_name.replace("-lc-", " LC ")
-            short_name = short_name.replace("-", " ")
+            # Extract title & metadata
+            title = stem.replace("-", " ").title()
+            lc_num = ""
+            m_num = re.search(r'(?:lc-)?(\d{4})', stem)
+            if m_num:
+                lc_num = f"LC {int(m_num.group(1))}"
 
-            diff = extract_difficulty(md_content, stem)
-            problem_key = f"{dir_name}/{stem}"
-
-            # Extract Chinese title and tags from markdown metadata
             cn_title = ""
-            tags = ""
             if md_content:
-                cn_match = re.search(r"#\s*LeetCode\s*\d+\.?\s*[^(（\n]*[（(]([^)）\n]+)[)）]", md_content)
+                cn_match = re.search(r'# .*?\| ([\u4e00-\u9fa5A-Za-z0-9\s\(\)]+)', md_content)
                 if cn_match:
                     cn_title = cn_match.group(1).strip()
-                tag_match = re.search(r"\*\*Tags:\*\*\s*([^\n]+)", md_content, re.IGNORECASE)
-                if not tag_match:
-                    tag_match = re.search(r"Tags:\s*([^\n]+)", md_content, re.IGNORECASE)
-                if tag_match:
-                    tags = tag_match.group(1).strip()
 
-            id_match = re.search(r"lc-?(\d+)", stem)
-            lc_num_str = str(int(id_match.group(1))) if id_match else ""
-            
-            clean_slug = normalize_slug(stem)
+            diff = extract_difficulty(md_content, stem)
+            clean_slug = normalize_slug(f"{stem} {cn_title}")
             search_blob = build_search_blob(
-                [short_name, cn_title, tags, clean_slug, diff],
-                md_content
+                [stem, title, cn_title, lc_num, diff, dir_name, cat_title],
+                f"{md_content}\n{py_content}"
             )
 
-            problems[problem_key] = create_document_item(
-                key=problem_key,
+            primary_key = f"{dir_name}/{py_file if py_file else md_file}"
+            problems[primary_key] = create_document_item(
+                key=primary_key,
                 category=cat_title,
-                title=f"{cat_title}: {short_name}",
-                short=short_name,
+                title=f"{lc_num} {stem}" if lc_num else title,
+                short=py_file if py_file else md_file,
                 slug=clean_slug,
                 cn_title=cn_title,
-                tags=tags,
-                lc_num=lc_num_str,
+                tags=f"{dir_name} {diff.lower()}",
+                lc_num=lc_num,
                 search_blob=search_blob,
                 path=f"{dir_name}/{stem}",
                 doc_type="problem",
@@ -313,21 +293,240 @@ def collect_workspace_documents():
                 md_file=f"{dir_name}/{md_file}" if md_file else "",
             )
 
-    # Aggregate all items
     all_items = {**overview_docs, **topic_docs, **problems}
     return all_items
 
+ROADMAP_DATA = [
+    {
+        "phase": 1,
+        "phase_name": "Phase 1: 线性结构与双指针基石",
+        "phase_badge": "PHASE 01 · 线性与双指针",
+        "phase_desc": "数组、链表、栈与队列是所有高级算法的基石，掌握双指针与滑动窗口可以秒杀 50% 线性搜索问题。",
+        "topics": [
+            {
+                "id": "topic-1",
+                "title": "数组与哈希查找",
+                "subtitle": "Array, Prefix Sum & Difference Array",
+                "icon": "hash",
+                "formula": "前缀和 s[i+1]=s[i]+x · 差分 diff[l]+=x · 原地哈希置换",
+                "problems": [
+                    {"num": 1, "name": "Two Sum", "cn": "两数之和", "diff": "Easy", "key": "luffy/02-lc-0001-two-sum.py"},
+                    {"num": 303, "name": "Range Sum Query", "cn": "区域和检索", "diff": "Easy", "key": "luffy/10-lc-0303-range-sum-query-immutable.py"},
+                    {"num": 560, "name": "Subarray Sum Equals K", "cn": "和为 K 的子数组", "diff": "Medium", "key": "luffy/11-lc-0560-subarray-sum-equals-k.py"},
+                    {"num": 1109, "name": "Corporate Flight Bookings", "cn": "航班预订统计", "diff": "Medium", "key": "luffy/12-lc-1109-corporate-flight-bookings.py"},
+                    {"num": 56, "name": "Merge Intervals", "cn": "合并区间", "diff": "Medium", "key": "luffy/13-lc-0056-merge-intervals.py"},
+                    {"num": 41, "name": "First Missing Positive", "cn": "缺失的第一个正数", "diff": "Hard", "key": "luffy/14-lc-0041-first-missing-positive.py"},
+                ]
+            },
+            {
+                "id": "topic-2",
+                "title": "双指针与滑动窗口",
+                "subtitle": "Two Pointers & Sliding Window",
+                "icon": "columns",
+                "formula": "短板贪心对撞 · 动态滑窗 [l, r] · 2-Way 极限剪枝 (3Sum)",
+                "problems": [
+                    {"num": 11, "name": "Container With Most Water", "cn": "盛最多水的容器", "diff": "Medium", "key": "top-100/lc-0011-container-with-most-water.py"},
+                    {"num": 15, "name": "3Sum", "cn": "三数之和", "diff": "Medium", "key": "top-100/lc-0015-3sum.py"},
+                    {"num": 16, "name": "3Sum Closest", "cn": "最接近的三数之和", "diff": "Medium", "key": "top-100/lc-0016-3-sum-closest.py"},
+                    {"num": 167, "name": "Two Sum II", "cn": "两数之和 II 有序数组", "diff": "Medium", "key": "top-100/lc-0167-two-sum-ii-input-array-is-sorted.py"},
+                    {"num": 26, "name": "Remove Duplicates", "cn": "删除有序数组重复项", "diff": "Easy", "key": "luffy/05-lc-0026-remove-duplicates-from-sorted-array.py"},
+                    {"num": 3, "name": "Longest Substring", "cn": "无重复字符最长子串", "diff": "Medium", "key": "top-100/lc-0003-longest-substring-without-repeating-characters.py"},
+                    {"num": 209, "name": "Minimum Size Subarray Sum", "cn": "长度最小子数组", "diff": "Medium", "key": "top-100/lc-0209-minimum-size-subarray-sum.py"},
+                    {"num": 713, "name": "Subarray Product Less Than K", "cn": "乘积小于K子数组", "diff": "Medium", "key": "top-100/lc-0713-subarray-product-less-than-k.py"},
+                    {"num": 3090, "name": "Max Substring At Most 2", "cn": "最多2次字符最长子串", "diff": "Easy", "key": "daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py"},
+                    {"num": 3471, "name": "Largest Almost Missing Integer", "cn": "最大几乎缺失整数", "diff": "Easy", "key": "daily-practice/lc-3471-find-the-largest-almost-missing-integer.py"},
+                ]
+            },
+            {
+                "id": "topic-3",
+                "title": "单链表穿针引线与快慢指针",
+                "subtitle": "Linked List In-Place Mastery",
+                "icon": "link",
+                "formula": "哨兵 dummy · 3 指针反转 (prev, cur, nxt) · 快慢指针中点/环入口",
+                "problems": [
+                    {"num": 206, "name": "Reverse Linked List", "cn": "反转链表", "diff": "Easy", "key": "top-100/lc-0206-reverse-linked-list.py"},
+                    {"num": 92, "name": "Reverse Linked List II", "cn": "反转链表 II (局部反转)", "diff": "Medium", "key": "daily-practice/lc-0092-reversed-linked-list-2.py"},
+                    {"num": 25, "name": "Reverse Nodes in k-Group", "cn": "K 个一组反转链表", "diff": "Hard", "key": "daily-practice/lc-0025-reverse-nodes-in-k-group.py"},
+                    {"num": 876, "name": "Middle of Linked List", "cn": "链表的中间结点", "diff": "Easy", "key": "daily-practice/lc-0876-middle-of-the-linked-list.py"},
+                    {"num": 143, "name": "Reorder List", "cn": "重排链表 (中点+反转+归并)", "diff": "Medium", "key": "daily-practice/lc-0143-reorder-list.py"},
+                    {"num": 141, "name": "Linked List Cycle", "cn": "环形链表 (2:1 碰撞)", "diff": "Easy", "key": "top-100/lc-0141-linked-list-cycle.py"},
+                    {"num": 142, "name": "Linked List Cycle II", "cn": "环形链表 II (入口相遇)", "diff": "Medium", "key": "top-100/lc-0142-linked-list-cycle-ii.py"},
+                    {"num": 21, "name": "Merge Two Sorted Lists", "cn": "合并有序链表", "diff": "Easy", "key": "luffy/16-lc-0021-merge-two-sorted-lists.py"},
+                    {"num": 19, "name": "Remove Nth Node From End", "cn": "删除倒数第 N 节点", "diff": "Medium", "key": "top-100/lc-0019-remove-nth-node-from-end-of-list.py"},
+                    {"num": 82, "name": "Remove Duplicates II", "cn": "删除链表重复元素 II", "diff": "Medium", "key": "daily-practice/lc-0082-remove-duplicates-from-sorted-list.py"},
+                    {"num": 83, "name": "Remove Duplicates", "cn": "删除链表重复元素", "diff": "Easy", "key": "daily-practice/lc-0083-remove-duplicates-from-sorted-list.py"},
+                    {"num": 237, "name": "Delete Node in Linked List", "cn": "删除节点 (替罪羊覆盖)", "diff": "Medium", "key": "daily-practice/lc-0237-delete-node-in-a-linked-list.py"},
+                ]
+            },
+            {
+                "id": "topic-4",
+                "title": "栈与队列、单调栈",
+                "subtitle": "Stack, Queue & Monotonic Stack",
+                "icon": "layers",
+                "formula": "栈括号匹配 · 辅助最小栈 MinStack · 前后缀最值柱体储水",
+                "problems": [
+                    {"num": 20, "name": "Valid Parentheses", "cn": "有效的括号", "diff": "Easy", "key": "luffy/19-lc-0020-valid-parentheses.py"},
+                    {"num": 155, "name": "Min Stack", "cn": "最小栈", "diff": "Medium", "key": "luffy/21-lc-0155-min-stack.py"},
+                    {"num": 232, "name": "Queue using Stacks", "cn": "用栈实现队列", "diff": "Easy", "key": "luffy/24-lc-0232-implement-queue-using-stacks.py"},
+                    {"num": 227, "name": "Basic Calculator II", "cn": "基本计算器 II", "diff": "Medium", "key": "luffy/22-lc-0227-basic-calculator-ii.py"},
+                    {"num": 394, "name": "Decode String", "cn": "字符串解码", "diff": "Medium", "key": "luffy/23-lc-0394-decode-string.py"},
+                    {"num": 42, "name": "Trapping Rain Water", "cn": "接雨水 (前后缀/双指针)", "diff": "Hard", "key": "top-100/lc-0042-trapping-rain-water.py"},
+                ]
+            }
+        ]
+    },
+    {
+        "phase": 2,
+        "phase_name": "Phase 2: 经典二分与极限搜索",
+        "phase_badge": "PHASE 02 · 经典二分",
+        "phase_desc": "红蓝染色法统一所有二分边界，将对数复杂度应用到旋转数组、峰值极值与二分答案判定中。",
+        "topics": [
+            {
+                "id": "topic-5",
+                "title": "二分查找与红蓝染色法",
+                "subtitle": "Binary Search & Red-Blue Framework",
+                "icon": "git-commit",
+                "formula": "开区间 (-1, n) 红蓝收缩 · 万能 lower_bound · nums[-1] 旋转锚点",
+                "problems": [
+                    {"num": 704, "name": "Binary Search", "cn": "二分查找", "diff": "Easy", "key": "luffy/07-lc-0704-binary-search.py"},
+                    {"num": 34, "name": "First & Last Position", "cn": "排序数组查找首末位置", "diff": "Medium", "key": "top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py"},
+                    {"num": 33, "name": "Search in Rotated Array", "cn": "搜索旋转排序数组", "diff": "Medium", "key": "top-100/lc-0033-search-in-rotated-sorted-array.py"},
+                    {"num": 153, "name": "Find Min in Rotated Array", "cn": "寻找旋转数组最小值", "diff": "Medium", "key": "daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py"},
+                    {"num": 162, "name": "Find Peak Element", "cn": "寻找峰值 (爬坡二分)", "diff": "Medium", "key": "top-100/lc-0162-find-peak-element.py"},
+                ]
+            },
+            {
+                "id": "topic-6",
+                "title": "二分答案与单调性判定",
+                "subtitle": "Binary Search on Answer",
+                "icon": "target",
+                "formula": "单调判定 check(mid) · 最小化最大值 / 最大化最小值",
+                "problems": []
+            }
+        ]
+    },
+    {
+        "phase": 3,
+        "phase_name": "Phase 3: 树形结构与递归本原",
+        "phase_badge": "PHASE 03 · 树与递归",
+        "phase_desc": "树是递归思维的最佳训练场。前序自顶向下、后序自底向上分治、BFS 层序遍历与 BST 有序性质。",
+        "topics": [
+            {
+                "id": "topic-7",
+                "title": "二叉树与递归分治",
+                "subtitle": "Binary Tree DFS & Divide-and-Conquer",
+                "icon": "git-pull-request",
+                "formula": "自底向上 1+max(l, r) · 对称镜像 isMirror · LCA 四状态归并",
+                "problems": [
+                    {"num": 104, "name": "Maximum Depth of Tree", "cn": "二叉树的最大深度", "diff": "Easy", "key": "top-100/lc-0104-maximum-depth-of-binary-tree.py"},
+                    {"num": 100, "name": "Same Tree", "cn": "相同的树", "diff": "Easy", "key": "daily-practice/lc-0100-same-tree.py"},
+                    {"num": 101, "name": "Symmetric Tree", "cn": "对称二叉树", "diff": "Easy", "key": "top-100/lc-0101-symmetric-tree.py"},
+                    {"num": 110, "name": "Balanced Binary Tree", "cn": "平衡二叉树 (-1 剪枝)", "diff": "Easy", "key": "daily-practice/lc-0110-balanced-binary-tree.py"},
+                    {"num": 236, "name": "Lowest Common Ancestor", "cn": "二叉树的最近公共祖先", "diff": "Medium", "key": "top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py"},
+                    {"num": 105, "name": "Construct Tree Pre/In", "cn": "从前序与中序遍历构造二叉树", "diff": "Medium", "key": "luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py"},
+                    {"num": 94, "name": "Inorder Traversal", "cn": "二叉树的中序遍历", "diff": "Easy", "key": "luffy/25-lc-0094-binary-tree-inorder-traversal.py"},
+                    {"num": 144, "name": "Preorder Traversal", "cn": "二叉树的前序遍历", "diff": "Easy", "key": "luffy/25-lc-0144-binary-tree-preorder-traversal.py"},
+                    {"num": 145, "name": "Postorder Traversal", "cn": "二叉树的后序遍历", "diff": "Easy", "key": "luffy/25-lc-0145-binary-tree-postorder-traversal.py"},
+                ]
+            },
+            {
+                "id": "topic-8",
+                "title": "广度优先搜索与层序遍历",
+                "subtitle": "Binary Tree BFS & Level Order",
+                "icon": "list",
+                "formula": "单队列快照 len(q) · 双数组滚动 (cur, nxt) · 逆序 BFS (先右后左)",
+                "problems": [
+                    {"num": 102, "name": "Level Order Traversal", "cn": "二叉树的层序遍历", "diff": "Medium", "key": "top-100/lc-0102-binary-tree-level-order-traversal.py"},
+                    {"num": 103, "name": "Zigzag Level Order", "cn": "二叉树的锯齿形层序遍历", "diff": "Medium", "key": "daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py"},
+                    {"num": 513, "name": "Find Bottom Left Value", "cn": "找树左下角的值 (逆序 BFS)", "diff": "Medium", "key": "daily-practice/lc-0513-find-bottom-left-tree-value.py"},
+                    {"num": 199, "name": "Right Side View", "cn": "二叉树的右视图", "diff": "Medium", "key": "daily-practice/lc-0199-binary-tree-right-side-view.py"},
+                ]
+            },
+            {
+                "id": "topic-9",
+                "title": "二叉搜索树性质与操作",
+                "subtitle": "Binary Search Tree BST",
+                "icon": "sliders",
+                "formula": "上下界约束 (low, high) · 中序遍历严格单调递增 · BST 值域分流",
+                "problems": [
+                    {"num": 98, "name": "Validate BST", "cn": "验证二叉搜索树", "diff": "Medium", "key": "luffy/29-lc-0098-validate-binary-search-tree-inorder.py"},
+                    {"num": 235, "name": "LCA of BST", "cn": "二叉搜索树的最近公共祖先", "diff": "Medium", "key": "daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py"},
+                ]
+            }
+        ]
+    },
+    {
+        "phase": 4,
+        "phase_name": "Phase 4: 暴力搜索与回溯算法",
+        "phase_badge": "PHASE 04 · 回溯决策树",
+        "phase_desc": "回溯是增量穷举解空间的递归过程。建立「回溯三问」模型，区分 0/1 决策与多叉搜索，精准树层去重。",
+        "topics": [
+            {
+                "id": "topic-10",
+                "title": "回溯三问模型与决策树",
+                "subtitle": "Backtracking & Search Trees",
+                "icon": "shuffle",
+                "formula": "回溯三问 · 0-1 选/不选二叉树 vs 多叉树前序收集 · 树层去重 (j > i)",
+                "problems": [
+                    {"num": 17, "name": "Letter Combinations", "cn": "电话号码字母组合 (笛卡尔积)", "diff": "Medium", "key": "top-100/lc-0017-letter-combinations-of-a-phone-number.py"},
+                    {"num": 78, "name": "Subsets", "cn": "子集 (0-1 选/不选 vs 枚举多叉树)", "diff": "Medium", "key": "top-100/lc-0078-subsets.py"},
+                    {"num": 77, "name": "Combinations", "cn": "组合 (定长组合 + 剩余剪枝)", "diff": "Medium", "key": "luffy/31-lc-0077-combinations.py"},
+                    {"num": 39, "name": "Combination Sum", "cn": "组合总和 (无限复用回溯)", "diff": "Medium", "key": "luffy/34-lc-0039-combination-sum.py"},
+                    {"num": 40, "name": "Combination Sum II", "cn": "组合总和 II (排序+树层去重)", "diff": "Medium", "key": "luffy/35-lc-0040-combination-sum-ii.py"},
+                    {"num": 46, "name": "Permutations", "cn": "全排列 (used 数组/原地交换)", "diff": "Medium", "key": "luffy/32-lc-0046-permutations.py"},
+                    {"num": 131, "name": "Palindrome Partitioning", "cn": "分割回文串 (隔板切分+回文剪枝)", "diff": "Medium", "key": "daily-practice/lc-0131-palindrome-partitioning.py"},
+                    {"num": 79, "name": "Word Search", "cn": "单词搜索 (2D 网格 DFS + 回溯)", "diff": "Medium", "key": "luffy/37-lc-0079-word-search.py"},
+                ]
+            }
+        ]
+    },
+    {
+        "phase": 5,
+        "phase_name": "Phase 5: 动态规划与进阶算法",
+        "phase_badge": "PHASE 05 · 动态规划与进阶",
+        "phase_desc": "子问题重叠与最优子结构。从记忆化搜索到递推表格，从经典 Kadane、背包九讲到图论拓扑排序与博弈论。",
+        "topics": [
+            {
+                "id": "topic-11",
+                "title": "动态规划核心与子问题递推",
+                "subtitle": "Dynamic Programming Foundations",
+                "icon": "trending-up",
+                "formula": "状态定义 dp[i] · Kadane 最大子数组 · 0-1/完全背包遍历顺序",
+                "problems": [
+                    {"num": 53, "name": "Maximum Subarray", "cn": "最大子数组和 (Kadane 状态压缩)", "diff": "Medium", "key": "top-100/lc-0053-maximum-subarray.py"},
+                    {"num": 130, "name": "Surrounded Regions", "cn": "被围绕的区域 (边界逆向 FloodFill)", "diff": "Medium", "key": "luffy/39-lc-0130-surrounded-regions.py"},
+                    {"num": 200, "name": "Number of Islands", "cn": "岛屿数量 (沉岛 DFS / 并查集)", "diff": "Medium", "key": "luffy/38-lc-0200-number-of-islands.py"},
+                    {"num": 994, "name": "Rotting Oranges", "cn": "腐烂的橘子 (多源网格 BFS)", "diff": "Medium", "key": "luffy/40-lc-0994-rotting-oranges.py"},
+                    {"num": 1091, "name": "Shortest Path in Matrix", "cn": "二进制矩阵最短路 (8 联通 BFS)", "diff": "Medium", "key": "luffy/41-lc-1091-shortest-path-in-binary-matrix.py"},
+                ]
+            },
+            {
+                "id": "topic-12",
+                "title": "图论拓扑排序与博弈数论",
+                "subtitle": "Graph Topology & Game Theory",
+                "icon": "share-2",
+                "formula": "Kahn 入度表 BFS · 3 色标记 DFS 环检测 · 模 3 同余博弈奇偶分析",
+                "problems": [
+                    {"num": 207, "name": "Course Schedule", "cn": "课程表 (拓扑排序 Kahn BFS / DFS)", "diff": "Medium", "key": "luffy/42-lc-0207-course-schedule.py"},
+                    {"num": 2029, "name": "Stone Game IX", "cn": "石子游戏 IX (模 3 同余分类博弈)", "diff": "Medium", "key": "daily-practice/lc-2029-stone-game-ix.py"},
+                ]
+            }
+        ]
+    }
+]
+
 def build_index_html():
-    """Generates the single-page index.html file with dual split-pane view and responsive tree explorer."""
+    """Generates the single-page index.html file with visual roadmap and dual split-pane view."""
     all_items = collect_workspace_documents()
     items_json = json.dumps(all_items)
+    roadmap_json = json.dumps(ROADMAP_DATA)
 
     html_template = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeetCode-SH</title>
+  <title>LeetCode-SH | Algorithm Master Station</title>
   <!-- Marked for Markdown Rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Highlight.js for Syntax Highlighting -->
@@ -362,7 +561,7 @@ def build_index_html():
       margin: 0;
       padding: 0;
     }}
-    /* Modern Minimalist Dark Theme Scrollbars (Fits Total Document Length) */
+    /* Minimalist Dark Theme Scrollbars */
     ::-webkit-scrollbar {{
       width: 7px;
       height: 7px;
@@ -381,7 +580,6 @@ def build_index_html():
     ::-webkit-scrollbar-thumb:hover {{
       background-color: rgba(139, 148, 158, 0.55);
     }}
-    /* Firefox */
     * {{
       scrollbar-width: thin;
       scrollbar-color: rgba(139, 148, 158, 0.28) transparent;
@@ -448,22 +646,24 @@ def build_index_html():
       height: 100%;
       cursor: col-resize;
       z-index: 30;
-      transition: background-color 0.15s;
     }}
     .resizer:hover, .resizer.dragging {{
       background-color: var(--accent);
     }}
 
-    /* Sidebar Header */
+    /* Sidebar Header & Brand */
     .sidebar-header {{
-      padding: 12px 14px 8px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: var(--bg-sidebar);
     }}
     .header-brand {{
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      justify-content: space-between;
     }}
     .brand-title {{
       font-size: 13.5px;
@@ -472,292 +672,211 @@ def build_index_html():
       display: flex;
       align-items: center;
       gap: 7px;
-      user-select: none;
+      letter-spacing: 0.2px;
     }}
-    .brand-icon {{
-      font-size: 15px;
+    .brand-svg {{
+      color: var(--accent);
+      flex-shrink: 0;
     }}
     .progress-badge {{
       font-size: 11px;
-      padding: 2px 7px;
-      background: rgba(56, 139, 253, 0.12);
-      border: 1px solid rgba(88, 166, 255, 0.25);
-      border-radius: 10px;
-      color: var(--accent);
       font-weight: 600;
-      white-space: nowrap;
+      background-color: rgba(56, 139, 253, 0.15);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 139, 253, 0.3);
     }}
+
+    /* Search Box */
     .search-box-wrapper {{
       position: relative;
-      margin-bottom: 2px;
-    }}
-    .search-box {{
-      width: 100%;
-      padding: 6px 26px 6px 28px;
-      background-color: var(--bg-main);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      color: #fff;
-      font-size: 12px;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }}
-    .search-box:focus {{
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+      display: flex;
+      align-items: center;
     }}
     .search-icon {{
       position: absolute;
-      left: 8px;
-      top: 50%;
-      transform: translateY(-50%);
+      left: 9px;
       color: var(--text-muted);
-      font-size: 11px;
+      display: flex;
+      align-items: center;
       pointer-events: none;
+    }}
+    .search-box {{
+      width: 100%;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 28px 6px 28px;
+      color: var(--text-bright);
+      font-size: 12px;
+      outline: none;
+      transition: all 0.15s;
+    }}
+    .search-box:focus {{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.18);
     }}
     .search-clear-btn {{
       position: absolute;
       right: 7px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
+      background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 11px;
       cursor: pointer;
       display: none;
+      align-items: center;
+      justify-content: center;
       padding: 2px;
-      line-height: 1;
+      border-radius: 4px;
     }}
     .search-clear-btn:hover {{
-      color: #fff;
+      color: var(--text-bright);
+      background-color: rgba(139, 148, 158, 0.2);
+    }}
+    .search-clear-btn.visible {{
+      display: flex;
     }}
 
-    /* Explorer Bar (Header for Tree) */
+    /* Explorer Top Bar */
     .explorer-bar {{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       padding: 8px 14px 6px;
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
-      user-select: none;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
     }}
     .explorer-actions {{
       display: flex;
+      align-items: center;
       gap: 4px;
     }}
     .icon-btn {{
       background: transparent;
-      border: 1px solid transparent;
+      border: none;
       color: var(--text-muted);
-      font-size: 12px;
       cursor: pointer;
-      padding: 2px 5px;
+      padding: 2px 4px;
       border-radius: 4px;
-      line-height: 1;
-      transition: all 0.15s;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: color 0.15s;
     }}
     .icon-btn:hover {{
-      background: rgba(177, 186, 196, 0.12);
       color: var(--text-bright);
-      border-color: var(--border-color);
+      background-color: rgba(139, 148, 158, 0.2);
     }}
 
-    /* Tree View Container (IDE Guide Line Hierarchy) */
+    /* Tree View Container */
     .tree-container {{
       flex: 1;
       overflow-y: auto;
-      padding: 8px 10px 24px;
-      font-size: clamp(12.5px, 0.88vw, 13.5px);
-    }}
-    .tree-root-folder {{
-      position: relative;
-    }}
-    .tree-root-header {{
-      display: flex;
-      align-items: center;
-      padding: 5px 8px;
-      border-radius: 6px;
-      font-size: clamp(12.5px, 0.9vw, 13.5px);
-      font-weight: 700;
-      color: var(--text-bright);
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      gap: 7px;
-      margin-bottom: 2px;
-      user-select: none;
-    }}
-    .tree-root-icon {{
-      color: var(--accent);
-      display: inline-flex;
-      align-items: center;
-    }}
-    .tree-root-children {{
-      position: relative;
-      margin-left: 12px;
-      padding-left: 10px;
-      border-left: 1px solid rgba(240, 246, 252, 0.12);
+      padding: 6px 0 16px;
     }}
     .tree-folder {{
-      position: relative;
+      user-select: none;
       margin-bottom: 2px;
-    }}
-    .tree-folder::before {{
-      content: "";
-      position: absolute;
-      top: 14px;
-      left: -10px;
-      width: 8px;
-      height: 1px;
-      background-color: rgba(240, 246, 252, 0.12);
-    }}
-    .tree-folder.last-folder::after {{
-      content: "";
-      position: absolute;
-      top: 15px;
-      bottom: 0;
-      left: -11px;
-      width: 2px;
-      background-color: var(--bg-sidebar);
     }}
     .tree-folder-header {{
       display: flex;
       align-items: center;
-      padding: 5.5px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      user-select: none;
-      font-size: clamp(12px, 0.88vw, 13px);
-      font-weight: 600;
-      color: var(--text-muted);
-      transition: background-color 0.15s, color 0.15s;
       gap: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: background-color 0.15s, color 0.15s;
     }}
     .tree-folder-header:hover {{
-      background-color: rgba(177, 186, 196, 0.08);
+      background-color: rgba(177, 186, 196, 0.12);
       color: var(--text-bright);
     }}
-    .tree-folder.has-active > .tree-folder-header {{
-      color: var(--text-bright);
-    }}
-    .tree-chevron {{
-      display: inline-flex;
+    .folder-arrow {{
+      width: 14px;
+      height: 14px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 12px;
       color: var(--text-muted);
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
     }}
-    .tree-folder.collapsed .tree-chevron {{
+    .tree-folder.collapsed .folder-arrow {{
       transform: rotate(-90deg);
     }}
-    .tree-folder-icon, .tree-file-icon {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: var(--text-muted);
-    }}
-    .tree-file-icon.code-icon {{
-      color: #58a6ff;
-    }}
-    .tree-file-icon.doc-icon {{
-      color: #8b949e;
-    }}
-    .pane-svg {{
+    .folder-icon {{
       color: var(--accent);
-      vertical-align: middle;
-      margin-right: 4px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
     }}
-    .tree-folder-name {{
+    .folder-name {{
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      font-size: inherit;
     }}
-    .tree-count-badge {{
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 10px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-subtle);
+    .folder-count {{
+      font-size: 10.5px;
       color: var(--text-muted);
+      background: rgba(139, 148, 158, 0.15);
+      padding: 1px 5px;
+      border-radius: 8px;
       font-weight: 500;
-      flex-shrink: 0;
     }}
     .tree-children {{
+      display: block;
+      padding-left: 20px;
       position: relative;
-      margin-left: 14px;
-      padding-left: 10px;
-      border-left: 1px solid rgba(240, 246, 252, 0.12);
-      transition: all 0.2s ease-out;
+    }}
+    .tree-children::before {{
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 0;
+      bottom: 6px;
+      width: 1px;
+      background-color: rgba(240, 246, 252, 0.12);
     }}
     .tree-folder.collapsed .tree-children {{
       display: none;
     }}
 
-    /* Tree Node / Nav Item with Guide Elbow Line */
+    /* Tree Nav Items */
     .nav-item {{
       display: flex;
       align-items: center;
-      padding: 5.5px 8px;
-      border-radius: 5px;
+      gap: 7px;
+      padding: 5px 12px 5px 6px;
+      font-size: 12px;
       color: var(--text-main);
-      text-decoration: none;
-      font-size: clamp(12px, 0.88vw, 13px);
-      line-height: 1.45;
       cursor: pointer;
-      margin-bottom: 1px;
-      transition: all 0.15s ease;
-      gap: 6px;
+      border-radius: 4px;
+      margin: 1px 6px 1px 0;
       position: relative;
+      transition: all 0.15s;
     }}
     .tree-children > .nav-item::before {{
       content: "";
       position: absolute;
       top: 50%;
-      left: -10px;
-      width: 8px;
+      left: -3px;
+      width: 6px;
       height: 1px;
       background-color: rgba(240, 246, 252, 0.12);
     }}
-    .tree-children > .nav-item.last-item::after {{
-      content: "";
-      position: absolute;
-      top: 50%;
-      bottom: 0;
-      left: -11px;
-      width: 2px;
-      background-color: var(--bg-sidebar);
+    .nav-item.root-leaf {{
+      padding-left: 24px;
+      margin: 1px 8px 1px 8px;
+      position: relative;
     }}
-    .nav-item.root-leaf::before {{
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: -10px;
-      width: 8px;
-      height: 1px;
-      background-color: rgba(240, 246, 252, 0.12);
-    }}
-    .nav-item.root-leaf.last-folder::after {{
-      content: "";
-      position: absolute;
-      top: 50%;
-      bottom: 0;
-      left: -11px;
-      width: 2px;
-      background-color: var(--bg-sidebar);
-    }}
-    .nav-item:hover {{
+    .nav-item.root-leaf:hover {{
       background-color: rgba(177, 186, 196, 0.12);
       color: var(--text-bright);
     }}
@@ -765,11 +884,6 @@ def build_index_html():
       background-color: rgba(56, 139, 253, 0.15);
       color: var(--accent);
       font-weight: 600;
-    }}
-    .tree-children > .nav-item.active::before,
-    .nav-item.root-leaf.active::before {{
-      background-color: var(--accent);
-      height: 1.5px;
     }}
     .tree-title {{
       flex: 1;
@@ -799,22 +913,7 @@ def build_index_html():
     }}
     .diff-All {{ display: none; }}
 
-    /* No search results placeholder */
-    .tree-no-results {{
-      padding: 32px 14px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 12.5px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }}
-    .tree-no-results svg {{
-      opacity: 0.5;
-    }}
-
-    /* Main Workspace Container */
+    /* Main Container */
     #main-container {{
       flex: 1;
       display: flex;
@@ -864,6 +963,42 @@ def build_index_html():
       color: #fff;
       border-color: var(--accent);
     }}
+
+    /* Main Mode Switcher (Roadmap vs Workspace) */
+    .main-mode-switcher {{
+      display: inline-flex;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }}
+    .mode-nav-btn {{
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }}
+    .mode-nav-btn:hover {{
+      color: var(--text-bright);
+      background-color: rgba(255, 255, 255, 0.05);
+    }}
+    .mode-nav-btn.active {{
+      background-color: #238636;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(35, 134, 54, 0.4);
+    }}
+
     .breadcrumb {{
       display: flex;
       align-items: center;
@@ -888,25 +1023,36 @@ def build_index_html():
     }}
     .diff-badge {{
       font-size: 10.5px;
-      padding: 1px 7px;
-      border-radius: 10px;
       font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
       margin-left: 4px;
     }}
-    .diff-badge.diff-Easy {{ background: rgba(63, 185, 80, 0.15); color: var(--diff-easy); border: 1px solid rgba(63, 185, 80, 0.3); }}
-    .diff-badge.diff-Medium {{ background: rgba(210, 153, 34, 0.15); color: var(--diff-medium); border: 1px solid rgba(210, 153, 34, 0.3); }}
-    .diff-badge.diff-Hard {{ background: rgba(248, 81, 73, 0.15); color: var(--diff-hard); border: 1px solid rgba(248, 81, 73, 0.3); }}
+    .diff-badge.Easy {{
+      background-color: rgba(63, 185, 80, 0.15);
+      color: var(--diff-easy);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+    }}
+    .diff-badge.Medium {{
+      background-color: rgba(210, 153, 34, 0.15);
+      color: var(--diff-medium);
+      border: 1px solid rgba(210, 153, 34, 0.3);
+    }}
+    .diff-badge.Hard {{
+      background-color: rgba(248, 81, 73, 0.15);
+      color: var(--diff-hard);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }}
+    .diff-badge.All {{ display: none; }}
 
-    /* Toolbar Right Controls */
     .toolbar-right {{
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-shrink: 0;
     }}
     .segmented-control {{
       display: inline-flex;
-      background: var(--bg-main);
+      background-color: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 2px;
@@ -916,107 +1062,331 @@ def build_index_html():
       background: transparent;
       border: none;
       color: var(--text-muted);
+      padding: 4px 9px;
       font-size: 11.5px;
-      padding: 3px 9px;
+      font-weight: 500;
       border-radius: 4px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-weight: 500;
+      gap: 5px;
       transition: all 0.15s;
-      user-select: none;
     }}
     .seg-btn:hover {{
       color: var(--text-bright);
     }}
     .seg-btn.active {{
-      background: rgba(56, 139, 253, 0.18);
+      background-color: var(--bg-sidebar);
       color: var(--accent);
       font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }}
     .action-btn {{
-      background: var(--card-bg);
+      background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      font-size: 11.5px;
       padding: 4px 10px;
+      font-size: 11.5px;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 5px;
-      font-weight: 500;
       transition: all 0.15s;
-      user-select: none;
     }}
     .action-btn:hover {{
-      background: rgba(177, 186, 196, 0.15);
+      background-color: rgba(177, 186, 196, 0.12);
       color: #fff;
-      border-color: var(--accent);
+      border-color: var(--text-muted);
     }}
 
-    /* Split Pane Workspace */
+    /* ========================================================= */
+    /* Roadmap Master View CSS (labuladong-inspired Layout)     */
+    /* ========================================================= */
+    #roadmap-view {{
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow-y: auto;
+      background: radial-gradient(circle at 50% 0%, rgba(56, 139, 253, 0.05) 0%, transparent 50%), var(--bg-main);
+      padding: 24px 32px 60px;
+    }}
+    #roadmap-view.active {{
+      display: flex;
+    }}
+    #workspace.hidden-view {{
+      display: none !important;
+    }}
+
+    .roadmap-hero {{
+      max-width: 1140px;
+      margin: 0 auto 28px;
+      width: 100%;
+      text-align: center;
+    }}
+    .roadmap-hero .hero-badge {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      color: var(--accent);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }}
+    .roadmap-hero h1 {{
+      font-size: clamp(22px, 2.2vw, 30px);
+      font-weight: 800;
+      color: var(--text-bright);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }}
+    .roadmap-hero p {{
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 720px;
+      margin: 0 auto 18px;
+      line-height: 1.6;
+    }}
+    .phase-filter-bar {{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }}
+    .phase-filter-btn {{
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 5px 13px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }}
+    .phase-filter-btn:hover {{
+      border-color: var(--accent);
+      color: var(--text-bright);
+    }}
+    .phase-filter-btn.active {{
+      background: var(--accent);
+      color: #0d1117;
+      border-color: var(--accent);
+      font-weight: 700;
+    }}
+
+    .roadmap-phases-container {{
+      max-width: 1140px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }}
+    .phase-section {{
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px 22px;
+      position: relative;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }}
+    .phase-section:hover {{
+      border-color: rgba(88, 166, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }}
+    .phase-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }}
+    .phase-title-group {{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }}
+    .phase-badge-pill {{
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 12px;
+      background: rgba(56, 139, 253, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 139, 253, 0.3);
+    }}
+    .phase-title-text {{
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-bright);
+    }}
+    .phase-desc {{
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }}
+    .phase-topics-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 14px;
+    }}
+
+    .topic-card {{
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    .topic-card:hover {{
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }}
+    .topic-card-top {{
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }}
+    .topic-card-title {{
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1.3;
+    }}
+    .topic-card-subtitle {{
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }}
+    .topic-card-count {{
+      font-size: 10.5px;
+      background: rgba(139, 148, 158, 0.15);
+      color: var(--text-main);
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      font-weight: 600;
+    }}
+    .topic-formula-badge {{
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 6px 9px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: #7ee787;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .topic-formula-badge svg {{
+      flex-shrink: 0;
+      opacity: 0.8;
+    }}
+    .topic-pills-container {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }}
+    .topic-problem-pill {{
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }}
+    .topic-problem-pill:hover {{
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.03);
+      background: rgba(56, 139, 253, 0.1);
+    }}
+    .pill-diff-dot {{
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }}
+
+    /* ========================================================= */
+    /* Workspace Dual Split View                                 */
+    /* ========================================================= */
     #workspace {{
       flex: 1;
       display: flex;
-      overflow: hidden;
       height: calc(100vh - 46px);
+      overflow: hidden;
       position: relative;
     }}
     .pane {{
+      flex: 1;
       overflow-y: auto;
-      height: 100%;
-      padding: 28px 36px;
-    }}
-    #left-pane {{
-      width: calc(50% - 2.5px);
-      background-color: var(--bg-panel);
+      padding: 24px 32px 60px;
       display: flex;
       flex-direction: column;
-      padding: 20px 24px;
-      min-width: 150px;
+      min-width: 0;
     }}
-    /* Draggable Splitter between Code & Notes */
+    #left-pane {{
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+    }}
+    #right-pane {{
+      background-color: var(--bg-main);
+    }}
     .workspace-resizer {{
       width: 5px;
-      background-color: var(--border-color);
+      margin: 0 -2.5px;
       cursor: col-resize;
-      transition: background-color 0.15s ease;
-      z-index: 20;
-      flex-shrink: 0;
-      user-select: none;
+      background: transparent;
+      z-index: 15;
+      transition: background-color 0.15s;
     }}
     .workspace-resizer:hover, .workspace-resizer.dragging {{
       background-color: var(--accent);
     }}
-    #right-pane {{
-      width: calc(50% - 2.5px);
-      background-color: var(--bg-main);
-      overflow-y: auto;
-      padding: 28px 36px;
-      min-width: 150px;
-    }}
     .pane-header {{
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-bottom: 12px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
+      justify-content: space-between;
+      margin-bottom: 12px;
     }}
     .pane-title {{
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-bright);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }}
-
-    /* Markdown Body Styling */
     .markdown-body {{
-      max-width: 900px;
+      color: var(--text-main);
+      max-width: 860px;
       margin: 0 auto;
       line-height: 1.75;
       font-size: clamp(14px, 0.98vw, 15.5px);
@@ -1084,7 +1454,6 @@ def build_index_html():
       color: #f0f6fc;
     }}
 
-    /* Code Pane Viewer */
     .code-viewer {{
       flex: 1;
       background-color: var(--code-bg);
@@ -1099,7 +1468,6 @@ def build_index_html():
       line-height: 1.65;
     }}
 
-    /* Responsive Breakpoints & Mobile Drawer */
     @media (max-width: 768px) {{
       #sidebar {{
         position: fixed;
@@ -1199,11 +1567,24 @@ def build_index_html():
             <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z"></path>
           </svg>
         </button>
+
+        <!-- Main Mode Switcher: Roadmap vs Workspace -->
+        <div class="main-mode-switcher">
+          <button class="mode-nav-btn active" id="btnModeRoadmap" onclick="setMainMode('roadmap')" title="Interactive Visual Roadmap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+            <span>Roadmap</span>
+          </button>
+          <button class="mode-nav-btn" id="btnModeWorkspace" onclick="setMainMode('workspace')" title="Dual-Split Problem Workspace">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            <span>Workspace</span>
+          </button>
+        </div>
+
         <div class="breadcrumb" id="itemBreadcrumb">Loading...</div>
       </div>
 
       <div class="toolbar-right">
-        <div class="segmented-control" id="viewSwitcher">
+        <div class="segmented-control" id="viewSwitcher" style="display: none;">
           <button class="seg-btn" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
             <span class="seg-label">Split</span>
@@ -1218,14 +1599,36 @@ def build_index_html():
           </button>
         </div>
 
-        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution">
+        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution" style="display: none;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           <span id="copyBtnLabel">Copy Code</span>
         </button>
       </div>
     </header>
 
-    <div id="workspace">
+    <!-- Roadmap Interactive View -->
+    <div id="roadmap-view" class="roadmap-container active">
+      <div class="roadmap-hero">
+        <div class="hero-badge">CURRICULUM TOPOLOGY</div>
+        <h1>算法刷题全景路线图</h1>
+        <p>灵茶山艾府基础算法精讲 × labuladong 核心解题框架 · 5 大递进阶段 · 12 核心专题全覆盖</p>
+        <div class="phase-filter-bar">
+          <button class="phase-filter-btn active" onclick="filterRoadmapPhase('all', this)">全部阶段 (All)</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(1, this)">Phase 1: 线性与双指针</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(2, this)">Phase 2: 经典二分</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(3, this)">Phase 3: 树与递归</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(4, this)">Phase 4: 回溯决策树</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(5, this)">Phase 5: 动态规划与进阶</button>
+        </div>
+      </div>
+
+      <div class="roadmap-phases-container" id="roadmapPhasesRoot">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Workspace Dual Split View -->
+    <div id="workspace" class="hidden-view">
       <!-- Left Pane: Syntax-Highlighted Code -->
       <section class="pane" id="left-pane">
         <div class="pane-header">
@@ -1251,6 +1654,9 @@ def build_index_html():
 
   <script>
     const items = {items_json};
+    const roadmapData = {roadmap_json};
+
+    let mainMode = localStorage.getItem("mainMode") || "roadmap";
     let currentKey = "README.md";
     let viewMode = "notes"; // 'dual', 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
@@ -1259,13 +1665,23 @@ def build_index_html():
     // Check initial URL hash
     if (window.location.hash && window.location.hash.length > 1) {{
       const hashKey = decodeURIComponent(window.location.hash.substring(1));
-      if (items[hashKey]) {{
+      if (hashKey === "roadmap") {{
+        mainMode = "roadmap";
+      }} else if (items[hashKey]) {{
         currentKey = hashKey;
+        mainMode = "workspace";
       }}
     }}
 
     // Tree folder structure definitions matching README.md repo structure
     const treeStructure = [
+      {{
+        id: "roadmap-doc",
+        name: "ROADMAP.md",
+        label: "Master Roadmap",
+        isLeaf: true,
+        filter: k => k === "ROADMAP.md"
+      }},
       {{
         id: "overview",
         name: "README.md",
@@ -1321,165 +1737,262 @@ def build_index_html():
       viewMode = mode;
       const leftPane = document.getElementById("left-pane");
       const rightPane = document.getElementById("right-pane");
-      const wsResizer = document.getElementById("workspace-resizer");
-      
+      const resizer = document.getElementById("workspace-resizer");
+
       document.getElementById("btnDual").classList.toggle("active", mode === "dual");
       document.getElementById("btnNotes").classList.toggle("active", mode === "notes");
       document.getElementById("btnCode").classList.toggle("active", mode === "code");
 
       if (mode === "dual") {{
         leftPane.style.display = "flex";
-        if (wsResizer) wsResizer.style.display = "block";
-        rightPane.style.display = "block";
+        rightPane.style.display = "flex";
+        resizer.style.display = "block";
         applyWorkspaceSplit(workspaceSplitRatio);
-      }} else if (mode === "notes") {{
-        leftPane.style.display = "none";
-        if (wsResizer) wsResizer.style.display = "none";
-        rightPane.style.display = "block";
-        rightPane.style.width = "100%";
-        rightPane.style.flex = "1";
       }} else if (mode === "code") {{
         leftPane.style.display = "flex";
         leftPane.style.width = "100%";
         leftPane.style.flex = "1";
-        if (wsResizer) wsResizer.style.display = "none";
         rightPane.style.display = "none";
+        resizer.style.display = "none";
+      }} else {{ // notes only
+        leftPane.style.display = "none";
+        rightPane.style.display = "flex";
+        rightPane.style.width = "100%";
+        rightPane.style.flex = "1";
+        resizer.style.display = "none";
+      }}
+    }}
+
+    function setMainMode(mode) {{
+      mainMode = mode;
+      localStorage.setItem("mainMode", mode);
+
+      const btnRoadmap = document.getElementById("btnModeRoadmap");
+      const btnWorkspace = document.getElementById("btnModeWorkspace");
+      const roadmapView = document.getElementById("roadmap-view");
+      const workspaceView = document.getElementById("workspace");
+      const viewSwitcher = document.getElementById("viewSwitcher");
+      const copyBtn = document.getElementById("copyBtn");
+      const breadcrumb = document.getElementById("itemBreadcrumb");
+
+      if (mode === "roadmap") {{
+        btnRoadmap.classList.add("active");
+        btnWorkspace.classList.remove("active");
+        roadmapView.classList.add("active");
+        workspaceView.classList.add("hidden-view");
+        viewSwitcher.style.display = "none";
+        copyBtn.style.display = "none";
+        breadcrumb.innerHTML = `
+          <span class="breadcrumb-folder">Curriculum</span>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-file">Algorithm Master Roadmap</span>
+        `;
+        if (history.replaceState) {{
+          history.replaceState(null, null, "#roadmap");
+        }}
+      }} else {{
+        btnRoadmap.classList.remove("active");
+        btnWorkspace.classList.add("active");
+        roadmapView.classList.remove("active");
+        workspaceView.classList.remove("hidden-view");
+        viewSwitcher.style.display = "inline-flex";
+        copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
+        switchItem(currentKey, false);
+      }}
+    }}
+
+    function renderRoadmap(selectedPhase = 'all') {{
+      const root = document.getElementById("roadmapPhasesRoot");
+      if (!root) return;
+
+      const diffColorMap = {{
+        "Easy": "var(--diff-easy)",
+        "Medium": "var(--diff-medium)",
+        "Hard": "var(--diff-hard)",
+      }};
+
+      let html = "";
+      roadmapData.forEach(p => {{
+        if (selectedPhase !== 'all' && p.phase !== parseInt(selectedPhase)) return;
+
+        let totalProblemsInPhase = 0;
+        p.topics.forEach(t => totalProblemsInPhase += t.problems.length);
+
+        html += `
+          <section class="phase-section" id="phase-sec-${{p.phase}}">
+            <div class="phase-header">
+              <div class="phase-title-group">
+                <span class="phase-badge-pill">${{p.phase_badge}}</span>
+                <h2 class="phase-title-text">${{p.phase_name}}</h2>
+              </div>
+              <span class="topic-card-count">${{p.topics.length}} 专题 · ${{totalProblemsInPhase}} 题解</span>
+            </div>
+            <p class="phase-desc">${{p.phase_desc}}</p>
+            <div class="phase-topics-grid">
+        `;
+
+        p.topics.forEach(t => {{
+          html += `
+            <div class="topic-card">
+              <div class="topic-card-top">
+                <div>
+                  <h3 class="topic-card-title">${{t.title}}</h3>
+                  <div class="topic-card-subtitle">${{t.subtitle}}</div>
+                </div>
+                <span class="topic-card-count">${{t.problems.length}} 题</span>
+              </div>
+              <div class="topic-formula-badge" title="Core Mental Model / Formula">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                <span>${{t.formula}}</span>
+              </div>
+              <div class="topic-pills-container">
+          `;
+
+          t.problems.forEach(prob => {{
+            const dotColor = diffColorMap[prob.diff] || "var(--diff-medium)";
+            html += `
+              <div class="topic-problem-pill" onclick="openProblemFromRoadmap('${{prob.key}}')" title="${{prob.name}} (${{prob.cn}})">
+                <span class="pill-diff-dot" style="background-color: ${{dotColor}};"></span>
+                <span>LC ${{prob.num}} ${{prob.cn || prob.name}}</span>
+              </div>
+            `;
+          }});
+
+          html += `
+              </div>
+            </div>
+          `;
+        }});
+
+        html += `
+            </div>
+          </section>
+        `;
+      }});
+
+      root.innerHTML = html;
+    }}
+
+    function filterRoadmapPhase(phase, btnEl) {{
+      document.querySelectorAll(".phase-filter-btn").forEach(b => b.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      renderRoadmap(phase);
+    }}
+
+    function openProblemFromRoadmap(key) {{
+      setMainMode("workspace");
+      switchItem(key);
+    }}
+
+    function getCategoryIcon(catId) {{
+      switch(catId) {{
+        case "roadmap-doc":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>`;
+        case "overview":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
+        case "problem-index":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`;
+        case "top-100":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        case "daily-practice":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+        case "luffy":
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>`;
+        default:
+          return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
       }}
     }}
 
     function toggleFolder(folderId) {{
       collapsedFolders[folderId] = !collapsedFolders[folderId];
       localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
-      renderTree();
+      renderTree(document.getElementById("search").value);
     }}
 
     function setAllFoldersCollapsed(collapsed) {{
       treeStructure.forEach(folder => {{
-        collapsedFolders[folder.id] = collapsed;
+        if (!folder.isLeaf) {{
+          collapsedFolders[folder.id] = collapsed;
+        }}
       }});
       localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
-      renderTree();
+      renderTree(document.getElementById("search").value);
     }}
 
     function matchesSearchQuery(item, query) {{
-      if (!query || !item) return true;
-      const normalizedQuery = query.toLowerCase().replace(/\\blc\\s+(\\d+)\\b/g, "lc$1").trim();
-      const tokens = normalizedQuery.split(/\\s+/).filter(Boolean);
-      if (!tokens.length) return true;
-
-      const searchBlob = item.search_blob || (item.title + " " + item.short).toLowerCase();
-      const lcNum = item.lc_num || "";
-      const slug = item.slug || "";
-
-      return tokens.every(token => {{
-        // Ignore standalone "lc" if accompanied by other keywords
-        if (token === "lc" && tokens.length > 1) return true;
-
-        // Numeric token (e.g. "1", "3", "100", "104") -> exact problem ID match or digit bounded by non-digits in slug (e.g. 3sum)
-        if (/^\\d+$/.test(token)) {{
-          if (lcNum && lcNum === parseInt(token, 10).toString()) return true;
-          // Match digit token in slug bounded by non-digits (e.g. 3sum, 2sum, 3-sum)
-          const digitRegex = new RegExp(`(^|\\D)${{token}}(\\D|$)`, "i");
-          return digitRegex.test(slug);
-        }}
-
-        // Prefixed problem ID (e.g. "lc1", "lc100", "lc-100") -> exact problem ID match
-        if (/^lc-?\\d+$/i.test(token)) {{
-          const num = token.replace(/\\D/g, "");
-          if (lcNum && lcNum === parseInt(num, 10).toString()) return true;
-          return false;
-        }}
-
-        // Text token match in enriched search blob (bilingual titles, tags, diff, keywords)
-        return searchBlob.includes(token);
-      }});
+      if (!query) return true;
+      const clean = query.trim().toLowerCase();
+      if (!clean) return true;
+      const tokens = clean.split(/\\s+/);
+      return tokens.every(token => item.search_blob.includes(token));
     }}
 
-    function renderTree(searchQuery = "") {{
-      const treeRoot = document.getElementById("treeRoot");
-      const query = searchQuery.toLowerCase().trim();
+    function renderTree(query = "") {{
+      const root = document.getElementById("treeRoot");
+      if (!root) return;
+
+      const isSearching = Boolean(query && query.trim().length > 0);
       let html = "";
-      let totalRenderedItems = 0;
+      let totalVisible = 0;
 
-      const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
-      const codeSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
-      const chevronSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
-      const repoSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`;
-
-      html += `
-        <div class="tree-root-folder">
-          <div class="tree-root-header" title="Repository Root">
-            <span class="tree-root-icon">${{repoSvg}}</span>
-            <span class="tree-root-name">leetcode-sh/</span>
-          </div>
-          <div class="tree-root-children">
-      `;
-
-      treeStructure.forEach((folder, folderIdx) => {{
-        const isLastFolder = folderIdx === treeStructure.length - 1;
-        const lastFolderClass = isLastFolder ? "last-folder" : "";
-
+      treeStructure.forEach(folder => {{
         if (folder.isLeaf) {{
-          const itemKey = "README.md";
-          if (items[itemKey]) {{
-            const item = items[itemKey];
-            if (!matchesSearchQuery(item, query)) return;
+          const matchingKey = Object.keys(items).find(k => folder.filter(k));
+          if (!matchingKey) return;
+          const item = items[matchingKey];
+          if (isSearching && !matchesSearchQuery(item, query)) return;
 
-            totalRenderedItems++;
-            const isActive = itemKey === currentKey;
-            const activeClass = isActive ? "active" : "";
-            html += `
-              <div class="nav-item root-leaf ${{activeClass}} ${{lastFolderClass}}" onclick="switchItem('${{itemKey}}')" data-key="${{itemKey}}" title="${{item.title || item.short}}">
-                <span class="tree-file-icon doc-icon">${{docSvg}}</span>
-                <span class="tree-title">${{folder.name}}</span>
-              </div>
-            `;
-          }}
+          const isActive = matchingKey === currentKey && mainMode === "workspace";
+          const iconSvg = getCategoryIcon(folder.id);
+
+          html += `
+            <div class="nav-item root-leaf ${{isActive ? 'active' : ''}}" data-key="${{matchingKey}}" onclick="switchItem('${{matchingKey}}')" title="${{item.title}}">
+              <span class="folder-icon" style="margin-right: 2px;">${{iconSvg}}</span>
+              <span class="tree-title">${{folder.name}}</span>
+            </div>
+          `;
+          totalVisible++;
           return;
         }}
 
-        const allKeys = Object.keys(items).filter(folder.filter);
-        const matchingKeys = query
-          ? allKeys.filter(itemKey => matchesSearchQuery(items[itemKey], query))
-          : allKeys;
+        const folderKeys = Object.keys(items).filter(k => folder.filter(k));
+        const matchingKeys = isSearching 
+          ? folderKeys.filter(k => matchesSearchQuery(items[k], query))
+          : folderKeys;
 
         if (matchingKeys.length === 0) return;
-        totalRenderedItems += matchingKeys.length;
+        totalVisible += matchingKeys.length;
 
-        const isCollapsed = query ? false : !!collapsedFolders[folder.id];
-        const collapseClass = isCollapsed ? "collapsed" : "";
-        const hasActive = matchingKeys.includes(currentKey) ? "has-active" : "";
-        const folderSvg = isCollapsed
-          ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`
-          : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"></path></svg>`;
+        const isCollapsed = isSearching ? false : Boolean(collapsedFolders[folder.id]);
+        const folderIconSvg = getCategoryIcon(folder.id);
 
         html += `
-          <div class="tree-folder ${{collapseClass}} ${{hasActive}} ${{lastFolderClass}}" id="folder-${{folder.id}}">
+          <div class="tree-folder ${{isCollapsed ? 'collapsed' : ''}}" id="folder-${{folder.id}}">
             <div class="tree-folder-header" onclick="toggleFolder('${{folder.id}}')">
-              <span class="tree-chevron">${{chevronSvg}}</span>
-              <span class="tree-folder-icon">${{folderSvg}}</span>
-              <span class="tree-folder-name">${{folder.name}}</span>
-              <span class="tree-count-badge">${{matchingKeys.length}}</span>
+              <span class="folder-arrow">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+              <span class="folder-icon">${{folderIconSvg}}</span>
+              <span class="folder-name">${{folder.label}}</span>
+              <span class="folder-count">${{matchingKeys.length}}</span>
             </div>
             <div class="tree-children">
         `;
 
-        matchingKeys.forEach((itemKey, idx) => {{
+        matchingKeys.forEach(itemKey => {{
           const item = items[itemKey];
-          const isActive = itemKey === currentKey;
-          const activeClass = isActive ? "active" : "";
-          const isLastItem = idx === matchingKeys.length - 1;
-          const lastItemClass = isLastItem ? "last-item" : "";
-          const diffClass = item.diff && item.diff !== "All" ? `diff-${{item.diff}}` : "diff-All";
-          const fileIconHtml = item.type === "doc"
-            ? `<span class="tree-file-icon doc-icon">${{docSvg}}</span>`
-            : `<span class="tree-file-icon code-icon">${{codeSvg}}</span>`;
+          const isActive = itemKey === currentKey && mainMode === "workspace";
+          const diffClass = `diff-${{item.diff}}`;
+
+          let displayTitle = item.title;
+          if (item.category.includes("Luffy")) {{
+            displayTitle = item.title.replace(/^LC \\d+\\s*/, "");
+          }}
 
           html += `
-            <div class="nav-item ${{activeClass}} ${{lastItemClass}}" onclick="switchItem('${{itemKey}}')" data-key="${{itemKey}}" title="${{item.title || item.short}}">
-              ${{fileIconHtml}}
-              <span class="tree-title">${{item.short}}</span>
-              <span class="tree-diff-dot ${{diffClass}}" title="${{item.diff}}"></span>
+            <div class="nav-item ${{isActive ? 'active' : ''}}" data-key="${{itemKey}}" onclick="switchItem('${{itemKey}}')" title="${{item.title}}">
+              <span class="tree-title">${{displayTitle}}</span>
+              <span class="tree-diff-dot ${{diffClass}}"></span>
             </div>
           `;
         }});
@@ -1490,53 +2003,33 @@ def build_index_html():
         `;
       }});
 
-      if (query && totalRenderedItems === 0) {{
-        html += `
+      if (totalVisible === 0) {{
+        html = `
           <div class="tree-no-results">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <div>No problems matching "${{query}}"</div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>No matching problems found</span>
           </div>
         `;
       }}
 
-      html += `
-          </div>
-        </div>
-      `;
-
-      treeRoot.innerHTML = html;
+      root.innerHTML = html;
     }}
 
-    let searchDebounceTimer = null;
-
-    function handleSearch(val) {{
+    function handleSearch(query) {{
       const clearBtn = document.getElementById("searchClear");
-      if (clearBtn) clearBtn.style.display = val.trim() ? "block" : "none";
-      renderTree(val);
-
-      clearTimeout(searchDebounceTimer);
-      const query = val.toLowerCase().trim();
-      if (query) {{
-        // Lightweight 150ms debounced auto-navigation to eliminate typing flicker
-        searchDebounceTimer = setTimeout(() => {{
-          const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
-          if (firstMatchEl) {{
-            const firstKey = firstMatchEl.getAttribute("data-key");
-            if (firstKey && items[firstKey]) {{
-              if (!matchesSearchQuery(items[currentKey], query)) {{
-                switchItem(firstKey, false);
-              }}
-            }}
-          }}
-        }}, 150);
+      if (query.trim().length > 0) {{
+        clearBtn.classList.add("visible");
+      }} else {{
+        clearBtn.classList.remove("visible");
       }}
+      renderTree(query);
     }}
 
     function clearSearch() {{
-      clearTimeout(searchDebounceTimer);
       const input = document.getElementById("search");
       input.value = "";
-      handleSearch("");
+      document.getElementById("searchClear").classList.remove("visible");
+      renderTree("");
       input.focus();
     }}
 
@@ -1545,22 +2038,21 @@ def build_index_html():
       currentKey = key;
       const item = items[key];
 
-      // Update URL hash
+      setMainMode("workspace");
+
       if (history.replaceState) {{
         history.replaceState(null, null, "#" + key);
       }} else {{
         window.location.hash = "#" + key;
       }}
 
-      // Ensure parent folder is expanded
       treeStructure.forEach(folder => {{
-        if (folder.filter(key) && collapsedFolders[folder.id]) {{
+        if (folder.filter && folder.filter(key) && collapsedFolders[folder.id]) {{
           collapsedFolders[folder.id] = false;
           localStorage.setItem("treeCollapsedFolders", JSON.stringify(collapsedFolders));
         }}
       }});
 
-      // Re-render tree highlight
       if (rerenderSearch) {{
         renderTree(document.getElementById("search").value);
       }} else {{
@@ -1573,105 +2065,50 @@ def build_index_html():
         }});
       }}
 
-      // Auto close sidebar on mobile upon item selection
       if (window.innerWidth <= 768) {{
         toggleSidebar(false);
       }}
 
-      // Scroll active item smoothly into view
-      setTimeout(() => {{
-        const activeEl = document.querySelector(`.nav-item[data-key="${{CSS.escape(key)}}"]`);
-        if (activeEl) {{
-          activeEl.scrollIntoView({{ block: "nearest", behavior: "smooth" }});
-        }}
-      }}, 50);
+      const breadcrumb = document.getElementById("itemBreadcrumb");
+      let folderLabel = item.category;
+      let diffHtml = item.diff !== "All" ? `<span class="diff-badge ${{item.diff}}">${{item.diff}}</span>` : "";
 
-      // Top Toolbar Breadcrumb
-      const pathParts = item.path.split("/");
-      const folderPart = pathParts.length > 1 ? pathParts[0] : "root";
-      const filePart = pathParts.length > 1 ? pathParts.slice(1).join("/") : pathParts[0];
-      const diffBadge = item.diff && item.diff !== "All"
-        ? `<span class="diff-badge diff-${{item.diff}}">${{item.diff}}</span>`
-        : "";
-
-      document.getElementById("itemBreadcrumb").innerHTML = `
-        <span class="breadcrumb-folder">${{folderPart}}</span>
+      breadcrumb.innerHTML = `
+        <span class="breadcrumb-folder">${{folderLabel}}</span>
         <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-file">${{filePart}}</span>
-        ${{diffBadge}}
+        <span class="breadcrumb-file">${{item.short || item.title}}</span>
+        ${{diffHtml}}
       `;
 
-      // Auto view mode: Full width for docs/overview, notes view by default for problems
-      if (item.type === "doc" || !item.code) {{
-        setViewMode("notes");
-        document.getElementById("btnDual").style.display = "none";
-        document.getElementById("btnCode").style.display = "none";
-        document.getElementById("copyBtn").style.display = "none";
+      const codeViewer = document.getElementById("codeViewer");
+      if (item.code) {{
+        codeViewer.textContent = item.code;
+        hljs.highlightElement(codeViewer);
       }} else {{
-        document.getElementById("btnDual").style.display = "inline-flex";
-        document.getElementById("btnCode").style.display = "inline-flex";
-        document.getElementById("copyBtn").style.display = "inline-flex";
-        setViewMode(viewMode || "notes");
+        codeViewer.textContent = "# No python solution source available for this item.";
       }}
 
-      // Render Markdown Notes
-      marked.setOptions({{
-        highlight: function(code, lang) {{
-          const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-          return hljs.highlight(code, {{ language }}).value;
-        }},
-        gfm: true,
-        breaks: true
-      }});
-
-      document.getElementById("notesViewer").innerHTML = marked.parse(item.notes || "# No Notes Available");
-
-      document.querySelectorAll('#notesViewer pre code').forEach((el) => {{
-        hljs.highlightElement(el);
-      }});
-
-      if (window.renderMathInElement) {{
-        renderMathInElement(document.getElementById("notesViewer"), {{
+      const notesViewer = document.getElementById("notesViewer");
+      if (item.notes) {{
+        notesViewer.innerHTML = marked.parse(item.notes);
+        notesViewer.querySelectorAll("pre code").forEach(block => {{
+          hljs.highlightElement(block);
+        }});
+        renderMathInElement(notesViewer, {{
           delimiters: [
             {{left: "$$", right: "$$", display: true}},
-            {{left: "$", right: "$", display: false}}
-          ]
+            {{left: "$", right: "$", display: false}},
+            {{left: "\\\\(", right: "\\\\)", display: false}},
+            {{left: "\\\\[", right: "\\\\]", display: true}}
+          ],
+          throwOnError: false
         }});
+      }} else {{
+        notesViewer.innerHTML = `<p style="color: var(--text-muted);">No documentation notes found for this problem.</p>`;
       }}
 
-      // Render Code Pane
-      const codeEl = document.getElementById("codeViewer");
-      codeEl.textContent = item.code || "# No python solution file directly associated";
-      delete codeEl.dataset.highlighted;
-      hljs.highlightElement(codeEl);
-
-      // Smart link interception: clicking internal markdown links navigates inside SPA
-      document.querySelectorAll('#notesViewer a').forEach(a => {{
-        const href = a.getAttribute('href');
-        if (!href) return;
-        if (href.startsWith('http://') || href.startsWith('https://')) return;
-        if (href.startsWith('#')) return;
-
-        let cleanHref = href.replace(/^(\\.\\/|\\/)/, '');
-        if (cleanHref.endsWith('.py') || cleanHref.endsWith('.md')) {{
-          cleanHref = cleanHref.replace(/\\.(py|md)$/, '');
-        }}
-
-        if (items[cleanHref]) {{
-          a.onclick = (e) => {{
-            e.preventDefault();
-            switchItem(cleanHref);
-          }};
-        }} else {{
-          const matchingKey = Object.keys(items).find(k => k.endsWith(cleanHref) || cleanHref.endsWith(k));
-          if (matchingKey) {{
-            a.onclick = (e) => {{
-              e.preventDefault();
-              switchItem(matchingKey);
-            }};
-          }}
-        }}
-      }});
+      const copyBtn = document.getElementById("copyBtn");
+      copyBtn.style.display = item.code ? "inline-flex" : "none";
 
       document.getElementById("left-pane").scrollTop = 0;
       document.getElementById("right-pane").scrollTop = 0;
@@ -1680,158 +2117,109 @@ def build_index_html():
     function copyActiveCode() {{
       const item = items[currentKey];
       if (!item || !item.code) return;
+
       navigator.clipboard.writeText(item.code).then(() => {{
         const label = document.getElementById("copyBtnLabel");
-        if (label) {{
-          const original = label.innerText;
-          label.innerText = "Copied!";
-          setTimeout(() => label.innerText = original, 1500);
-        }}
+        const originalText = label.innerText;
+        label.innerText = "Copied!";
+        setTimeout(() => {{
+          label.innerText = originalText;
+        }}, 1800);
+      }}).catch(err => {{
+        console.error("Failed to copy code: ", err);
       }});
     }}
 
-    // Sidebar Toggle & Collapse
-    function toggleSidebar(forceState) {{
+    function toggleSidebar(forceState = null) {{
       const sidebar = document.getElementById("sidebar");
       const backdrop = document.getElementById("sidebar-backdrop");
       const isMobile = window.innerWidth <= 768;
 
       if (isMobile) {{
-        const willOpen = forceState !== undefined ? forceState : !sidebar.classList.contains("mobile-open");
+        const willOpen = forceState !== null ? forceState : !sidebar.classList.contains("mobile-open");
         sidebar.classList.toggle("mobile-open", willOpen);
         backdrop.classList.toggle("active", willOpen);
       }} else {{
-        const isCollapsed = forceState !== undefined ? !forceState : !sidebar.classList.contains("collapsed");
+        const isCollapsed = forceState !== null ? !forceState : !sidebar.classList.contains("collapsed");
         sidebar.classList.toggle("collapsed", isCollapsed);
-        localStorage.setItem("sidebarCollapsed", isCollapsed);
       }}
     }}
 
-    // Draggable Resizer Logic
-    (function initResizer() {{
-      const resizer = document.getElementById("resizer");
-      const sidebar = document.getElementById("sidebar");
-      let isResizing = false;
+    // Sidebar Resizer Dragging
+    const resizer = document.getElementById("resizer");
+    const sidebar = document.getElementById("sidebar");
+    let isResizingSidebar = false;
 
-      // Restore saved width
-      const savedWidth = localStorage.getItem("sidebarWidth");
-      if (savedWidth && window.innerWidth > 768) {{
-        sidebar.style.width = savedWidth + "px";
-        sidebar.style.minWidth = savedWidth + "px";
+    resizer.addEventListener("mousedown", (e) => {{
+      isResizingSidebar = true;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    }});
+
+    // Workspace Split Resizer Dragging
+    const workspaceResizer = document.getElementById("workspace-resizer");
+    let isResizingWorkspace = false;
+
+    workspaceResizer.addEventListener("mousedown", (e) => {{
+      isResizingWorkspace = true;
+      workspaceResizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    }});
+
+    workspaceResizer.addEventListener("dblclick", () => {{
+      workspaceSplitRatio = 50;
+      localStorage.setItem("workspaceSplitRatio", "50");
+      applyWorkspaceSplit(50);
+    }});
+
+    window.addEventListener("mousemove", (e) => {{
+      if (isResizingSidebar) {{
+        const newWidth = Math.max(220, Math.min(650, e.clientX));
+        sidebar.style.width = `${{newWidth}}px`;
+        document.documentElement.style.setProperty("--sidebar-width", `${{newWidth}}px`);
+      }} else if (isResizingWorkspace) {{
+        const workspace = document.getElementById("workspace");
+        const rect = workspace.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const totalWidth = rect.width;
+        const ratio = (offsetX / totalWidth) * 100;
+        workspaceSplitRatio = Math.max(15, Math.min(85, ratio));
+        applyWorkspaceSplit(workspaceSplitRatio);
       }}
+    }});
 
-      // Restore collapsed state on desktop
-      const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
-      if (isCollapsed && window.innerWidth > 768) {{
-        sidebar.classList.add("collapsed");
+    window.addEventListener("mouseup", () => {{
+      if (isResizingSidebar) {{
+        isResizingSidebar = false;
+        resizer.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       }}
+      if (isResizingWorkspace) {{
+        isResizingWorkspace = false;
+        workspaceResizer.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem("workspaceSplitRatio", workspaceSplitRatio.toString());
+      }}
+    }});
 
-      resizer.addEventListener("mousedown", (e) => {{
-        if (window.innerWidth <= 768) return;
-        isResizing = true;
-        resizer.classList.add("dragging");
-        document.body.style.cursor = "col-resize";
-        document.body.style.userSelect = "none";
-      }});
-
-      window.addEventListener("mousemove", (e) => {{
-        if (!isResizing) return;
-        const newWidth = Math.min(Math.max(e.clientX, 220), 650);
-        sidebar.style.width = newWidth + "px";
-        sidebar.style.minWidth = newWidth + "px";
-      }});
-
-      window.addEventListener("mouseup", () => {{
-        if (isResizing) {{
-          isResizing = false;
-          resizer.classList.remove("dragging");
-          document.body.style.cursor = "";
-          document.body.style.userSelect = "";
-          const width = parseInt(sidebar.style.width);
-          if (width) localStorage.setItem("sidebarWidth", width);
-        }}
-      }});
-    }})();
-
-    // Workspace Split Resizer (Between Code & Notes in Dual View)
-    (function initWorkspaceResizer() {{
-      const resizer = document.getElementById("workspace-resizer");
-      const workspace = document.getElementById("workspace");
-      if (!resizer || !workspace) return;
-
-      let isResizing = false;
-
-      resizer.addEventListener("mousedown", (e) => {{
-        if (viewMode !== "dual") return;
-        isResizing = true;
-        resizer.classList.add("dragging");
-        document.body.style.cursor = "col-resize";
-        document.body.style.userSelect = "none";
-      }});
-
-      resizer.addEventListener("dblclick", () => {{
-        workspaceSplitRatio = 50;
-        localStorage.setItem("workspaceSplitRatio", "50");
-        applyWorkspaceSplit(50);
-      }});
-
-      window.addEventListener("mousemove", (e) => {{
-        if (!isResizing) return;
-        const wsRect = workspace.getBoundingClientRect();
-        const newRatio = ((e.clientX - wsRect.left) / wsRect.width) * 100;
-        if (newRatio >= 15 && newRatio <= 85) {{
-          workspaceSplitRatio = newRatio;
-          applyWorkspaceSplit(newRatio);
-        }}
-      }});
-
-      window.addEventListener("mouseup", () => {{
-        if (isResizing) {{
-          isResizing = false;
-          resizer.classList.remove("dragging");
-          document.body.style.cursor = "";
-          document.body.style.userSelect = "";
-          localStorage.setItem("workspaceSplitRatio", workspaceSplitRatio.toString());
-        }}
-      }});
-    }})();
-
-    // Global Keyboard Shortcuts
+    // Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {{
-      // Cmd+B / Ctrl+B: Toggle sidebar
-      if ((e.metaKey || e.ctrlKey) && (e.key === "b" || e.key === "B")) {{
-        e.preventDefault();
-        toggleSidebar();
-      }}
-      // /: Focus search
-      else if (e.key === "/" && document.activeElement.tagName !== "INPUT") {{
+      if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {{
         e.preventDefault();
         const searchInput = document.getElementById("search");
-        if (document.getElementById("sidebar").classList.contains("collapsed")) {{
+        if (sidebar.classList.contains("collapsed")) {{
           toggleSidebar(true);
         }}
         searchInput.focus();
-      }}
-      // Enter in search: focus note viewer
-      else if (e.key === "Enter" && document.activeElement === document.getElementById("search")) {{
-        clearTimeout(searchDebounceTimer);
-        const firstMatchEl = document.querySelector(".tree-children > .nav-item, .nav-item.root-leaf");
-        if (firstMatchEl) {{
-          const firstKey = firstMatchEl.getAttribute("data-key");
-          if (firstKey) {{
-            switchItem(firstKey, true);
-            firstMatchEl.scrollIntoView({{ block: "nearest", behavior: "smooth" }});
-          }}
-        }}
-        document.getElementById("search").blur();
-        const notesPane = document.getElementById("notesPane");
-        if (notesPane) {{
-          notesPane.setAttribute("tabindex", "-1");
-          notesPane.focus();
-        }}
-      }}
-      // Escape: Clear search & blur
-      else if (e.key === "Escape") {{
+        searchInput.select();
+      }} else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {{
+        e.preventDefault();
+        toggleSidebar();
+      }} else if (e.key === "Escape") {{
         const searchInput = document.getElementById("search");
         if (document.activeElement === searchInput) {{
           clearSearch();
@@ -1840,10 +2228,17 @@ def build_index_html():
       }}
     }});
 
-    // Initialize
+    // Initialize SPA
     renderTree();
     updateProgressBadge();
-    switchItem(currentKey);
+    renderRoadmap('all');
+
+    if (mainMode === "roadmap") {{
+      setMainMode("roadmap");
+    }} else {{
+      setMainMode("workspace");
+      switchItem(currentKey);
+    }}
   </script>
 </body>
 </html>
