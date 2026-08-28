@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 30 | ~34% | 25 |
-| **Medium** | 56 | ~63% | 142 |
+| **Easy** | 30 | ~33% | 25 |
+| **Medium** | 57 | ~64% | 142 |
 | **Hard** | 3 | ~3% | 3 |
-| **Total** | **89 In-Depth Notes** | **100%** | **171 Problem Entities** |
+| **Total** | **90 In-Depth Notes** | **100%** | **171 Problem Entities** |
 
 ---
 
@@ -81,6 +81,7 @@ leetcode-sh/
 │   ├── lc-0199-binary-tree-right-side-view.py / .md
 │   ├── lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py / .md
 │   ├── lc-0237-delete-node-in-a-linked-list.py / .md
+│   ├── lc-0513-find-bottom-left-tree-value.py / .md
 │   ├── lc-0876-middle-of-the-linked-list.py / .md
 │   ├── lc-2029-stone-game-ix.py / .md
 │   ├── lc-3090-maximum-length-substring-with-at-most-two-occurrences.py / .md
@@ -165,6 +166,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **199** | Binary Tree Right Side View | [LC 199](https://leetcode.com/problems/binary-tree-right-side-view/) | [`daily-practice/lc-0199-binary-tree-right-side-view.py`](daily-practice/lc-0199-binary-tree-right-side-view.py)<br>[`daily-practice/lc-0199-binary-tree-right-side-view.md`](daily-practice/lc-0199-binary-tree-right-side-view.md) | Medium | DFS Root-Right-Left Traversal (`depth == len(ans)`) |
 | **235** | Lowest Common Ancestor of a BST | [LC 235](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | [`daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py`](daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py)<br>[`daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.md`](daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.md) | Medium | BST Value-Directed Split / Interval Divergence |
 | **237** | Delete Node in a Linked List | [LC 237](https://leetcode.com/problems/delete-node-in-a-linked-list/) | [`daily-practice/lc-0237-delete-node-in-a-linked-list.py`](daily-practice/lc-0237-delete-node-in-a-linked-list.py)<br>[`daily-practice/lc-0237-delete-node-in-a-linked-list.md`](daily-practice/lc-0237-delete-node-in-a-linked-list.md) | Medium | Scapegoat Value Copy + Bypass Next Node |
+| **513** | Find Bottom Left Tree Value | [LC 513](https://leetcode.com/problems/find-bottom-left-tree-value/) | [`daily-practice/lc-0513-find-bottom-left-tree-value.py`](daily-practice/lc-0513-find-bottom-left-tree-value.py)<br>[`daily-practice/lc-0513-find-bottom-left-tree-value.md`](daily-practice/lc-0513-find-bottom-left-tree-value.md) | Medium | Reverse BFS (Right-to-Left Queue) / Final Deque Node |
 | **876** | Middle of the Linked List | [LC 876](https://leetcode.com/problems/middle-of-the-linked-list/) | [`daily-practice/lc-0876-middle-of-the-linked-list.py`](daily-practice/lc-0876-middle-of-the-linked-list.py)<br>[`daily-practice/lc-0876-middle-of-the-linked-list.md`](daily-practice/lc-0876-middle-of-the-linked-list.md) | Easy | Fast & Slow Pointers (`slow=1`, `fast=2`) |
 | **2029** | Stone Game IX | [LC 2029](https://leetcode.com/problems/stone-game-ix/) | [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py)<br>[`daily-practice/lc-2029-stone-game-ix.md`](daily-practice/lc-2029-stone-game-ix.md) | Medium | Modulo 3 Arithmetic / Game Theory |
 | **3090** | Maximum Length Substring With at Most Two Occurrences | [LC 3090](https://leetcode.com/problems/maximum-length-substring-with-at-most-two-occurrences/) | [`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)<br>[`daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md`](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.md) | Easy | Sliding Window / Frequency Map |
@@ -274,6 +276,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **199** | Binary Tree Right Side View | [LC 199](https://leetcode.com/problems/binary-tree-right-side-view/) | [`daily-practice/lc-0199-binary-tree-right-side-view.py`](daily-practice/lc-0199-binary-tree-right-side-view.py)<br>[`daily-practice/lc-0199-binary-tree-right-side-view.md`](daily-practice/lc-0199-binary-tree-right-side-view.md) | Medium | DFS Root-Right-Left Traversal | Visit right subtree first; append node value when `depth == len(ans)` in $O(N)$ time and $O(H)$ space. |
 | **235** | Lowest Common Ancestor of a BST | [LC 235](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | [`daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py`](daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.py)<br>[`daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.md`](daily-practice/lc-0235-lowest-common-ancestor-of-a-binary-search-tree.md) | Medium | BST Value-Directed Split / Divergence | Compare with `root.val`; if both smaller go left, if both greater go right; first divergence point is LCA in $O(H)$ time. |
 | **236** | Lowest Common Ancestor of Binary Tree | [LC 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.py)<br>[`top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md`](top-100/lc-0236-lowest-common-ancestor-of-a-binary-tree.md)<br>[`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py) | Medium | Postorder Divide & Conquer (4-State Aggregation) | If both left and right return non-null, root is LCA; else propagate non-null child in $O(N)$ time and $O(H)$ space. |
+| **513** | Find Bottom Left Tree Value | [LC 513](https://leetcode.com/problems/find-bottom-left-tree-value/) | [`daily-practice/lc-0513-find-bottom-left-tree-value.py`](daily-practice/lc-0513-find-bottom-left-tree-value.py)<br>[`daily-practice/lc-0513-find-bottom-left-tree-value.md`](daily-practice/lc-0513-find-bottom-left-tree-value.md) | Medium | Reverse BFS Queue (Right-to-Left) | Push right child before left child; last popped node in BFS is bottom-left in $O(N)$ time and $O(W)$ space. |
 | **Misc** | Advanced Tree Practices | — | [`luffy/25-tree-traversal-advanced-patterns.py`](luffy/25-tree-traversal-advanced-patterns.py) | Medium | Tree Patterns | Comprehensive tree construction and traversal utilities. |
 
 ---
