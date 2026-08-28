@@ -36,10 +36,10 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 29 | ~33% | 25 |
-| **Medium** | 55 | ~63% | 141 |
-| **Hard** | 3 | ~4% | 3 |
-| **Total** | **87 In-Depth Notes** | **100%** | **170 Problem Entities** |
+| **Easy** | 30 | ~34% | 25 |
+| **Medium** | 56 | ~63% | 142 |
+| **Hard** | 3 | ~3% | 3 |
+| **Total** | **89 In-Depth Notes** | **100%** | **171 Problem Entities** |
 
 ---
 
@@ -74,6 +74,7 @@ leetcode-sh/
 │   ├── lc-0083-remove-duplicates-from-sorted-list.py / .md
 │   ├── lc-0092-reversed-linked-list-2.py / .md
 │   ├── lc-0100-same-tree.py / .md
+│   ├── lc-0103-binary-tree-zigzag-level-order-traversal.py / .md
 │   ├── lc-0110-balanced-binary-tree.py / .md
 │   ├── lc-0143-reorder-list.py / .md
 │   ├── lc-0153-find-minimum-in-rotated-sorted-array.py / .md
@@ -157,6 +158,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **83** | Remove Duplicates from Sorted List | [LC 83](https://leetcode.com/problems/remove-duplicates-from-sorted-list/) | [`daily-practice/lc-0083-remove-duplicates-from-sorted-list.py`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.py)<br>[`daily-practice/lc-0083-remove-duplicates-from-sorted-list.md`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.md) | Easy | In-Place Adjacent Deduplication (`cur.next = cur.next.next`) |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Dummy Node + Local Segment Reversal (`p0`, `pre`, `cur`) |
 | **100** | Same Tree | [LC 100](https://leetcode.com/problems/same-tree/) | [`daily-practice/lc-0100-same-tree.py`](daily-practice/lc-0100-same-tree.py)<br>[`daily-practice/lc-0100-same-tree.md`](daily-practice/lc-0100-same-tree.md) | Easy | Dual Tree Synchronous Recursion (`p is q`, `p.val == q.val`, `left`, `right`) |
+| **103** | Binary Tree Zigzag Level Order Traversal | [LC 103](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/) | [`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py)<br>[`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md) | Medium | Dual-Buffer BFS + Parity Toggle / Level Reversal |
 | **110** | Balanced Binary Tree | [LC 110](https://leetcode.com/problems/balanced-binary-tree/) | [`daily-practice/lc-0110-balanced-binary-tree.py`](daily-practice/lc-0110-balanced-binary-tree.py)<br>[`daily-practice/lc-0110-balanced-binary-tree.md`](daily-practice/lc-0110-balanced-binary-tree.md) | Easy | Post-Order Bottom-Up Height + Short-Circuit Sentinel (`-1`) |
 | **143** | Reorder List | [LC 143](https://leetcode.com/problems/reorder-list/) | [`daily-practice/lc-0143-reorder-list.py`](daily-practice/lc-0143-reorder-list.py)<br>[`daily-practice/lc-0143-reorder-list.md`](daily-practice/lc-0143-reorder-list.md) | Medium | Fast/Slow Mid (LC 876) + Reverse 2nd Half (LC 206) + Zip-Merge |
 | **153** | Find Minimum in Rotated Sorted Array | [LC 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) | [`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)<br>[`daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md`](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.md) | Medium | Binary Search on Two-Segment Step Array (`nums[-1]`) |
@@ -263,6 +265,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **100** | Same Tree | [LC 100](https://leetcode.com/problems/same-tree/) | [`daily-practice/lc-0100-same-tree.py`](daily-practice/lc-0100-same-tree.py)<br>[`daily-practice/lc-0100-same-tree.md`](daily-practice/lc-0100-same-tree.md) | Easy | Dual-Tree Synchronous Recursion | Both null -> True (`p is q`); values must match and both subtrees match in $O(\min(N, M))$ time. |
 | **101** | Symmetric Tree | [LC 101](https://leetcode.com/problems/symmetric-tree/) | [`top-100/lc-0101-symmetric-tree.py`](top-100/lc-0101-symmetric-tree.py)<br>[`top-100/lc-0101-symmetric-tree.md`](top-100/lc-0101-symmetric-tree.md) | Easy | Dual-Subtree Mirror Recursion | Single tree symmetric ⟺ `isMirror(root.left, root.right)`; cross-match outer `(p.l, q.r)` and inner `(p.r, q.l)` in $O(N)$ time. |
 | **102** | Binary Tree Level Order Traversal | [LC 102](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [`top-100/lc-0102-binary-tree-level-order-traversal.py`](top-100/lc-0102-binary-tree-level-order-traversal.py)<br>[`top-100/lc-0102-binary-tree-level-order-traversal.md`](top-100/lc-0102-binary-tree-level-order-traversal.md)<br>[`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](luffy/28-lc-0102-binary-tree-level-order-traversal.py) | Medium | Dual-Buffer BFS / Level Snapshot | Maintain `cur` and `nxt` buffers to isolate levels; append `node.val` and roll `cur = nxt` in $O(N)$ time and $O(N)$ space. |
+| **103** | Binary Tree Zigzag Level Order Traversal | [LC 103](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/) | [`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.py)<br>[`daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md`](daily-practice/lc-0103-binary-tree-zigzag-level-order-traversal.md) | Medium | BFS / Zigzag Level Traversal | Traverse with `cur` & `nxt` buffers; append `vals[::-1] if even else vals` and toggle `even = not even` in $O(N)$ time. |
 | **104** | Maximum Depth of Binary Tree | [LC 104](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [`top-100/lc-0104-maximum-depth-of-binary-tree.py`](top-100/lc-0104-maximum-depth-of-binary-tree.py)<br>[`top-100/lc-0104-maximum-depth-of-binary-tree.md`](top-100/lc-0104-maximum-depth-of-binary-tree.md)<br>[`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](luffy/26-lc-0104-maximum-depth-of-binary-tree.py) | Easy | Post-order Divide & Conquer | Depth = $1 + \max(\text{left}, \text{right})$; foundational primitive for Tree DP. |
 | **105** | Construct Binary Tree from Preorder & Inorder | [LC 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py) | Medium | Divide & Conquer / Hash Map | Preorder gives root; Inorder splits left and right subtrees. |
 | **110** | Balanced Binary Tree | [LC 110](https://leetcode.com/problems/balanced-binary-tree/) | [`daily-practice/lc-0110-balanced-binary-tree.py`](daily-practice/lc-0110-balanced-binary-tree.py)<br>[`daily-practice/lc-0110-balanced-binary-tree.md`](daily-practice/lc-0110-balanced-binary-tree.md) | Easy | Post-order Bottom-Up Height + Short-Circuit Pruning | Post-order compute height; if left/right subtree is -1 or $|h_l - h_r| > 1$, return -1; else return $\max(h_l, h_r) + 1$ in $O(N)$ time. |

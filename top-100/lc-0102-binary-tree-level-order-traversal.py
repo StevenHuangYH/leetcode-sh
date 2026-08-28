@@ -41,7 +41,7 @@ class Solution:
 
 from collections import deque
 
-# use queue
+#use queue
 class Solution2:
     def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
         if root is None:
@@ -52,13 +52,16 @@ class Solution2:
 
         while q:
             vals = []
+
             for _ in range(len(q)):
                 node = q.popleft()
                 vals.append(node.val)
-                if node.left:
+                if node.left: 
                     q.append(node.left)
-                if node.right:
+                if node.right: 
                     q.append(node.right)
-            ans.append(vals)
 
+            ans.append(vals)
         return ans
+
+        
