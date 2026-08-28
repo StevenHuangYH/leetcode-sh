@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking (Used Array)
 - **LeetCode Link:** [46. Permutations](https://leetcode.com/problems/permutations/)
-- **Corresponding Python File:** [`luffy/32-lc-0046-permutations.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/32-lc-0046-permutations.py)
+- **Corresponding Python File:** [`luffy/32-lc-0046-permutations.py`](luffy/32-lc-0046-permutations.py)
 
 ---
 

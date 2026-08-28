@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0033
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/search-in-rotated-sorted-array/)
-- **Solution File**: [lc-0033-search-in-rotated-sorted-array.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0033-search-in-rotated-sorted-array.py)
+- **Solution File**: [lc-0033-search-in-rotated-sorted-array.py](top-100/lc-0033-search-in-rotated-sorted-array.py)
 
 ---
 

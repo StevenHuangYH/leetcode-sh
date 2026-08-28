@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Matrix Boundary Simulation
 - **LeetCode Link:** [59. Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)
-- **Corresponding Python File:** [`luffy/08-lc-0059-spiral-matrix-ii.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/08-lc-0059-spiral-matrix-ii.py)
+- **Corresponding Python File:** [`luffy/08-lc-0059-spiral-matrix-ii.py`](luffy/08-lc-0059-spiral-matrix-ii.py)
 
 ---
 

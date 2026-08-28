@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0092
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/reverse-linked-list-ii/)
-- **Solution File**: [lc-0092-reversed-linked-list-2.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/daily-practice/lc-0092-reversed-linked-list-2.py)
+- **Solution File**: [lc-0092-reversed-linked-list-2.py](daily-practice/lc-0092-reversed-linked-list-2.py)
 
 ---
 

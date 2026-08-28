@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Topological Sort (Kahn / DFS)
 - **LeetCode Link:** [207. Course Schedule](https://leetcode.com/problems/course-schedule/)
-- **Corresponding Python File:** [`luffy/42-lc-0207-course-schedule.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/42-lc-0207-course-schedule.py)
+- **Corresponding Python File:** [`luffy/42-lc-0207-course-schedule.py`](luffy/42-lc-0207-course-schedule.py)
 
 ---
 

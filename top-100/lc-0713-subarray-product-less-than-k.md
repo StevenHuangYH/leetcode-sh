@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0713
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/subarray-product-less-than-k/)
-- **Solution File**: [lc-0713-subarray-product-less-than-k.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0713-subarray-product-less-than-k.py)
+- **Solution File**: [lc-0713-subarray-product-less-than-k.py](top-100/lc-0713-subarray-product-less-than-k.py)
 
 ---
 

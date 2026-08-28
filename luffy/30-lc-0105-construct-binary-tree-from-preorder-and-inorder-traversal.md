@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Divide & Conquer + Hash Map
 - **LeetCode Link:** [105. Construct Binary Tree from Pre & Inorder](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
-- **Corresponding Python File:** [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py)
+- **Corresponding Python File:** [`luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py`](luffy/30-lc-0105-construct-binary-tree-from-preorder-and-inorder-traversal.py)
 
 ---
 

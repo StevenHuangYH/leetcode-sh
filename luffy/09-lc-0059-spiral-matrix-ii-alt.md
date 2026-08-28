@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Matrix Direction Vectors
 - **LeetCode Link:** [59. Spiral Matrix II (Alternative)](https://leetcode.com/problems/spiral-matrix-ii/)
-- **Corresponding Python File:** [`luffy/09-lc-0059-spiral-matrix-ii-alt.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/09-lc-0059-spiral-matrix-ii-alt.py)
+- **Corresponding Python File:** [`luffy/09-lc-0059-spiral-matrix-ii-alt.py`](luffy/09-lc-0059-spiral-matrix-ii-alt.py)
 
 ---
 

@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Two Pointers (Inward)
 - **LeetCode Link:** [167. Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
-- **Corresponding Python File:** [`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)
+- **Corresponding Python File:** [`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)
 
 ---
 

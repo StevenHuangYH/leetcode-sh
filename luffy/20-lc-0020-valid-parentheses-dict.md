@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Stack + Hash Map
 - **LeetCode Link:** [20. Valid Parentheses (Dict Mapping)](https://leetcode.com/problems/valid-parentheses/)
-- **Corresponding Python File:** [`luffy/20-lc-0020-valid-parentheses-dict.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/20-lc-0020-valid-parentheses-dict.py)
+- **Corresponding Python File:** [`luffy/20-lc-0020-valid-parentheses-dict.py`](luffy/20-lc-0020-valid-parentheses-dict.py)
 
 ---
 

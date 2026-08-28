@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Binary Search
 - **LeetCode Link:** [704. Binary Search](https://leetcode.com/problems/binary-search/)
-- **Corresponding Python File:** [`luffy/07-lc-0704-binary-search.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/07-lc-0704-binary-search.py)
+- **Corresponding Python File:** [`luffy/07-lc-0704-binary-search.py`](luffy/07-lc-0704-binary-search.py)
 
 ---
 

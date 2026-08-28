@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Divide & Conquer
 - **LeetCode Link:** [98. Validate Binary Search Tree (Bounds Check)](https://leetcode.com/problems/validate-binary-search-tree/)
-- **Corresponding Python File:** [`luffy/29-lc-0098-validate-binary-search-tree-bounds.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/29-lc-0098-validate-binary-search-tree-bounds.py)
+- **Corresponding Python File:** [`luffy/29-lc-0098-validate-binary-search-tree-bounds.py`](luffy/29-lc-0098-validate-binary-search-tree-bounds.py)
 
 ---
 

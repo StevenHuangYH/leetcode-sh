@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Dynamic Sliding Window
 - **LeetCode Link:** [209. Minimum Size Subarray Sum](https://leetcode.com/problems/minimum-size-subarray-sum/)
-- **Corresponding Python File:** [`luffy/06-lc-0209-minimum-size-subarray-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/06-lc-0209-minimum-size-subarray-sum.py)
+- **Corresponding Python File:** [`luffy/06-lc-0209-minimum-size-subarray-sum.py`](luffy/06-lc-0209-minimum-size-subarray-sum.py)
 
 ---
 

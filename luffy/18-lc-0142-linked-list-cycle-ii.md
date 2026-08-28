@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Cycle Detection + Mathematical Entry
 - **LeetCode Link:** [142. Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
-- **Corresponding Python File:** [`luffy/18-lc-0142-linked-list-cycle-ii.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/18-lc-0142-linked-list-cycle-ii.py)
+- **Corresponding Python File:** [`luffy/18-lc-0142-linked-list-cycle-ii.py`](luffy/18-lc-0142-linked-list-cycle-ii.py)
 
 ---
 

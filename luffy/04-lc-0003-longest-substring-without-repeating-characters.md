@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Dynamic Sliding Window
 - **LeetCode Link:** [3. Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
-- **Corresponding Python File:** [`luffy/04-lc-0003-longest-substring-without-repeating-characters.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/04-lc-0003-longest-substring-without-repeating-characters.py)
+- **Corresponding Python File:** [`luffy/04-lc-0003-longest-substring-without-repeating-characters.py`](luffy/04-lc-0003-longest-substring-without-repeating-characters.py)
 
 ---
 

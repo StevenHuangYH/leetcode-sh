@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Two Stacks (In/Out)
 - **LeetCode Link:** [232. Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
-- **Corresponding Python File:** [`luffy/24-lc-0232-implement-queue-using-stacks.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/24-lc-0232-implement-queue-using-stacks.py)
+- **Corresponding Python File:** [`luffy/24-lc-0232-implement-queue-using-stacks.py`](luffy/24-lc-0232-implement-queue-using-stacks.py)
 
 ---
 

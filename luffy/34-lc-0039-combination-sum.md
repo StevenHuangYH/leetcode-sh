@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking (Unbounded Choice)
 - **LeetCode Link:** [39. Combination Sum](https://leetcode.com/problems/combination-sum/)
-- **Corresponding Python File:** [`luffy/34-lc-0039-combination-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/34-lc-0039-combination-sum.py)
+- **Corresponding Python File:** [`luffy/34-lc-0039-combination-sum.py`](luffy/34-lc-0039-combination-sum.py)
 
 ---
 

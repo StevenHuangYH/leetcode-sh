@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Hash Map (Complement)
 - **LeetCode Link:** [1. Two Sum](https://leetcode.com/problems/two-sum/)
-- **Corresponding Python File:** [`luffy/02-lc-0001-two-sum.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/02-lc-0001-two-sum.py)
+- **Corresponding Python File:** [`luffy/02-lc-0001-two-sum.py`](luffy/02-lc-0001-two-sum.py)
 
 ---
 

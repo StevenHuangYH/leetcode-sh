@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** DFS Inorder (L-Root-R)
 - **LeetCode Link:** [94. Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/)
-- **Corresponding Python File:** [`luffy/25-lc-0094-binary-tree-inorder-traversal.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/25-lc-0094-binary-tree-inorder-traversal.py)
+- **Corresponding Python File:** [`luffy/25-lc-0094-binary-tree-inorder-traversal.py`](luffy/25-lc-0094-binary-tree-inorder-traversal.py)
 
 ---
 

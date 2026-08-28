@@ -4,7 +4,7 @@
 - **Difficulty:** Easy
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Object-Oriented Programming
-- **Corresponding Python File:** [`luffy/10-oop-pre-main-practice.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/10-oop-pre-main-practice.py)
+- **Corresponding Python File:** [`luffy/10-oop-pre-main-practice.py`](luffy/10-oop-pre-main-practice.py)
 
 ---
 

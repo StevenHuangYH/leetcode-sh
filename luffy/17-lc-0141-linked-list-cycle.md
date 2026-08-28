@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Floyd's Fast & Slow Pointers
 - **LeetCode Link:** [141. Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
-- **Corresponding Python File:** [`luffy/17-lc-0141-linked-list-cycle.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/17-lc-0141-linked-list-cycle.py)
+- **Corresponding Python File:** [`luffy/17-lc-0141-linked-list-cycle.py`](luffy/17-lc-0141-linked-list-cycle.py)
 
 ---
 

@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** BFS Queue (Level-by-Level)
 - **LeetCode Link:** [102. Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
-- **Corresponding Python File:** [`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/28-lc-0102-binary-tree-level-order-traversal.py)
+- **Corresponding Python File:** [`luffy/28-lc-0102-binary-tree-level-order-traversal.py`](luffy/28-lc-0102-binary-tree-level-order-traversal.py)
 
 ---
 

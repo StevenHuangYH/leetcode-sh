@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0034
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
-- **Solution File**: [lc-0034-find-first-and-last-position-of-element-in-sorted-array.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py)
+- **Solution File**: [lc-0034-find-first-and-last-position-of-element-in-sorted-array.py](top-100/lc-0034-find-first-and-last-position-of-element-in-sorted-array.py)
 
 ---
 

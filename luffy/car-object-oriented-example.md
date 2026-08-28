@@ -4,7 +4,7 @@
 - **Difficulty:** Easy
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Object-Oriented Programming
-- **Corresponding Python File:** [`luffy/car-object-oriented-example.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/car-object-oriented-example.py)
+- **Corresponding Python File:** [`luffy/car-object-oriented-example.py`](luffy/car-object-oriented-example.py)
 
 ---
 

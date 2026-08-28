@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** 2D Grid DFS + Backtracking
 - **LeetCode Link:** [79. Word Search](https://leetcode.com/problems/word-search/)
-- **Corresponding Python File:** [`luffy/37-lc-0079-word-search.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/37-lc-0079-word-search.py)
+- **Corresponding Python File:** [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py)
 
 ---
 

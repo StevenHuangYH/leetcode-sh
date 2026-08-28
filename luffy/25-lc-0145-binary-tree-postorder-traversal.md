@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** DFS Postorder (L-R-Root)
 - **LeetCode Link:** [145. Binary Tree Postorder Traversal](https://leetcode.com/problems/binary-tree-postorder-traversal/)
-- **Corresponding Python File:** [`luffy/25-lc-0145-binary-tree-postorder-traversal.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/25-lc-0145-binary-tree-postorder-traversal.py)
+- **Corresponding Python File:** [`luffy/25-lc-0145-binary-tree-postorder-traversal.py`](luffy/25-lc-0145-binary-tree-postorder-traversal.py)
 
 ---
 

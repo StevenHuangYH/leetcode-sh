@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Stack & Operator Precedence
 - **LeetCode Link:** [227. Basic Calculator II](https://leetcode.com/problems/basic-calculator-ii/)
-- **Corresponding Python File:** [`luffy/22-lc-0227-basic-calculator-ii.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/22-lc-0227-basic-calculator-ii.py)
+- **Corresponding Python File:** [`luffy/22-lc-0227-basic-calculator-ii.py`](luffy/22-lc-0227-basic-calculator-ii.py)
 
 ---
 

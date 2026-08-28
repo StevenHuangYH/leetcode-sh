@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking + Pruning
 - **LeetCode Link:** [77. Combinations](https://leetcode.com/problems/combinations/)
-- **Corresponding Python File:** [`luffy/31-lc-0077-combinations.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/31-lc-0077-combinations.py)
+- **Corresponding Python File:** [`luffy/31-lc-0077-combinations.py`](luffy/31-lc-0077-combinations.py)
 
 ---
 

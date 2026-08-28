@@ -4,7 +4,7 @@
 - **Difficulty:** Easy
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Prefix Sum Demo
-- **Corresponding Python File:** [`luffy/11-prefix-sum-basic-example.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/11-prefix-sum-basic-example.py)
+- **Corresponding Python File:** [`luffy/11-prefix-sum-basic-example.py`](luffy/11-prefix-sum-basic-example.py)
 
 ---
 

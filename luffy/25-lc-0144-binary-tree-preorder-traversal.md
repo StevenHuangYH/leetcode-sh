@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** DFS Preorder (Root-L-R)
 - **LeetCode Link:** [144. Binary Tree Preorder Traversal](https://leetcode.com/problems/binary-tree-preorder-traversal/)
-- **Corresponding Python File:** [`luffy/25-lc-0144-binary-tree-preorder-traversal.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/25-lc-0144-binary-tree-preorder-traversal.py)
+- **Corresponding Python File:** [`luffy/25-lc-0144-binary-tree-preorder-traversal.py`](luffy/25-lc-0144-binary-tree-preorder-traversal.py)
 
 ---
 

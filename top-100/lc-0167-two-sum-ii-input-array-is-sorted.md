@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0167
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
-- **Solution File**: [lc-0167-two-sum-ii-input-array-is-sorted.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)
+- **Solution File**: [lc-0167-two-sum-ii-input-array-is-sorted.py](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)
 
 ---
 

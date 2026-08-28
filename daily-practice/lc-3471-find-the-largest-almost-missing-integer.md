@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 3471
 - **Difficulty**: Easy
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/find-the-largest-almost-missing-integer/)
-- **Solution File**: [lc-3471-find-the-largest-almost-missing-integer.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)
+- **Solution File**: [lc-3471-find-the-largest-almost-missing-integer.py](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)
 
 ---
 

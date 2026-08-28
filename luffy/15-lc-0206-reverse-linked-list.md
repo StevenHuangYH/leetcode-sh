@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** 3-Pointer Iteration
 - **LeetCode Link:** [206. Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
-- **Corresponding Python File:** [`luffy/15-lc-0206-reverse-linked-list.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/15-lc-0206-reverse-linked-list.py)
+- **Corresponding Python File:** [`luffy/15-lc-0206-reverse-linked-list.py`](luffy/15-lc-0206-reverse-linked-list.py)
 
 ---
 

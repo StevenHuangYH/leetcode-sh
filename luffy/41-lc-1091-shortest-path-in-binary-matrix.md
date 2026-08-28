@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** 8-Directional Grid BFS
 - **LeetCode Link:** [1091. Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
-- **Corresponding Python File:** [`luffy/41-lc-1091-shortest-path-in-binary-matrix.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/41-lc-1091-shortest-path-in-binary-matrix.py)
+- **Corresponding Python File:** [`luffy/41-lc-1091-shortest-path-in-binary-matrix.py`](luffy/41-lc-1091-shortest-path-in-binary-matrix.py)
 
 ---
 

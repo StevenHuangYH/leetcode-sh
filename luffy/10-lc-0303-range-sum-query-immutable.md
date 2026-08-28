@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Prefix Sum Array
 - **LeetCode Link:** [303. Range Sum Query - Immutable](https://leetcode.com/problems/range-sum-query-immutable/)
-- **Corresponding Python File:** [`luffy/10-lc-0303-range-sum-query-immutable.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/10-lc-0303-range-sum-query-immutable.py)
+- **Corresponding Python File:** [`luffy/10-lc-0303-range-sum-query-immutable.py`](luffy/10-lc-0303-range-sum-query-immutable.py)
 
 ---
 

@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0209
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/minimum-size-subarray-sum/)
-- **Solution File**: [lc-0209-minimum-size-subarray-sum.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0209-minimum-size-subarray-sum.py)
+- **Solution File**: [lc-0209-minimum-size-subarray-sum.py](top-100/lc-0209-minimum-size-subarray-sum.py)
 
 ---
 

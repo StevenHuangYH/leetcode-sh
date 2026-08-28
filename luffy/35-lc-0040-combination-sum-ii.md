@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking + Deduplication
 - **LeetCode Link:** [40. Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)
-- **Corresponding Python File:** [`luffy/35-lc-0040-combination-sum-ii.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/35-lc-0040-combination-sum-ii.py)
+- **Corresponding Python File:** [`luffy/35-lc-0040-combination-sum-ii.py`](luffy/35-lc-0040-combination-sum-ii.py)
 
 ---
 

@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Basic Arithmetic
 - **LeetCode Link:** [2235. Add Two Integers](https://leetcode.com/problems/add-two-integers/)
-- **Corresponding Python File:** [`luffy/01-lc-2235-add-two-integers.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/01-lc-2235-add-two-integers.py)
+- **Corresponding Python File:** [`luffy/01-lc-2235-add-two-integers.py`](luffy/01-lc-2235-add-two-integers.py)
 
 ---
 

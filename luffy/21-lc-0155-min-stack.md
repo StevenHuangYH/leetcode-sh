@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Auxiliary Min Stack
 - **LeetCode Link:** [155. Min Stack](https://leetcode.com/problems/min-stack/)
-- **Corresponding Python File:** [`luffy/21-lc-0155-min-stack.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/21-lc-0155-min-stack.py)
+- **Corresponding Python File:** [`luffy/21-lc-0155-min-stack.py`](luffy/21-lc-0155-min-stack.py)
 
 ---
 

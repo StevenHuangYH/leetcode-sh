@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Dual Stack (Counts & Strings)
 - **LeetCode Link:** [394. Decode String](https://leetcode.com/problems/decode-string/)
-- **Corresponding Python File:** [`luffy/23-lc-0394-decode-string.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/23-lc-0394-decode-string.py)
+- **Corresponding Python File:** [`luffy/23-lc-0394-decode-string.py`](luffy/23-lc-0394-decode-string.py)
 
 ---
 

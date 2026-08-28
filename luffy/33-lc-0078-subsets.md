@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking / Cascading
 - **LeetCode Link:** [78. Subsets](https://leetcode.com/problems/subsets/)
-- **Corresponding Python File:** [`luffy/33-lc-0078-subsets.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/33-lc-0078-subsets.py)
+- **Corresponding Python File:** [`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py)
 
 ---
 

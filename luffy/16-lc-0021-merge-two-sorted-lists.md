@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Dummy Head + Two Pointers
 - **LeetCode Link:** [21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
-- **Corresponding Python File:** [`luffy/16-lc-0021-merge-two-sorted-lists.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/16-lc-0021-merge-two-sorted-lists.py)
+- **Corresponding Python File:** [`luffy/16-lc-0021-merge-two-sorted-lists.py`](luffy/16-lc-0021-merge-two-sorted-lists.py)
 
 ---
 

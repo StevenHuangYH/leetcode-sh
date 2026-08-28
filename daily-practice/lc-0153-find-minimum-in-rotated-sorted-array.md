@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0153
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
-- **Solution File**: [lc-0153-find-minimum-in-rotated-sorted-array.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)
+- **Solution File**: [lc-0153-find-minimum-in-rotated-sorted-array.py](daily-practice/lc-0153-find-minimum-in-rotated-sorted-array.py)
 
 ---
 

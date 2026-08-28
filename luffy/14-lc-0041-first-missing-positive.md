@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Cyclic Sort / In-Place Hashing
 - **LeetCode Link:** [41. First Missing Positive](https://leetcode.com/problems/first-missing-positive/)
-- **Corresponding Python File:** [`luffy/14-lc-0041-first-missing-positive.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/14-lc-0041-first-missing-positive.py)
+- **Corresponding Python File:** [`luffy/14-lc-0041-first-missing-positive.py`](luffy/14-lc-0041-first-missing-positive.py)
 
 ---
 

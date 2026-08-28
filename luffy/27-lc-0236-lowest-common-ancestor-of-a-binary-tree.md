@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Postorder DFS
 - **LeetCode Link:** [236. Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
-- **Corresponding Python File:** [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py)
+- **Corresponding Python File:** [`luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py`](luffy/27-lc-0236-lowest-common-ancestor-of-a-binary-tree.py)
 
 ---
 

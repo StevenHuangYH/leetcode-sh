@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0162
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/find-peak-element/)
-- **Solution File**: [lc-0162-find-peak-element.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0162-find-peak-element.py)
+- **Solution File**: [lc-0162-find-peak-element.py](top-100/lc-0162-find-peak-element.py)
 
 ---
 

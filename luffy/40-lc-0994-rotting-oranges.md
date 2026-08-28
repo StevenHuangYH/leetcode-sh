@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Multi-Source BFS Queue
 - **LeetCode Link:** [994. Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)
-- **Corresponding Python File:** [`luffy/40-lc-0994-rotting-oranges.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/40-lc-0994-rotting-oranges.py)
+- **Corresponding Python File:** [`luffy/40-lc-0994-rotting-oranges.py`](luffy/40-lc-0994-rotting-oranges.py)
 
 ---
 

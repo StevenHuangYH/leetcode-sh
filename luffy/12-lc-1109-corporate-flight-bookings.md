@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Difference Array
 - **LeetCode Link:** [1109. Corporate Flight Bookings](https://leetcode.com/problems/corporate-flight-bookings/)
-- **Corresponding Python File:** [`luffy/12-lc-1109-corporate-flight-bookings.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/12-lc-1109-corporate-flight-bookings.py)
+- **Corresponding Python File:** [`luffy/12-lc-1109-corporate-flight-bookings.py`](luffy/12-lc-1109-corporate-flight-bookings.py)
 
 ---
 

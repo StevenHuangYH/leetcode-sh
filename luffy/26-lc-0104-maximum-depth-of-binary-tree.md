@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** DFS / Divide & Conquer
 - **LeetCode Link:** [104. Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
-- **Corresponding Python File:** [`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/26-lc-0104-maximum-depth-of-binary-tree.py)
+- **Corresponding Python File:** [`luffy/26-lc-0104-maximum-depth-of-binary-tree.py`](luffy/26-lc-0104-maximum-depth-of-binary-tree.py)
 
 ---
 

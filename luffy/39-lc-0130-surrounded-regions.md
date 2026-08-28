@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Boundary Flood Fill
 - **LeetCode Link:** [130. Surrounded Regions](https://leetcode.com/problems/surrounded-regions/)
-- **Corresponding Python File:** [`luffy/39-lc-0130-surrounded-regions.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/39-lc-0130-surrounded-regions.py)
+- **Corresponding Python File:** [`luffy/39-lc-0130-surrounded-regions.py`](luffy/39-lc-0130-surrounded-regions.py)
 
 ---
 

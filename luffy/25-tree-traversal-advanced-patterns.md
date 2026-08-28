@@ -4,7 +4,7 @@
 - **Difficulty:** Medium
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Tree Traversal Patterns
-- **Corresponding Python File:** [`luffy/25-tree-traversal-advanced-patterns.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/25-tree-traversal-advanced-patterns.py)
+- **Corresponding Python File:** [`luffy/25-tree-traversal-advanced-patterns.py`](luffy/25-tree-traversal-advanced-patterns.py)
 
 ---
 

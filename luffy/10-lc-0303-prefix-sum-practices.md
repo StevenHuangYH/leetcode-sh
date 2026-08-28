@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Prefix Sum & Cumulative Array
 - **LeetCode Link:** [Prefix Sum Foundation Practices](https://leetcode.com/problems/range-sum-query-immutable/)
-- **Corresponding Python File:** [`luffy/10-lc-0303-prefix-sum-practices.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/10-lc-0303-prefix-sum-practices.py)
+- **Corresponding Python File:** [`luffy/10-lc-0303-prefix-sum-practices.py`](luffy/10-lc-0303-prefix-sum-practices.py)
 
 ---
 

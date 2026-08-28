@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0053
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/maximum-subarray/)
-- **Solution File**: [lc-0053-maximum-subarray.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0053-maximum-subarray.py)
+- **Solution File**: [lc-0053-maximum-subarray.py](top-100/lc-0053-maximum-subarray.py)
 
 ---
 

@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Slow & Fast Two Pointers
 - **LeetCode Link:** [26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
-- **Corresponding Python File:** [`luffy/05-lc-0026-remove-duplicates-from-sorted-array.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/05-lc-0026-remove-duplicates-from-sorted-array.py)
+- **Corresponding Python File:** [`luffy/05-lc-0026-remove-duplicates-from-sorted-array.py`](luffy/05-lc-0026-remove-duplicates-from-sorted-array.py)
 
 ---
 

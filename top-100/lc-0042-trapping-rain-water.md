@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 0042
 - **Difficulty**: Hard
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/trapping-rain-water/)
-- **Solution File**: [lc-0042-trapping-rain-water.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/top-100/lc-0042-trapping-rain-water.py)
+- **Solution File**: [lc-0042-trapping-rain-water.py](top-100/lc-0042-trapping-rain-water.py)
 
 ---
 

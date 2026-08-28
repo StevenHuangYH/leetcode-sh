@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Prefix Sum + Hash Map
 - **LeetCode Link:** [560. Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
-- **Corresponding Python File:** [`luffy/11-lc-0560-subarray-sum-equals-k.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/11-lc-0560-subarray-sum-equals-k.py)
+- **Corresponding Python File:** [`luffy/11-lc-0560-subarray-sum-equals-k.py`](luffy/11-lc-0560-subarray-sum-equals-k.py)
 
 ---
 

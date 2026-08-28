@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 2029
 - **Difficulty**: Medium
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/stone-game-ix/)
-- **Solution File**: [lc-2029-stone-game-ix.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/daily-practice/lc-2029-stone-game-ix.py)
+- **Solution File**: [lc-2029-stone-game-ix.py](daily-practice/lc-2029-stone-game-ix.py)
 
 ---
 

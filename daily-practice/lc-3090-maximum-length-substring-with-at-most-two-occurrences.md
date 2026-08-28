@@ -3,7 +3,7 @@
 - **LeetCode ID**: LC 3090
 - **Difficulty**: Easy
 - **Source Link**: [LeetCode Problem](https://leetcode.com/problems/maximum-length-substring-with-two-occurrences/)
-- **Solution File**: [lc-3090-maximum-length-substring-with-at-most-two-occurrences.py](file:///mnt/c/Users/steve/iCloudDrive/Desktop/leetcode-sh/daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)
+- **Solution File**: [lc-3090-maximum-length-substring-with-at-most-two-occurrences.py](daily-practice/lc-3090-maximum-length-substring-with-at-most-two-occurrences.py)
 
 ---
 

@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Grid Flood Fill (DFS/BFS)
 - **LeetCode Link:** [200. Number of Islands](https://leetcode.com/problems/number-of-islands/)
-- **Corresponding Python File:** [`luffy/38-lc-0200-number-of-islands.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/38-lc-0200-number-of-islands.py)
+- **Corresponding Python File:** [`luffy/38-lc-0200-number-of-islands.py`](luffy/38-lc-0200-number-of-islands.py)
 
 ---
 

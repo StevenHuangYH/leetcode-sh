@@ -5,7 +5,7 @@
 - **Category:** Luffy Structured Curriculum
 - **Core Technique:** Backtracking + Palindrome Verification
 - **LeetCode Link:** [131. Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
-- **Corresponding Python File:** [`luffy/36-lc-0131-palindrome-partitioning.py`](file:///mnt/c/Users/steve/iCloudDrive/desktop/leetcode-sh/luffy/36-lc-0131-palindrome-partitioning.py)
+- **Corresponding Python File:** [`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py)
 
 ---
 
