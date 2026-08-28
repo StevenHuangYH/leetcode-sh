@@ -1,130 +1,82 @@
-# LeetCode 3471. Find the Largest Almost Missing Integer
+# LeetCode 3471. Find the Largest Almost Missing Integer (找出最大的几乎缺失整数)
 ## Step-by-Step Code Walkthrough & Notes / 代码逐行详解与知识点总结
 
-- **Difficulty:** Easy
-- **Tags:** Array, Hash Table, Sliding Window, Math
+- **Difficulty:** Easy (定长滑动窗口 / 集合去重 / 数学分类讨论 / 边界极值分析)
+- **Tags:** Array, Hash Table
 - **Corresponding Python File:** [`daily-practice/lc-3471-find-the-largest-almost-missing-integer.py`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py)
 
 ---
 
 ## 1. Problem Statement / 题目描述
 
-* **[EN]** You are given an integer array `nums` and an integer `k`. An integer `x` is defined as **"almost missing"** if it appears in **exactly one** contiguous subarray of size `k`. Return the **largest** almost missing integer. If no such integer exists, return `-1`.
-* **[CN]** 给你一个整数数组 `nums` 和一个整数 `k`。如果一个整数 `x` 在 `nums` 中**恰好出现在 1 个**长度为 `k` 的连续子数组中，则称 `x` 为**“几乎缺失的整数”**。返回**最大的**几乎缺失整数；若不存在，返回 `-1`。
+* **[EN]** You are given an integer array `nums` and an integer `k`. An integer `x` is **almost missing** from `nums` if `x` appears in **exactly one** subarray of size `k` within `nums`. Return the **largest** almost missing integer, or `-1` if no such integer exists.
+* **[CN]** 给你一个整数数组 `nums` 和一个整数 `k` 。如果整数 `x` 恰好在 `nums` 中 **仅一个** 大小为 `k` 的子数组中出现，则称 `x` 是一个 **几乎缺失的整数** 。返回 **最大的** 几乎缺失整数，如果不存在这样的整数，则返回 `-1` 。
 
 ---
 
-## 2. Step-by-Step Code Walkthrough / 代码逐行详解
+## 2. Problem Blueprint & Core Invariant / 题意考点蓝图与核心不变量
 
-### 方案 1：定长滑动窗口 + Set 去重 + Dict 计数 (Fixed Sliding Window)
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎯 考试与面试考察核心蓝图 (Interview Blueprint)                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. 定长窗口滑窗统计法 (General Sliding Window):                             │
+│    • 滑动长度为 k 的窗口，对每个窗口 set(window) 去重，频数加 1。            │
+│    • 统计所有 count == 1 的最大元素。                                        │
+│ 2. O(n) 数学分类讨论公理 (Mathematical Bound Invariant):                    │
+│    • 情况 1: k == 1 -> 每个元素自成窗口，寻找在全数组中仅出现 1 次的最大元素。  │
+│    • 情况 2: k == n -> 整个数组是唯一窗口，直接返回 max(nums)。               │
+│    • 情况 3: 1 < k < n -> 只有首端点 nums[0] 和尾端点 nums[-1] 可能恰好被 1   │
+│      个窗口包含（中间元素必然被 >= 2 个窗口包含）。比较全局频数为 1 的端点。 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Step-by-Step Code Walkthrough / 代码逐行详解
+
+基于原 Python 文件 [`daily-practice/lc-3471-find-the-largest-almost-missing-integer.py`](daily-practice/lc-3471-find-the-largest-almost-missing-integer.py) 中的双实现进行逐行深入解析：
 
 ```python
+from typing import List
+from collections import Counter
+
+# 方案 1: 定长滑动窗口模拟
 class Solution:
     def largestInteger(self, nums: List[int], k: int) -> int:
         window_counts = {}
-```
-
-* **[EN] Action:** Initializes an empty dictionary `window_counts = {}`.
-  * **Why `{}` instead of `[]`?** `{}` is a **Dictionary (Hash Map)** that stores `Key : Value` pairs (`number : window_count`). A List `[]` cannot map arbitrary integers to counts in $\mathcal{O}(1)$ time.
-* **[CN] 动作**：初始化一个空字典 `window_counts = {}`。
-  * **为什么用 `{}` 而不用 `[]`？** `{}` 是**字典（哈希表）**，用于保存 `数字 : 出现窗口次数` 的键值对映射。列表 `[]` 无法以 $\mathcal{O}(1)$ 时间把任意数字当作 Key 进行频数统计。
-
----
-
-```python
-        # Slide a fixed window of size k across nums
+        
+        # 滑动大小为 k 的窗口
         for i in range(len(nums) - k + 1):
             current_window = nums[i : i + k]
-```
-
-* **[EN] Action:** Iterates from `i = 0` to `n - k`, cutting out each contiguous slice `nums[i : i + k]` of fixed size `k`.
-  * **Pattern Difference from `lc4` & `lc6`:** `lc4` and `lc6` use **dynamic (variable-size)** windows that expand/shrink with two pointers. LC 3471 uses a **fixed-size** window of length `k`.
-* **[CN] 动作**：遍历所有起点 `i`，每次截取长度固定为 `k` 的子数组 `nums[i : i + k]`。
-  * **与 `lc4` / `lc6` 的区别**：`lc4` / `lc6` 是**变长滑动窗口**，左右指针根据条件动态伸缩；而本题是**定长滑动窗口**，窗口长度始终为 $k$。
-
----
-
-```python
-            # Use set() so that duplicate numbers inside the SAME window are only counted once
+            # 同一窗口内重复出现的数字仅计数一次
             for num in set(current_window):
                 window_counts[num] = window_counts.get(num, 0) + 1
-```
-
-* **[EN] Action:** Converts the current window into a `set()` and increments the count for each unique number.
-  * **What is `set()` used for?** `set()` automatically **removes duplicates** within the current window. If a window is `[7, 2, 1, 7]`, `set` reduces it to `{1, 2, 7}` so that the number `7` is counted as appearing in this window only **once**.
-  * **What does `.get(num, 0)` do?** Returns the existing count if `num` is already in the dictionary; otherwise returns `0`.
-* **[CN] 动作**：将当前窗口转为集合 `set()`，并让其中每个不同元素的计数加 1。
-  * **`set()` 的作用**：**自动去重**。如果一个窗口是 `[7, 2, 1, 7]`，转成 `set` 后变成 `{1, 2, 7}`，确保数字 `7` 在这一个窗口中只被计入 1 次。
-  * **`.get(num, 0)` 的作用**：如果 `num` 已经在字典里，取其旧值；如果不在，给默认值 `0`。
-
----
-
-```python
-        # Find the largest number that appeared in EXACTLY 1 window
+        
+        # 寻找恰好出现在 1 个窗口中的最大值
         max_val = -1
         for num, count in window_counts.items():
             if count == 1:
                 max_val = max(max_val, num)
                 
         return max_val
-```
 
-* **[EN] Action:** Scans the dictionary to find all numbers where `count == 1`, returning the maximum value. If no number has `count == 1`, returns the default `-1`.
-* **[CN] 动作**：遍历字典中所有 `count == 1` 的候选数字，取最大值 `max_val` 返回；若没有任何数字满足条件，直接返回初始值 `-1`。
-
----
-
-## 3. Key FAQs & Concept Clarifications / 核心答疑
-
-### Q1: 示例 1 中 `nums = [3, 9, 2, 1, 7], k = 3`，为什么答案是 7 而不是 9？
-* **所有长度为 3 的窗口：**
-  1. `[3, 9, 2]`
-  2. `[9, 2, 1]`
-  3. `[2, 1, 7]`
-* **统计出现窗口数：**
-  * `9` 出现在了窗口 1 和窗口 2 $\rightarrow$ **出现 2 次** ❌（被淘汰，不符合“恰好 1 次”）
-  * `3` 出现在窗口 1 $\rightarrow$ **出现 1 次** ✅
-  * `7` 出现在窗口 3 $\rightarrow$ **出现 1 次** ✅
-* 在符合条件的 `{3, 7}` 中，最大的是 **`7`** ($\max(3, 7) = 7$)。
-
----
-
-### Q2: 什么时候会返回 `-1`？
-* 当数组中的**每一个数字**都出现在 0 个或 $\ge 2$ 个长度为 $k$ 的子数组中时。
-* **例如 `nums = [0, 0], k = 1`：** 两个长度为 1 的窗口 `[0]` 和 `[0]` 都包含 0，所以 0 出现了 2 次，没有符合“恰好 1 次”的数字，返回 **`-1`**。
-
----
-
-### Q3: 变长滑动窗口 (`lc4`, `lc6`) vs 定长滑动窗口 (本题) 的对比
-
-| 维度 | `lc4` (LC 3) / `lc6` (LC 209) | `lc3471` (Almost Missing) |
-| :--- | :--- | :--- |
-| **窗口大小** | **变长**：窗口大小动态改变 | **定长**：固定为 $k$ |
-| **求解目标** | 求解最长/最短的**窗口长度**（`max_len` / `min_len`） | 统计落在窗口内的**数字频数** |
-| **指针移动** | `left` 和 `right` 根据条件动态伸缩 | 每次整体平移 $k$ 长度的切片 |
-
----
-
-## 4. 方案 2：$\mathcal{O}(n)$ 最优数学分类讨论 (Optimal Math Approach)
-
-通过数学推导，任何内部元素（$0 < i < n - 1$）在 $1 < k < n$ 时必然被至少 2 个窗口覆盖。因此只有两端元素才可能是答案：
-
-```python
+# 方案 2: O(n) 最优数学分类讨论
 class SolutionOptimal:
     def largestInteger(self, nums: List[int], k: int) -> int:
         n = len(nums)
         freq = Counter(nums)
         
-        # Case 1: k == 1 -> 返回全局只出现 1 次的最大元素
+        # 情况 1: k == 1
         if k == 1:
             unique_nums = [x for x, c in freq.items() if c == 1]
             return max(unique_nums) if unique_nums else -1
         
-        # Case 2: k == n -> 整个数组就是唯一的窗口，返回最大元素
+        # 情况 2: k == n
         if k == n:
             return max(nums)
         
-        # Case 3: 1 < k < n -> 只有 nums[0] 和 nums[-1] 可能是候选
+        # 情况 3: 1 < k < n，仅需检查两端元素
         candidates = []
         if freq[nums[0]] == 1:
             candidates.append(nums[0])
@@ -136,11 +88,9 @@ class SolutionOptimal:
 
 ---
 
-## 5. Complexity Analysis / 复杂度分析
+## 4. Complexity Analysis / 复杂度分析
 
-* **定长滑动窗口法 (Method 1):**
-  * **时间复杂度 (Time):** $\mathcal{O}(n \times k)$ — 遍历 $n - k + 1$ 个窗口，每个窗口切片及转 set 需要 $\mathcal{O}(k)$。
-  * **空间复杂度 (Space):** $\mathcal{O}(n)$ — 哈希表存储不同元素频数。
-* **数学分类讨论法 (Method 2):**
-  * **时间复杂度 (Time):** $\mathcal{O}(n)$ — 仅需一次线性扫描统计频数。
-  * **空间复杂度 (Space):** $\mathcal{O}(n)$ — 存储频数哈希表。
+| 维度 (Dimension) | 复杂度 (Complexity) | 数学证明与核心原由 (Mathematical Rationale) |
+| :--- | :---: | :--- |
+| **时间复杂度 (Time Complexity)** | $\mathcal{O}(n)$ | 数学分类法通过 `Counter(nums)` 线性统计元素频数，后续 $O(1)$ 判定；定长滑窗耗时 $\mathcal{O}(n \cdot k)$。 |
+| **空间复杂度 (Space Complexity)** | $\mathcal{O}(n)$ | 哈希表存储不同元素的出现频数。 |

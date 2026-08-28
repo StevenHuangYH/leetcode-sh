@@ -1,72 +1,68 @@
-Here is the bilingual Markdown file for the step-by-step code explanation. You can copy this and save it as a `.md` file.
+# LeetCode 2029. Stone Game IX (石子游戏 IX)
+## Step-by-Step Code Walkthrough & Notes / 代码逐行详解与知识点总结
 
-```markdown
-# LeetCode 2029. Stone Game IX 
-## Step-by-Step Code Walkthrough / 代码逐行详解
-
-### 1. Initializing Counters (初始化计数器)
-```python
-cnt0 = cnt1 = cnt2 = 0
-
-```
-
-* **[EN] Action:** Creates three variables initialized to 0.
-**Purpose:** Tracks the count of stones with remainders 0, 1, and 2 when divided by 3. Since the goal is to avoid sums divisible by 3, the exact values don't matter, only their remainders.
-* **[CN] 动作**：创建了三个变量，初始值都设为 0。
-**目的**：分别用来统计除以 3 余数分别为 0、1、2 的石头的数量。因为游戏的核心是不让总和被 3 整除，所以石头的具体面值不重要，余数才重要。
+- **Difficulty:** Medium (博弈论 / 模 3 同余分类讨论 / 奇偶性分析 / 贪心决策)
+- **Tags:** Array, Math, Greedy, Game Theory
+- **Corresponding Python File:** [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py)
 
 ---
 
-### 2. Categorizing Stones (遍历石头并分类)
+## 1. Problem Statement / 题目描述
 
-```python
-for val in stones:
-    rem = val % 3
-    if rem == 0:
-        cnt0 += 1
-    elif rem == 1:
-        cnt1 += 1
-    else:
-        cnt2 += 1
-
-```
-
-* **[EN] Action:** Loops through each stone (`val`) in the `stones` array.
-**Math:** `rem = val % 3` calculates the remainder of the stone's value divided by 3.
-**Sorting:** The `if...elif...else` block categorizes the stones into their respective "buckets" (`cnt0`, `cnt1`, or `cnt2`) based on the remainder.
-* **[CN] 动作**：遍历数组 `stones` 中的每一块石头（`val`）。
-**计算**：`rem = val % 3` 计算这块石头的面值除以 3 的余数。
-**分拣**：`if...elif...else` 语句根据余数把石头放进对应的“桶”里（余数为0增加`cnt0`，余数为1增加`cnt1`，余数为2增加`cnt2`）。
+* **[EN]** Alice and Bob play a game with stones. There is a collection of stones with positive integer values. Alice and Bob take turns, with Alice starting first. On each turn, the player makes a move consisting of removing a stone from the pile. A player loses if the sum of the values of all removed stones is divisible by 3. If all stones are removed without the sum becoming divisible by 3, Bob wins. Return `true` if Alice wins, or `false` if Bob wins.
+* **[CN]** Alice 和 Bob 再次设计了一款新的石子游戏。现有一包石子，每个石子上都有一个正整数。游戏由 Alice 和 Bob 轮流进行，Alice 先手。在每个回合中，玩家可以从石子堆中选出一个石子并移除。如果移除后所有已被移除石子的总和能被 3 整除，则该玩家输掉游戏。如果所有石子都被移除且总和仍不能被 3 整除，则 Bob 获胜。如果 Alice 赢，返回 `true` ；否则返回 `false` 。
 
 ---
 
-### 3. Handling Even 0s (处理偶数个 0 的情况)
-
-```python
-if cnt0 % 2 == 0:
-    return cnt1 >= 1 and cnt2 >= 1
+## 2. Problem Blueprint & Core Invariant / 题意考点蓝图与核心不变量
 
 ```
-
-* **[EN] Logic:** `cnt0 % 2 == 0` checks if the number of remainder-0 stones ("skip turn" cards) is even.
-**Game Theory:** If even, Alice playing a 0 is immediately countered by Bob playing a 0. They cancel out, maintaining Alice's first-mover advantage.
-**Conclusion:** With the advantage kept, Alice wins (`True`) as long as the pool has at least one `1` AND at least one `2` to start the game safely. If she lacks either, she eventually traps herself (`False`).
-* **[CN] 判断逻辑**：`cnt0 % 2 == 0` 用来检查余数为 0 的石头（相当于“跳过回合”牌）的数量是不是偶数。
-**博弈分析**：如果是偶数，Alice 拿一个 0，Bob 也会跟着拿一个 0，它们的作用刚好相互抵消了。此时，原本就先出手的 Alice 保留了她的先手优势。
-**结论**：在这种情况下，只要池子里至少有一个 1 且至少有一个 2（确保开局有牌可打），Alice 就能获胜；如果缺了某种石头，Alice 必输。
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎯 考试与面试考察核心蓝图 (Interview Blueprint)                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. 模 3 同余分类 (Modulo 3 Invariant):                                       │
+│    • 每个石子仅取决于 val % 3 的余数：cnt0, cnt1, cnt2。                     │
+│ 2. 模 0 石子的充要性质 (Parity Buffer):                                      │
+│    • 选 cnt0 不改变当前累加和的模 3 状态，仅用于翻转出牌先后手。             │
+│ 3. 极简胜负判定公式 (Decision Invariant):                                    │
+│    • 若 cnt0 为偶数: Alice 必胜当且仅当 cnt1 >= 1 且 cnt2 >= 1。             │
+│    • 若 cnt0 为奇数: Alice 必胜当且仅当 abs(cnt1 - cnt2) > 2。               │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-### 4. Handling Odd 0s (处理奇数个 0 的情况)
+## 3. Step-by-Step Code Walkthrough / 代码逐行详解
+
+基于原 Python 文件 [`daily-practice/lc-2029-stone-game-ix.py`](daily-practice/lc-2029-stone-game-ix.py) 中的实现进行逐行深入解析：
 
 ```python
-return abs(cnt1 - cnt2) > 2
+class Solution:
+    def stoneGameIX(self, stones: list[int]) -> bool:
+        # 1. 统计模 3 余数为 0, 1, 2 的石子个数
+        cnt0 = cnt1 = cnt2 = 0
+        for val in stones:
+            rem = val % 3
+            if rem == 0:
+                cnt0 += 1
+            elif rem == 1:
+                cnt1 += 1
+            else:
+                cnt2 += 1
 
+        # 2. 情况一：cnt0 为偶数（相当于没有 0 类型的石子）
+        if cnt0 % 2 == 0:
+            return cnt1 >= 1 and cnt2 >= 1
+            
+        # 3. 情况二：cnt0 为奇数（Alice 可以利用 0 的反转破坏 Bob 的策略）
+        return abs(cnt1 - cnt2) > 2
 ```
 
-* **[EN] Logic:** If the code reaches here, `cnt0` is guaranteed to be odd.
-**Game Theory:** An odd number of 0s causes a permanent turn reversal. A losing move that Bob would have been forced to make now falls on Alice. Bob gains the advantage.
-**Conclusion:** To overcome this massive disadvantage, Alice must rely on a huge imbalance between 1s and 2s. She wins (`True`) only if the absolute difference (`abs`) between `cnt1` and `cnt2` is strictly greater than 2, allowing her to exhaust one type of stone and corner Bob.
-* **[CN] 判断逻辑**：如果代码运行到了最后这一行，说明 `cnt0` 肯定是奇数。
-**博弈分析**：奇数个 0 会导致回合顺序发生一次根本性的反转，原本轮到 Bob 被逼上绝路的一步，现在变成 Alice 去走了，优势被送给了 Bob。
-**结论**：在这种极端劣势下，Alice 想逆风翻盘就必须利用 1 和 2 数量上的巨大悬殊。这要求 `cnt1` 和 `cnt2` 的数量差的绝对值（`abs`）必须严格大于 2。满足条件则赢，否则输。
+---
+
+## 4. Complexity Analysis / 复杂度分析
+
+| 维度 (Dimension) | 复杂度 (Complexity) | 数学证明与核心原由 (Mathematical Rationale) |
+| :--- | :---: | :--- |
+| **时间复杂度 (Time Complexity)** | $\mathcal{O}(n)$ | 单次遍历数组统计模 3 频数，后续判定 $\mathcal{O}(1)$，总时间严格为 $\mathcal{O}(n)$。 |
+| **空间复杂度 (Space Complexity)** | $\mathcal{O}(1)$ | 仅使用 3 个计数器变量。 |
