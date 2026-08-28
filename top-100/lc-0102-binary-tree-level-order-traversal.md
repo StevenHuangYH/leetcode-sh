@@ -152,7 +152,9 @@ $$\mathcal{L}_{d+1} = \bigcup_{u \in \mathcal{L}_d} \Big( \text{Children}(u) \se
 
 ## 4. Step-by-Step Code Walkthrough / 代码逐行详解
 
-基于原 Python 文件 [`top-100/lc-0102-binary-tree-level-order-traversal.py`](top-100/lc-0102-binary-tree-level-order-traversal.py) 中的实现进行逐行深入解析：
+基于原 Python 文件 [`top-100/lc-0102-binary-tree-level-order-traversal.py`](top-100/lc-0102-binary-tree-level-order-traversal.py) 中的双解法实现进行逐行深入解析：
+
+### 解法一：双数组滚动状态转移法 (`Solution`)
 
 ```python
 from typing import List, Optional
@@ -195,6 +197,43 @@ class Solution:
             ans.append(vals) # 将当前层收集完的数值数组加入最终结果 ans
 
         # 6. 返回层序遍历总结果
+        return ans
+```
+
+---
+
+### 解法二：双端队列与定长快照法 (`Solution2`)
+
+```python
+from collections import deque
+
+# use queue
+class Solution2:
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        # 1. 空树防护
+        if root is None:
+            return []
+
+        # 2. 初始化结果容器与双端队列
+        ans = []
+        q = deque([root])
+
+        # 3. 队列非空时持续按层处理
+        while q:
+            vals = []
+            # 核心: 固定当前层的节点数量 len(q)，循环 len(q) 次严格出队当前层节点
+            for _ in range(len(q)):
+                node = q.popleft()     # O(1) 弹出队首节点
+                vals.append(node.val)  # 记录数值
+                # 按左、右顺序将下一层节点推入队尾
+                if node.left:
+                    q.append(node.left)
+                if node.right:
+                    q.append(node.right)
+            
+            # 当前层所有节点出队并收集完毕后，打包追加进 ans
+            ans.append(vals)
+
         return ans
 ```
 
