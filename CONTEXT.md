@@ -17,6 +17,11 @@ This file serves as the single source of truth for domain vocabulary and archite
 * **NoteStructureValidator**: The quality enforcement module that audits companion .md notes against the standard 7-Section Active Recall template mandated by AGENTS.md.
 * **ValidationResult**: The structured result object returned by NoteStructureValidator, providing granular diagnostics on missing sections, bilingual tags, error log schemas, and complexity proofs.
 
+### 3. Three Pillars of Algorithmic Mastery
+* **Pillar 1: Core Linear Structures & Array Techniques**: Proficient in contiguous memory manipulations, prefix sums, difference arrays, matrices, two-pointer techniques, sliding window mechanics, binary search variants, circular arrays, stacks, queues, and hash-based structures.
+* **Pillar 2: Non-Linear Architectures & Tree Hierarchies**: Pointer-based dynamic data structures, linked list manipulation, recursive modeling, binary trees, BSTs, heaps/priority queues, tries, foundational graph theory, and modular object design.
+* **Pillar 3: Search Algorithms & Dynamic Problem-Solving Paradigms**: State-space exploration, level-order traversals (BFS, shortest path), recursive tree traversals (DFS, Backtracking), Divide and Conquer, Dynamic Programming, greedy strategies, and applied mathematical logic.
+
 ---
 
 ## Architectural Seams & Principles
