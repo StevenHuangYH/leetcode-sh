@@ -52,5 +52,12 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertIn("{items_json}", template_text)
         self.assertIn("{roadmap_json}", template_text)
 
+    def test_mobile_responsive_features_present(self):
+        """Assert station template and index.html include mobile bottom nav and 100dvh."""
+        content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn("mobile-bottom-nav", content)
+        self.assertIn("setMobileTab", content)
+        self.assertIn("100dvh", content)
+
 if __name__ == "__main__":
     unittest.main()
