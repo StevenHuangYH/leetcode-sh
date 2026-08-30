@@ -61,12 +61,16 @@
       scrollbar-width: thin;
       scrollbar-color: rgba(139, 148, 158, 0.28) transparent;
     }
+    html, body {
+      height: 100%;
+      height: 100dvh;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
       display: flex;
-      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
 
@@ -395,10 +399,12 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100%;
+      height: 100dvh;
       overflow: hidden;
       background-color: var(--bg-main);
       min-width: 0;
+      position: relative;
     }
 
     /* Top Toolbar */
@@ -815,7 +821,8 @@
     #workspace {
       flex: 1;
       display: flex;
-      height: calc(100vh - 46px);
+      height: calc(100% - 46px);
+      min-height: 0;
       overflow: hidden;
       position: relative;
     }
@@ -901,8 +908,21 @@
       font-size: 13px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
+    .katex-display {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 6px 0;
+      margin: 12px 0;
+      max-width: 100%;
+    }
+    .katex-display::-webkit-scrollbar {
+      height: 4px;
+    }
     .markdown-body table {
+      display: block;
       width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
@@ -945,6 +965,11 @@
       line-height: 1.65;
     }
 
+    /* Mobile Bottom Navigation Bar */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       #sidebar {
         position: fixed;
@@ -967,28 +992,162 @@
         transform: translateX(-100%);
         width: min(85vw, 340px) !important;
       }
-      .resizer {
+      .resizer, .workspace-resizer {
         display: none !important;
+      }
+      .nav-item {
+        min-height: 38px;
+        padding: 8px 12px 8px 28px;
+        font-size: 13.5px;
+      }
+      .tree-folder-header {
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+      .folder-arrow {
+        width: 18px;
+        height: 18px;
       }
       .top-toolbar {
         padding: 0 10px;
+        gap: 8px;
+      }
+      .mode-nav-btn span {
+        display: none;
+      }
+      .mode-nav-btn {
+        padding: 5px 8px;
       }
       .breadcrumb {
         font-size: 11.5px;
+        max-width: 130px;
       }
-      .seg-label {
+      .breadcrumb-folder, .breadcrumb-sep {
         display: none;
       }
+      .segmented-control {
+        display: none !important;
+      }
+      #copyBtnLabel {
+        display: none;
+      }
+      .action-btn {
+        padding: 5px 8px;
+      }
+
+      /* Roadmap mobile layout */
+      #roadmap-view {
+        padding: 16px 14px 40px;
+      }
+      .roadmap-hero {
+        margin-bottom: 20px;
+      }
+      .roadmap-hero h1 {
+        font-size: 20px;
+      }
+      .roadmap-hero p {
+        font-size: 12.5px;
+        margin-bottom: 12px;
+      }
+      .phase-filter-bar {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 2px 8px;
+        margin: 8px -14px 0;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+      .phase-filter-bar::-webkit-scrollbar {
+        display: none;
+      }
+      .phase-filter-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: 11.5px;
+        padding: 4px 11px;
+      }
+      .phase-section {
+        padding: 16px 14px;
+      }
+      .phase-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .phase-topics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+      }
+      .topic-card {
+        padding: 12px;
+      }
+
+      /* Workspace mobile single pane layout */
       #workspace {
         flex-direction: column;
+        height: calc(100% - 46px - 48px - env(safe-area-inset-bottom, 0px));
+      }
+      .pane {
+        padding: 16px 16px 30px;
       }
       #left-pane {
         border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding: 16px 20px;
+        border-bottom: none;
       }
       #right-pane {
-        padding: 16px 20px;
+        padding: 16px 16px 30px;
+      }
+      .markdown-body {
+        font-size: 14px;
+      }
+
+      /* Mobile Bottom Navigation (Workspace Only) */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(48px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background-color: rgba(22, 27, 34, 0.96);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-color);
+        z-index: 50;
+        align-items: center;
+        justify-content: space-around;
+        padding-left: 12px;
+        padding-right: 12px;
+        gap: 8px;
+      }
+      .mobile-bottom-nav.hidden {
+        display: none !important;
+      }
+      .mobile-tab-btn {
+        flex: 1;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 12.5px;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .mobile-tab-btn.active {
+        color: var(--accent);
+        background-color: rgba(88, 166, 255, 0.14);
+        font-weight: 600;
       }
     }
   </style>
@@ -1127,6 +1286,17 @@
         </div>
       </section>
     </div>
+    <!-- Mobile Bottom Navigation Bar (Workspace Mode Only) -->
+    <nav class="mobile-bottom-nav hidden" id="mobileBottomNav">
+      <button class="mobile-tab-btn active" id="mobileTabNotes" onclick="setMobileTab('notes')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <span>题解笔记 (Notes)</span>
+      </button>
+      <button class="mobile-tab-btn" id="mobileTabCode" onclick="setMobileTab('code')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        <span>Python 源码 (Code)</span>
+      </button>
+    </nav>
   </main>
 
   <script>
@@ -1136,6 +1306,7 @@
     let mainMode = localStorage.getItem("mainMode") || "roadmap";
     let currentKey = "README.md";
     let viewMode = "dual"; // 'dual', 'notes', 'code'
+    let mobileTab = "notes"; // 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
 
@@ -1210,6 +1381,37 @@
       }
     }
 
+    function setMobileTab(tab) {
+      mobileTab = tab;
+      const tabNotes = document.getElementById("mobileTabNotes");
+      const tabCode = document.getElementById("mobileTabCode");
+      if (tabNotes) tabNotes.classList.toggle("active", tab === "notes");
+      if (tabCode) tabCode.classList.toggle("active", tab === "code");
+
+      const leftPane = document.getElementById("left-pane");
+      const rightPane = document.getElementById("right-pane");
+      const resizer = document.getElementById("workspace-resizer");
+
+      if (window.innerWidth <= 768) {
+        if (resizer) resizer.style.display = "none";
+        if (tab === "code") {
+          if (leftPane) {
+            leftPane.style.display = "flex";
+            leftPane.style.width = "100%";
+            leftPane.style.flex = "1";
+          }
+          if (rightPane) rightPane.style.display = "none";
+        } else {
+          if (leftPane) leftPane.style.display = "none";
+          if (rightPane) {
+            rightPane.style.display = "flex";
+            rightPane.style.width = "100%";
+            rightPane.style.flex = "1";
+          }
+        }
+      }
+    }
+
     function setViewMode(mode) {
       viewMode = mode;
       const leftPane = document.getElementById("left-pane");
@@ -1219,6 +1421,11 @@
       document.getElementById("btnDual").classList.toggle("active", mode === "dual");
       document.getElementById("btnNotes").classList.toggle("active", mode === "notes");
       document.getElementById("btnCode").classList.toggle("active", mode === "code");
+
+      if (window.innerWidth <= 768) {
+        setMobileTab(mode === "code" ? "code" : "notes");
+        return;
+      }
 
       if (mode === "dual") {
         leftPane.style.display = "flex";
@@ -1251,6 +1458,7 @@
       const viewSwitcher = document.getElementById("viewSwitcher");
       const copyBtn = document.getElementById("copyBtn");
       const breadcrumb = document.getElementById("itemBreadcrumb");
+      const mobileNav = document.getElementById("mobileBottomNav");
 
       if (mode === "roadmap") {
         if (btnRoadmap) btnRoadmap.classList.add("active");
@@ -1259,6 +1467,7 @@
         if (workspaceView) workspaceView.classList.add("hidden-view");
         if (viewSwitcher) viewSwitcher.style.display = "none";
         if (copyBtn) copyBtn.style.display = "none";
+        if (mobileNav) mobileNav.classList.add("hidden");
         if (breadcrumb) {
           breadcrumb.innerHTML = `
             <span class="breadcrumb-folder">Curriculum</span>
@@ -1274,8 +1483,14 @@
         if (btnWorkspace) btnWorkspace.classList.add("active");
         if (roadmapView) roadmapView.classList.remove("active");
         if (workspaceView) workspaceView.classList.remove("hidden-view");
-        if (viewSwitcher) viewSwitcher.style.display = "inline-flex";
+        if (viewSwitcher) viewSwitcher.style.display = window.innerWidth <= 768 ? "none" : "inline-flex";
         if (copyBtn) copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
+        if (mobileNav) mobileNav.classList.remove("hidden");
+        if (window.innerWidth <= 768) {
+          setMobileTab(mobileTab);
+        } else {
+          setViewMode(viewMode);
+        }
         if (triggerSwitch) {
           switchItem(currentKey, false);
         }
@@ -1579,6 +1794,7 @@
 
       if (window.innerWidth <= 768) {
         toggleSidebar(false);
+        setMobileTab(mobileTab);
       }
 
       const breadcrumb = document.getElementById("itemBreadcrumb");
@@ -1750,6 +1966,17 @@
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
         localStorage.setItem("workspaceSplitRatio", workspaceSplitRatio.toString());
+      }
+    });
+
+    // Handle Window Resize Responsiveness
+    window.addEventListener("resize", () => {
+      if (mainMode === "workspace") {
+        if (window.innerWidth <= 768) {
+          setMobileTab(mobileTab);
+        } else {
+          setViewMode(viewMode);
+        }
       }
     });
 
