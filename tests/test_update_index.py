@@ -67,6 +67,13 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertEqual(en, "Spiral Matrix II Alt")
         self.assertEqual(full, "LC 59 · Spiral Matrix II Alt")
 
+        # 5. FormattedTitle dataclass attributes
+        from scripts.compiler.entities import ProblemTitleFormatter, FormattedTitle
+        formatted = ProblemTitleFormatter.format("lc-0153-find-minimum-in-rotated-sorted-array")
+        self.assertIsInstance(formatted, FormattedTitle)
+        self.assertEqual(formatted.lc_num, "LC 153")
+        self.assertEqual(formatted.en_title, "Find Minimum In Rotated Sorted Array")
+
     def test_overview_document_semantic_title(self):
         documents = collect_workspace_documents()
         self.assertIn("README.md", documents)

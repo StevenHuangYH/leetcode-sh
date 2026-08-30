@@ -152,7 +152,7 @@ const items = {items_json};
           breadcrumb.innerHTML = `
             <span class="breadcrumb-folder">Curriculum</span>
             <span class="breadcrumb-sep">/</span>
-            <span class="breadcrumb-file">Interactive Topology Graph</span>
+            <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
         if (history.replaceState) {
@@ -718,6 +718,7 @@ const items = {items_json};
 
       const breadcrumb = document.getElementById("itemBreadcrumb");
       let folderLabel = item.category || "Workspace";
+      folderLabel = folderLabel.replace(/\s+Track$/, '').replace(/\s*\(\d{2}-\d{2}\)$/, '');
       let diffHtml = item.diff && item.diff !== "All" ? `<span class="diff-badge ${item.diff}">${item.diff}</span>` : "";
 
       breadcrumb.innerHTML = `

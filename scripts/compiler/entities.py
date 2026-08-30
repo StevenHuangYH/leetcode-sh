@@ -84,65 +84,95 @@ def read_file(path: Path) -> str:
     except Exception as e:
         return f"Error reading file: {e}"
 
-def format_problem_title(stem: str, md_content: str = ""):
-    """
-    Extracts and normalizes (lc_num, en_title, cn_title, full_title) from a filename stem and markdown content.
-    Handles standard problems, curriculum prefixed problems, and non-LC tutorials.
-    """
-    # 1. Match LeetCode 4-digit problem number in stem
-    m_lc = re.search(r'(?:^|\D)(?:lc-)?(\d{4})(?:-|$)', stem)
-    if m_lc:
-        num_int = int(m_lc.group(1))
-        lc_num = f"LC {num_int}"
-        raw_slug = re.sub(r'^(?:\d{2}-)?(?:lc-)?\d{4}-?', '', stem)
-    else:
-        m_range = re.search(r'^(\d{2}-\d{2})-(.+)$', stem)
-        if m_range:
-            lc_num = m_range.group(1)
-            raw_slug = m_range.group(2)
-        else:
-            lc_num = ""
-            raw_slug = re.sub(r'^\d{2}-', '', stem)
+def read_file(path: Path) -> str:
+    """Safely reads a text file."""
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
+    except Exception as e:
+        return f"Error reading file: {e}"
 
-    # 2. Extract Chinese Title from Markdown H1 header (# LC ... | 中文标题)
-    cn_title = ""
-    if md_content:
-        cn_match = re.search(r'# .*?\|\s*([\u4e00-\u9fa5A-Za-z0-9\s\(\)·\-—]+)', md_content)
-        if cn_match:
-            cn_title = cn_match.group(1).strip()
+@dataclass
+class FormattedTitle:
+    """Structured representation of normalized problem title metadata."""
+    lc_num: str
+    en_title: str
+    cn_title: str
+    full_title: str
 
-    # 3. Clean and title-case English title with acronym/Roman numeral preservation
-    raw_slug = raw_slug.strip("-")
-    words = [w for w in raw_slug.split("-") if w]
-    cased_words = []
-    for w in words:
-        wl = w.lower()
-        if wl in ("oop", "bst", "dfs", "bfs", "dp", "lca", "lru", "lfu"):
-            cased_words.append(w.upper())
-        elif wl in ("i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii"):
-            cased_words.append(w.upper())
-        else:
-            cased_words.append(w.capitalize())
-    en_title = " ".join(cased_words)
+    def __iter__(self):
+        """Allows unpacking as a 4-tuple: lc_num, en_title, cn_title, full_title."""
+        return iter((self.lc_num, self.en_title, self.cn_title, self.full_title))
 
-    # 4. Construct canonical full title
-    if lc_num:
-        if en_title and cn_title:
-            full_title = f"{lc_num} · {en_title} ({cn_title})"
-        elif en_title:
-            full_title = f"{lc_num} · {en_title}"
-        elif cn_title:
-            full_title = f"{lc_num} · {cn_title}"
-        else:
-            full_title = lc_num
-    else:
-        if en_title and cn_title:
-            full_title = f"{en_title} ({cn_title})"
-        elif en_title:
-            full_title = en_title
-        elif cn_title:
-            full_title = cn_title
-        else:
-            full_title = stem
 
-    return lc_num, en_title, cn_title, full_title
+class ProblemTitleFormatter:
+    """Domain model responsible for normalizing problem titles across tracks."""
+
+    KNOWN_ACRONYMS = frozenset({"oop", "bst", "dfs", "bfs", "dp", "lca", "lru", "lfu"})
+    ROMAN_NUMERALS = frozenset({"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii"})
+
+    @classmethod
+    def format(cls, stem: str, md_content: str = "") -> FormattedTitle:
+        """
+        Extracts and normalizes (lc_num, en_title, cn_title, full_title) from a filename stem and markdown content.
+        Handles standard problems, curriculum prefixed problems, and non-LC tutorials.
+        """
+        # 1. Match LeetCode 4-digit problem number in stem
+        match_lc = re.search(r'(?:^|\D)(?:lc-)?(\d{4})(?:-|$)', stem)
+        if match_lc:
+            num_int = int(match_lc.group(1))
+            lc_num = f"LC {num_int}"
+            raw_slug = re.sub(r'^(?:\d{2}-)?(?:lc-)?\d{4}-?', '', stem)
+        else:
+            match_range = re.search(r'^(\d{2}-\d{2})-(.+)$', stem)
+            if match_range:
+                lc_num = match_range.group(1)
+                raw_slug = match_range.group(2)
+            else:
+                lc_num = ""
+                raw_slug = re.sub(r'^\d{2}-', '', stem)
+
+        # 2. Extract Chinese Title from Markdown H1 header (# LC ... | 中文标题)
+        cn_title = ""
+        if md_content:
+            match_cn = re.search(r'# .*?\|\s*([\u4e00-\u9fa5A-Za-z0-9\s\(\)·\-—]+)', md_content)
+            if match_cn:
+                cn_title = match_cn.group(1).strip()
+
+        # 3. Clean and title-case English title with acronym/Roman numeral preservation
+        raw_slug = raw_slug.strip("-")
+        words = [w for w in raw_slug.split("-") if w]
+        cased_words = []
+        for word in words:
+            word_lower = word.lower()
+            if word_lower in cls.KNOWN_ACRONYMS or word_lower in cls.ROMAN_NUMERALS:
+                cased_words.append(word.upper())
+            else:
+                cased_words.append(word.capitalize())
+        en_title = " ".join(cased_words)
+
+        # 4. Construct canonical full title
+        clean_fallback = en_title or raw_slug.replace("-", " ").title() or stem
+        if lc_num:
+            if en_title and cn_title:
+                full_title = f"{lc_num} · {en_title} ({cn_title})"
+            elif en_title:
+                full_title = f"{lc_num} · {en_title}"
+            elif cn_title:
+                full_title = f"{lc_num} · {cn_title}"
+            else:
+                full_title = f"{lc_num} · {clean_fallback}" if clean_fallback else lc_num
+        else:
+            if en_title and cn_title:
+                full_title = f"{en_title} ({cn_title})"
+            elif en_title:
+                full_title = en_title
+            elif cn_title:
+                full_title = cn_title
+            else:
+                full_title = clean_fallback
+
+        return FormattedTitle(lc_num=lc_num, en_title=en_title, cn_title=cn_title, full_title=full_title)
+
+
+# Direct functional alias for backward compatibility
+format_problem_title = ProblemTitleFormatter.format
