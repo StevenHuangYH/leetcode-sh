@@ -11,7 +11,7 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ## Table of Contents
 
-> **[全景算法路线图与知识图谱 (ROADMAP.md)](ROADMAP.md)**：融合灵茶山艾府基础算法精讲 × labuladong 核心解题框架体系的 5 大阶段 12 核心专题路线图与模板库。
+> **[Algorithm Master Roadmap (ROADMAP.md)](ROADMAP.md)**: A structured full-landscape curriculum covering 5 progressive phases, 12 core algorithmic topics, and mental model pattern templates.
 
 1. [Practice Statistics & Summary](#practice-statistics--summary)
 2. [Repository Structure](#repository-structure)
@@ -399,11 +399,12 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 
 This repository features an automated, standalone single-page application (`index.html`) designed for distraction-free local study:
 
-* **Dual Split-Pane Layout**: Read detailed Markdown explanations on the left while simultaneously reviewing syntax-highlighted Python solutions on the right.
-* **View Mode Controls**: Switch instantly between `[Split View]`, `[Notes Only]`, and `[Code Only]`.
+* **Interactive Algorithm Roadmap**: Explore a full-landscape curriculum organized into 5 progressive phases and 12 core topics, featuring mental model formulas and instant problem links.
+* **Dual Split-Pane Layout**: Read detailed Markdown explanations while simultaneously reviewing syntax-highlighted Python solutions side-by-side.
+* **View Mode Controls**: Switch instantly between `[Split View]`, `[Notes Only]`, and `[Code Only]`, with dedicated single-pane tab navigation on mobile devices.
 * **Category Accordion**: Collapse / expand categories (`Top 100`, `Daily Practice`, `Luffy Curriculum`, `Topic Index`) or use `Expand All` / `Fold All`.
 * **Difficulty & Pattern Filter Pills**: Filter by `Easy`, `Medium`, `Hard`, or specific algorithmic patterns.
-* **Keyboard Shortcuts**: Press `/` to focus the search box, `Esc` to clear.
+* **Keyboard Shortcuts**: Press `/` to focus the search box, `Cmd+B` / `Ctrl+B` to toggle the sidebar, and `Esc` to clear search.
 
 ---
 
