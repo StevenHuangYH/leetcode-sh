@@ -14,6 +14,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <!-- Cytoscape.js & Dagre for Interactive Roadmap Graph -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
   <style>
     <!-- @inject: styles/base.css -->
     <!-- @inject: styles/roadmap.css -->
@@ -116,6 +120,40 @@
         <div class="hero-badge">CURRICULUM TOPOLOGY</div>
         <h1>算法刷题全景路线图</h1>
         <p>核心算法解题框架与思维模型 · 5 大递进阶段 · 12 核心专题全覆盖</p>
+        <div class="roadmap-subview-switcher">
+          <button class="roadmap-subview-btn active" id="btnSubviewGraph" onclick="switchRoadmapSubview('graph')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span>拓扑交互图谱 (Interactive Graph)</span>
+          </button>
+          <button class="roadmap-subview-btn" id="btnSubviewGrid" onclick="switchRoadmapSubview('grid')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>阶段矩阵列表 (Phase Cards)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Graph Interactive Viewport Container -->
+      <div id="roadmapGraphContainer" class="roadmap-graph-container">
+        <div class="graph-toolbar">
+          <div class="graph-legend">
+            <span class="legend-item"><span class="legend-dot dot-mastered"></span> 已掌握</span>
+            <span class="legend-item"><span class="legend-dot dot-learning"></span> 学习中</span>
+            <span class="legend-item"><span class="legend-dot dot-unvisited"></span> 未开始</span>
+          </div>
+          <div class="graph-actions">
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.fitView()" title="自适应居中">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+              <span>居中</span>
+            </button>
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.zoomIn()" title="放大">+</button>
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.zoomOut()" title="缩小">-</button>
+          </div>
+        </div>
+        <div id="cy-roadmap" class="cy-viewport"></div>
+      </div>
+
+      <!-- Phase Matrix Cards Container -->
+      <div id="roadmapGridContainer" class="roadmap-grid-container" style="display: none;">
         <div class="phase-filter-bar">
           <button class="phase-filter-btn active" onclick="filterRoadmapPhase('all', this)">全部阶段 (All)</button>
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(1, this)">Phase 1: 线性与双指针</button>
@@ -124,10 +162,10 @@
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(4, this)">Phase 4: 回溯决策树</button>
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(5, this)">Phase 5: 动态规划与进阶</button>
         </div>
-      </div>
 
-      <div class="roadmap-phases-container" id="roadmapPhasesRoot">
-        <!-- Rendered via JS -->
+        <div class="roadmap-phases-container" id="roadmapPhasesRoot">
+          <!-- Rendered via JS -->
+        </div>
       </div>
     </div>
 

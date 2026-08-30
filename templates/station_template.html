@@ -14,9 +14,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <!-- Cytoscape.js & Dagre for Interactive Roadmap Graph -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
   <style>
     :root{--bg-main:#0d1117;--bg-sidebar:#161b22;--bg-panel:#0d1117;--border-color:#30363d;--border-subtle:#21262d;--text-main:#c9d1d9;--text-bright:#f0f6fc;--text-muted:#8b949e;--accent:#58a6ff;--accent-hover:#1f6feb;--card-bg:#1c2128;--code-bg:#161b22;--diff-easy:#3fb950;--diff-medium:#d29922;--diff-hard:#f85149;--sidebar-width:320px;}*{box-sizing:border-box;margin:0;padding:0;}::-webkit-scrollbar{width:7px;height:7px;background-color:transparent;}::-webkit-scrollbar-track{background-color:transparent;}::-webkit-scrollbar-thumb{background-color:rgba(139,148,158,0.28);border-radius:6px;border:1px solid transparent;background-clip:padding-box;transition:background-color 0.2s ease;}::-webkit-scrollbar-thumb:hover{background-color:rgba(139,148,158,0.55);}*{scrollbar-width:thin;scrollbar-color:rgba(139,148,158,0.28) transparent;}html,body{height:100%;height:100dvh;}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;background-color:var(--bg-main);color:var(--text-main);display:flex;height:100dvh;overflow:hidden;}#sidebar-backdrop{display:none;position:fixed;inset:0;background-color:rgba(0,0,0,0.65);backdrop-filter:blur(3px);z-index:990;opacity:0;transition:opacity 0.25s ease;}#sidebar-backdrop.active{display:block;opacity:1;}#sidebar{width:var(--sidebar-width);min-width:220px;max-width:650px;background-color:var(--bg-sidebar);border-right:1px solid var(--border-color);display:flex;flex-direction:column;height:100%;position:relative;flex-shrink:0;z-index:20;transition:width 0.2s cubic-bezier(0.4,0,0.2,1),margin-left 0.2s cubic-bezier(0.4,0,0.2,1),transform 0.25s ease;}#sidebar.collapsed{width:0 !important;min-width:0 !important;max-width:0 !important;margin-left:0;border-right:none;overflow:hidden;pointer-events:none;}#sidebar.collapsed>*{display:none !important;}.resizer{position:absolute;top:0;right:-3px;width:6px;height:100%;cursor:col-resize;z-index:30;}.resizer:hover,.resizer.dragging{background-color:var(--accent);}.sidebar-header{padding:12px 14px;border-bottom:1px solid var(--border-color);display:flex;flex-direction:column;gap:10px;background-color:var(--bg-sidebar);}.header-brand{display:flex;align-items:center;justify-content:space-between;}.brand-title{font-size:13.5px;font-weight:700;color:var(--text-bright);display:flex;align-items:center;gap:7px;letter-spacing:0.2px;}.brand-svg{color:var(--accent);flex-shrink:0;}.progress-badge{font-size:11px;font-weight:600;background-color:rgba(56,139,253,0.15);color:var(--accent);padding:2px 7px;border-radius:12px;border:1px solid rgba(56,139,253,0.3);}.search-box-wrapper{position:relative;display:flex;align-items:center;}.search-icon{position:absolute;left:9px;color:var(--text-muted);display:flex;align-items:center;pointer-events:none;}.search-box{width:100%;background-color:var(--bg-main);border:1px solid var(--border-color);border-radius:6px;padding:6px 28px 6px 28px;color:var(--text-bright);font-size:12px;outline:none;transition:all 0.15s;}.search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,0.18);}.search-clear-btn{position:absolute;right:7px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;display:none;align-items:center;justify-content:center;padding:2px;border-radius:4px;}.search-clear-btn:hover{color:var(--text-bright);background-color:rgba(139,148,158,0.2);}.search-clear-btn.visible{display:flex;}.explorer-bar{padding:8px 14px 6px;font-size:10.5px;font-weight:700;color:var(--text-muted);letter-spacing:0.8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-subtle);}.explorer-actions{display:flex;align-items:center;gap:4px;}.icon-btn{background:transparent;border:none;color:var(--text-muted);cursor:pointer;padding:2px 4px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color 0.15s;}.icon-btn:hover{color:var(--text-bright);background-color:rgba(139,148,158,0.2);}.tree-container{flex:1;overflow-y:auto;padding:6px 0 16px;}.tree-folder{user-select:none;margin-bottom:2px;}.tree-folder-header{display:flex;align-items:center;gap:6px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-main);transition:background-color 0.15s,color 0.15s;}.tree-folder-header:hover{background-color:rgba(177,186,196,0.12);color:var(--text-bright);}.folder-arrow{width:14px;height:14px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:transform 0.15s cubic-bezier(0.4,0,0.2,1);flex-shrink:0;}.tree-folder.collapsed .folder-arrow{transform:rotate(-90deg);}.folder-icon{color:var(--accent);display:flex;align-items:center;flex-shrink:0;}.folder-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.folder-count{font-size:10.5px;color:var(--text-muted);background:rgba(139,148,158,0.15);padding:1px 5px;border-radius:8px;font-weight:500;}.tree-children{display:block;padding-left:20px;position:relative;}.tree-children::before{content:"";position:absolute;left:17px;top:0;bottom:6px;width:1px;background-color:rgba(240,246,252,0.12);}.tree-folder.collapsed .tree-children{display:none;}.nav-item{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;font-size:12px;color:var(--text-main);cursor:pointer;border-radius:4px;margin:1px 6px 1px 0;position:relative;transition:all 0.15s;}.tree-children>.nav-item::before{content:"";position:absolute;top:50%;left:-3px;width:6px;height:1px;background-color:rgba(240,246,252,0.12);}.nav-item.root-leaf{padding-left:24px;margin:1px 8px 1px 8px;position:relative;}.nav-item.root-leaf:hover{background-color:rgba(177,186,196,0.12);color:var(--text-bright);}.nav-item.active{background-color:rgba(56,139,253,0.15);color:var(--accent);font-weight:600;}.tree-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.tree-diff-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:auto;display:inline-block;}.diff-Easy{background-color:var(--diff-easy);box-shadow:0 0 5px rgba(63,185,80,0.45);}.diff-Medium{background-color:var(--diff-medium);box-shadow:0 0 5px rgba(210,153,34,0.45);}.diff-Hard{background-color:var(--diff-hard);box-shadow:0 0 5px rgba(248,81,73,0.45);}.diff-All{display:none;}#main-container{flex:1;display:flex;flex-direction:column;height:100%;height:100dvh;overflow:hidden;background-color:var(--bg-main);min-width:0;position:relative;}.top-toolbar{height:46px;min-height:46px;background-color:var(--bg-sidebar);border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:12px;z-index:10;}.toolbar-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}.toggle-sidebar-btn{background:transparent;border:1px solid var(--border-color);color:var(--text-main);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s;}.toggle-sidebar-btn:hover{background:rgba(177,186,196,0.12);color:#fff;border-color:var(--accent);}.main-mode-switcher{display:inline-flex;background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:6px;padding:2px;gap:2px;flex-shrink:0;}.mode-nav-btn{background:transparent;border:none;color:var(--text-muted);padding:4px 10px;font-size:12px;font-weight:500;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s ease;}.mode-nav-btn:hover{color:var(--text-bright);background-color:rgba(255,255,255,0.05);}.mode-nav-btn.active{background-color:#238636;color:#ffffff;font-weight:600;box-shadow:0 0 8px rgba(35,134,54,0.4);}.breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.breadcrumb-folder{color:var(--text-muted);}.breadcrumb-sep{color:var(--text-muted);opacity:0.5;font-size:11px;}.breadcrumb-file{font-weight:600;color:var(--text-bright);}.diff-badge{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;}.diff-badge.Easy{background-color:rgba(63,185,80,0.15);color:var(--diff-easy);border:1px solid rgba(63,185,80,0.3);}.diff-badge.Medium{background-color:rgba(210,153,34,0.15);color:var(--diff-medium);border:1px solid rgba(210,153,34,0.3);}.diff-badge.Hard{background-color:rgba(248,81,73,0.15);color:var(--diff-hard);border:1px solid rgba(248,81,73,0.3);}.diff-badge.All{display:none;}.toolbar-right{display:flex;align-items:center;gap:8px;}.segmented-control{display:inline-flex;background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:6px;padding:2px;gap:2px;}.seg-btn{background:transparent;border:none;color:var(--text-muted);padding:4px 9px;font-size:11.5px;font-weight:500;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s;}.seg-btn:hover{color:var(--text-bright);}.seg-btn.active{background-color:var(--bg-sidebar);color:var(--accent);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.3);}.action-btn{background:transparent;border:1px solid var(--border-color);color:var(--text-main);padding:4px 10px;font-size:11.5px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s;}.action-btn:hover{background-color:rgba(177,186,196,0.12);color:#fff;border-color:var(--text-muted);}#workspace{flex:1;display:flex;height:calc(100% - 46px);min-height:0;overflow:hidden;position:relative;}.pane{flex:1;overflow-y:auto;padding:24px 32px 60px;display:flex;flex-direction:column;min-width:0;}#left-pane{background-color:var(--bg-sidebar);border-right:1px solid var(--border-color);}#right-pane{background-color:var(--bg-main);}.workspace-resizer{width:5px;margin:0 -2.5px;cursor:col-resize;background:transparent;z-index:15;transition:background-color 0.15s;}.workspace-resizer:hover,.workspace-resizer.dragging{background-color:var(--accent);}.pane-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}.pane-title{font-size:11.5px;font-weight:700;color:var(--text-muted);letter-spacing:0.6px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}.markdown-body{color:var(--text-main);max-width:860px;margin:0 auto;line-height:1.75;font-size:clamp(14px,0.98vw,15.5px);}.markdown-body h1,.markdown-body h2,.markdown-body h3{color:#f0f6fc;margin-top:24px;margin-bottom:12px;border-bottom:1px solid var(--border-color);padding-bottom:6px;}.markdown-body p,.markdown-body ul,.markdown-body ol{margin-bottom:14px;}.markdown-body code{background-color:var(--code-bg);padding:2px 6px;border-radius:4px;font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:85%;border:1px solid rgba(240,246,252,0.1);}.markdown-body pre{background-color:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:16px;margin-bottom:18px;overflow-x:auto;}.markdown-body pre code{border:none;padding:0;background-color:transparent;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}.katex-display{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0;margin:12px 0;max-width:100%;}.katex-display::-webkit-scrollbar{height:4px;}.markdown-body table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-collapse:collapse;margin-bottom:20px;}.markdown-body th,.markdown-body td{border:1px solid var(--border-color);padding:8px 12px;text-align:left;}.markdown-body th{background-color:var(--bg-sidebar);color:#f0f6fc;}.markdown-body a{color:var(--accent);text-decoration:none;}.markdown-body a:hover{text-decoration:underline;}.markdown-body blockquote{border-left:4px solid var(--accent);padding:8px 16px;background-color:var(--card-bg);border-radius:0 6px 6px 0;margin-bottom:16px;color:#f0f6fc;}.code-viewer{flex:1;background-color:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;overflow:auto;padding:16px;}.code-viewer pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(13px,0.9vw,14.5px);line-height:1.65;}.mobile-bottom-nav{display:none;}
-    #roadmap-view{display:none;flex:1;flex-direction:column;overflow-y:auto;background:radial-gradient(circle at 50% 0%,rgba(56,139,253,0.05) 0%,transparent 50%),var(--bg-main);padding:24px 32px 60px;}#roadmap-view.active{display:flex;}#workspace.hidden-view{display:none !important;}.roadmap-hero{max-width:1140px;margin:0 auto 28px;width:100%;text-align:center;}.roadmap-hero .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent);font-size:11.5px;font-weight:700;letter-spacing:0.8px;margin-bottom:12px;text-transform:uppercase;}.roadmap-hero h1{font-size:clamp(22px,2.2vw,30px);font-weight:800;color:var(--text-bright);margin-bottom:8px;letter-spacing:-0.5px;}.roadmap-hero p{color:var(--text-muted);font-size:14px;max-width:720px;margin:0 auto 18px;line-height:1.6;}.phase-filter-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px;}.phase-filter-btn{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-main);padding:5px 13px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.15s ease;}.phase-filter-btn:hover{border-color:var(--accent);color:var(--text-bright);}.phase-filter-btn.active{background:var(--accent);color:#0d1117;border-color:var(--accent);font-weight:700;}.roadmap-phases-container{max-width:1140px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:28px;}.phase-section{background:var(--bg-sidebar);border:1px solid var(--border-color);border-radius:12px;padding:20px 22px;position:relative;transition:border-color 0.2s ease,box-shadow 0.2s ease;}.phase-section:hover{border-color:rgba(88,166,255,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.35);}.phase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);}.phase-title-group{display:flex;align-items:center;gap:10px;}.phase-badge-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(56,139,253,0.15);color:var(--accent);border:1px solid rgba(56,139,253,0.3);}.phase-title-text{font-size:16px;font-weight:700;color:var(--text-bright);}.phase-desc{font-size:12.5px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}.phase-topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;}.topic-card{background:var(--card-bg);border:1px solid var(--border-subtle);border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:10px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);}.topic-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.4);}.topic-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}.topic-card-title{font-size:14px;font-weight:700;color:var(--text-bright);line-height:1.3;}.topic-card-subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;}.topic-card-count{font-size:10.5px;background:rgba(139,148,158,0.15);color:var(--text-main);padding:2px 7px;border-radius:10px;white-space:nowrap;font-weight:600;}.topic-formula-badge{background:rgba(13,17,23,0.85);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#7ee787;line-height:1.4;display:flex;align-items:center;gap:6px;}.topic-formula-badge svg{flex-shrink:0;opacity:0.8;}.topic-pills-container{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}.topic-problem-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:11.5px;font-weight:500;background:var(--code-bg);border:1px solid var(--border-color);color:var(--text-main);text-decoration:none;cursor:pointer;transition:all 0.15s ease;}.topic-problem-pill:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.03);background:rgba(56,139,253,0.1);}.pill-diff-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    #roadmap-view{display:none;flex:1;flex-direction:column;overflow-y:auto;background:radial-gradient(circle at 50% 0%,rgba(56,139,253,0.05) 0%,transparent 50%),var(--bg-main);padding:24px 32px 60px;}#roadmap-view.active{display:flex;}#workspace.hidden-view{display:none !important;}.roadmap-hero{max-width:1140px;margin:0 auto 28px;width:100%;text-align:center;}.roadmap-hero .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent);font-size:11.5px;font-weight:700;letter-spacing:0.8px;margin-bottom:12px;text-transform:uppercase;}.roadmap-hero h1{font-size:clamp(22px,2.2vw,30px);font-weight:800;color:var(--text-bright);margin-bottom:8px;letter-spacing:-0.5px;}.roadmap-hero p{color:var(--text-muted);font-size:14px;max-width:720px;margin:0 auto 18px;line-height:1.6;}.phase-filter-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px;}.phase-filter-btn{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-main);padding:5px 13px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.15s ease;}.phase-filter-btn:hover{border-color:var(--accent);color:var(--text-bright);}.phase-filter-btn.active{background:var(--accent);color:#0d1117;border-color:var(--accent);font-weight:700;}.roadmap-phases-container{max-width:1140px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:28px;}.phase-section{background:var(--bg-sidebar);border:1px solid var(--border-color);border-radius:12px;padding:20px 22px;position:relative;transition:border-color 0.2s ease,box-shadow 0.2s ease;}.phase-section:hover{border-color:rgba(88,166,255,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.35);}.phase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);}.phase-title-group{display:flex;align-items:center;gap:10px;}.phase-badge-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(56,139,253,0.15);color:var(--accent);border:1px solid rgba(56,139,253,0.3);}.phase-title-text{font-size:16px;font-weight:700;color:var(--text-bright);}.phase-desc{font-size:12.5px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}.phase-topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;}.topic-card{background:var(--card-bg);border:1px solid var(--border-subtle);border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:10px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);}.topic-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.4);}.topic-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}.topic-card-title{font-size:14px;font-weight:700;color:var(--text-bright);line-height:1.3;}.topic-card-subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;}.topic-card-count{font-size:10.5px;background:rgba(139,148,158,0.15);color:var(--text-main);padding:2px 7px;border-radius:10px;white-space:nowrap;font-weight:600;}.topic-formula-badge{background:rgba(13,17,23,0.85);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#7ee787;line-height:1.4;display:flex;align-items:center;gap:6px;}.topic-formula-badge svg{flex-shrink:0;opacity:0.8;}.topic-pills-container{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}.topic-problem-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:11.5px;font-weight:500;background:var(--code-bg);border:1px solid var(--border-color);color:var(--text-main);text-decoration:none;cursor:pointer;transition:all 0.15s ease;}.topic-problem-pill:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.03);background:rgba(56,139,253,0.1);}.pill-diff-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}.roadmap-subview-switcher{display:inline-flex;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:3px;gap:4px;margin-top:16px;}.roadmap-subview-btn{background:transparent;border:none;color:var(--text-muted);padding:6px 14px;font-size:12.5px;font-weight:600;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all 0.15s ease;}.roadmap-subview-btn:hover{color:var(--text-bright);background-color:rgba(255,255,255,0.05);}.roadmap-subview-btn.active{background-color:#238636;color:#ffffff;font-weight:700;box-shadow:0 0 10px rgba(35,134,54,0.4);}.roadmap-graph-container{max-width:1280px;margin:0 auto;width:100%;height:calc(100vh - 270px);min-height:560px;background-color:#0d1117;border:1px solid var(--border-color);border-radius:12px;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 28px rgba(0,0,0,0.5);}.graph-toolbar{position:absolute;top:14px;left:16px;right:16px;z-index:10;display:flex;justify-content:space-between;align-items:center;pointer-events:none;}.graph-legend{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:6px 12px;background:rgba(22,27,34,0.88);backdrop-filter:blur(8px);border:1px solid var(--border-color);border-radius:8px;font-size:11.5px;color:var(--text-muted);}.legend-item{display:flex;align-items:center;gap:5px;}.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}.dot-mastered{background-color:#34d399;box-shadow:0 0 6px rgba(52,211,153,0.6);}.dot-learning{background-color:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,0.6);}.dot-unvisited{background-color:#64748b;}.graph-actions{pointer-events:auto;display:flex;gap:6px;}.graph-btn{background:rgba(22,27,34,0.88);backdrop-filter:blur(8px);border:1px solid var(--border-color);color:var(--text-main);padding:6px 11px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s ease;}.graph-btn:hover{background:#21262d;border-color:#2dd4bf;color:#2dd4bf;}.cy-viewport{width:100%;height:100%;flex:1;}
     @media (max-width:768px){#sidebar{position:fixed;left:0;top:0;bottom:0;width:min(85vw,340px) !important;min-width:unset !important;max-width:unset !important;z-index:1000;transform:translateX(-100%);transition:transform 0.25s ease;box-shadow:none;}#sidebar.mobile-open{transform:translateX(0);box-shadow:4px 0 30px rgba(0,0,0,0.7);}#sidebar.collapsed{transform:translateX(-100%);width:min(85vw,340px) !important;}.resizer,.workspace-resizer{display:none !important;}.nav-item{min-height:38px;padding:8px 12px 8px 28px;font-size:13.5px;}.tree-folder-header{min-height:40px;padding:8px 12px;font-size:13px;}.folder-arrow{width:18px;height:18px;}.top-toolbar{padding:0 10px;gap:8px;}.mode-nav-btn span{display:none;}.mode-nav-btn{padding:5px 8px;}.breadcrumb{font-size:11.5px;max-width:130px;}.breadcrumb-folder,.breadcrumb-sep{display:none;}.segmented-control{display:none !important;}#copyBtnLabel{display:none;}.action-btn{padding:5px 8px;}#roadmap-view{padding:16px 14px 40px;}.roadmap-hero{margin-bottom:20px;}.roadmap-hero h1{font-size:20px;}.roadmap-hero p{font-size:12.5px;margin-bottom:12px;}.phase-filter-bar{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 2px 8px;margin:8px -14px 0;padding-left:14px;padding-right:14px;}.phase-filter-bar::-webkit-scrollbar{display:none;}.phase-filter-btn{flex-shrink:0;white-space:nowrap;font-size:11.5px;padding:4px 11px;}.phase-section{padding:16px 14px;}.phase-header{flex-direction:column;align-items:flex-start;gap:6px;}.phase-topics-grid{grid-template-columns:1fr !important;gap:12px;}.topic-card{padding:12px;}#workspace{flex-direction:column;height:calc(100% - 46px - 48px - env(safe-area-inset-bottom,0px));}.pane{padding:16px 16px 30px;}#left-pane{border-right:none;border-bottom:none;}#right-pane{padding:16px 16px 30px;}.markdown-body{font-size:14px;}.mobile-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(48px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background-color:rgba(22,27,34,0.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--border-color);z-index:50;align-items:center;justify-content:space-around;padding-left:12px;padding-right:12px;gap:8px;}.mobile-bottom-nav.hidden{display:none !important;}.mobile-tab-btn{flex:1;height:34px;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text-muted);font-size:12.5px;font-weight:500;border-radius:6px;cursor:pointer;transition:all 0.15s ease;}.mobile-tab-btn.active{color:var(--accent);background-color:rgba(88,166,255,0.14);font-weight:600;}}
   </style>
 </head>
@@ -116,6 +120,40 @@
         <div class="hero-badge">CURRICULUM TOPOLOGY</div>
         <h1>算法刷题全景路线图</h1>
         <p>核心算法解题框架与思维模型 · 5 大递进阶段 · 12 核心专题全覆盖</p>
+        <div class="roadmap-subview-switcher">
+          <button class="roadmap-subview-btn active" id="btnSubviewGraph" onclick="switchRoadmapSubview('graph')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span>拓扑交互图谱 (Interactive Graph)</span>
+          </button>
+          <button class="roadmap-subview-btn" id="btnSubviewGrid" onclick="switchRoadmapSubview('grid')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>阶段矩阵列表 (Phase Cards)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Graph Interactive Viewport Container -->
+      <div id="roadmapGraphContainer" class="roadmap-graph-container">
+        <div class="graph-toolbar">
+          <div class="graph-legend">
+            <span class="legend-item"><span class="legend-dot dot-mastered"></span> 已掌握</span>
+            <span class="legend-item"><span class="legend-dot dot-learning"></span> 学习中</span>
+            <span class="legend-item"><span class="legend-dot dot-unvisited"></span> 未开始</span>
+          </div>
+          <div class="graph-actions">
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.fitView()" title="自适应居中">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+              <span>居中</span>
+            </button>
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.zoomIn()" title="放大">+</button>
+            <button class="graph-btn" onclick="roadmapGraphInstance && roadmapGraphInstance.zoomOut()" title="缩小">-</button>
+          </div>
+        </div>
+        <div id="cy-roadmap" class="cy-viewport"></div>
+      </div>
+
+      <!-- Phase Matrix Cards Container -->
+      <div id="roadmapGridContainer" class="roadmap-grid-container" style="display: none;">
         <div class="phase-filter-bar">
           <button class="phase-filter-btn active" onclick="filterRoadmapPhase('all', this)">全部阶段 (All)</button>
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(1, this)">Phase 1: 线性与双指针</button>
@@ -124,10 +162,10 @@
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(4, this)">Phase 4: 回溯决策树</button>
           <button class="phase-filter-btn" onclick="filterRoadmapPhase(5, this)">Phase 5: 动态规划与进阶</button>
         </div>
-      </div>
 
-      <div class="roadmap-phases-container" id="roadmapPhasesRoot">
-        <!-- Rendered via JS -->
+        <div class="roadmap-phases-container" id="roadmapPhasesRoot">
+          <!-- Rendered via JS -->
+        </div>
       </div>
     </div>
 
@@ -171,6 +209,8 @@
     const items = {items_json};
     const roadmapData = {roadmap_json};
     let mainMode = localStorage.getItem("mainMode") || "roadmap";
+    let currentRoadmapSubview = localStorage.getItem("roadmapSubview") || "graph";
+    let roadmapGraphInstance = null;
     let currentKey = "README.md";
     let viewMode = "dual"; // 'dual', 'notes', 'code'
     let mobileTab = "notes"; // 'notes', 'code'
@@ -329,6 +369,7 @@
         if (history.replaceState) {
           history.replaceState(null, null, "#roadmap");
         }
+        switchRoadmapSubview(currentRoadmapSubview);
       } else {
         if (btnRoadmap) btnRoadmap.classList.remove("active");
         if (btnWorkspace) btnWorkspace.classList.add("active");
@@ -346,6 +387,253 @@
           switchItem(currentKey, false);
         }
       }
+    }
+    const ROADMAP_GRAPH_DATA = {
+      nodes: [
+        { data: { id: "root", topic_id: "ROADMAP.md", label: "数据结构与算法\nDSA Master", category: "Root", status: "mastered" } },
+        { data: { id: "array_root", topic_id: "topic-01-arrays-sliding-window", label: "数组 (Array)", category: "Linear", status: "mastered" } },
+        { data: { id: "linked_list_root", topic_id: "topic-05-linked-lists", label: "链表 (Linked List)", category: "Linear", status: "mastered" } },
+        { data: { id: "arr_ops", topic_id: "topic-01-arrays-sliding-window", label: "数组操作", category: "Array", status: "mastered" } },
+        { data: { id: "prefix_sum", topic_id: "topic-03-prefix-sum", label: "前缀和 (Prefix Sum)", category: "Array", status: "mastered" } },
+        { data: { id: "diff_array", topic_id: "topic-03-prefix-sum", label: "差分数组 (Diff Array)", category: "Array", status: "learning" } },
+        { data: { id: "matrix_2d", topic_id: "topic-04-intervals", label: "二维数组 (2D Matrix)", category: "Array", status: "learning" } },
+        { data: { id: "arr_two_pointers", topic_id: "topic-01-arrays-sliding-window", label: "数组双指针", category: "Two Pointers", status: "mastered" } },
+        { data: { id: "sliding_window", topic_id: "topic-01-arrays-sliding-window", label: "滑动窗口 (Sliding Window)", category: "Two Pointers", status: "mastered" } },
+        { data: { id: "binary_search", topic_id: "topic-02-binary-search", label: "二分搜索 (Binary Search)", category: "Searching", status: "mastered" } },
+        { data: { id: "random_algo", topic_id: "topic-02-binary-search", label: "随机算法 (Randomized)", category: "Searching", status: "unvisited" } },
+        { data: { id: "basic_ds", topic_id: "topic-06-stacks-queues", label: "基础数据结构\n(循环数组/栈/队列/哈希/设计)", category: "Data Structures", status: "mastered" } },
+        { data: { id: "adv_ds", topic_id: "topic-07-trees-bst", label: "高级数据结构\n(BST/堆/字典树/图论)", category: "Data Structures", status: "learning" } },
+        { data: { id: "ll_two_pointers", topic_id: "topic-05-linked-lists", label: "链表双指针", category: "Linked List", status: "mastered" } },
+        { data: { id: "recursion_tree", topic_id: "topic-07-trees-bst", label: "递归本原 (Recursion)", category: "Recursive", status: "mastered" } },
+        { data: { id: "binary_tree_root", topic_id: "topic-07-trees-bst", label: "二叉树 (Binary Tree)", category: "Tree", status: "mastered" } },
+        { data: { id: "level_order", topic_id: "topic-07-trees-bst", label: "层序遍历", category: "BFS", status: "mastered" } },
+        { data: { id: "bfs_search", topic_id: "topic-09-graphs", label: "广度优先搜索 (BFS)", category: "BFS", status: "mastered" } },
+        { data: { id: "shortest_path", topic_id: "topic-09-graphs", label: "最短路径 (Shortest Path)", category: "BFS", status: "learning" } },
+        { data: { id: "recursive_traversal", topic_id: "topic-07-trees-bst", label: "递归遍历 (Traversal)", category: "Tree Paradigms", status: "mastered" } },
+        { data: { id: "backtracking", topic_id: "topic-08-backtracking", label: "回溯算法 (Backtracking)", category: "Exhaustive", status: "mastered" } },
+        { data: { id: "dfs_search", topic_id: "topic-09-graphs", label: "深度优先搜索 (DFS)", category: "Exhaustive", status: "mastered" } },
+        { data: { id: "divide_and_conquer", topic_id: "topic-07-trees-bst", label: "分治算法 (Divide & Conquer)", category: "Subproblems", status: "mastered" } },
+        { data: { id: "dynamic_programming", topic_id: "topic-10-dp-math", label: "动态规划 (DP)", category: "Optimization", status: "learning" } },
+        { data: { id: "math_algo", topic_id: "topic-10-dp-math", label: "数学思维 (Math)", category: "Discrete Math", status: "mastered" } },
+        { data: { id: "greedy_algo", topic_id: "topic-10-dp-math", label: "贪心算法 (Greedy)", category: "Optimization", status: "learning" } }
+      ],
+      edges: [
+        { data: { id: "e-root-arr", source: "root", target: "array_root" } },
+        { data: { id: "e-root-ll", source: "root", target: "linked_list_root" } },
+        { data: { id: "e-arr-ops", source: "array_root", target: "arr_ops" } },
+        { data: { id: "e-ops-prefix", source: "arr_ops", target: "prefix_sum" } },
+        { data: { id: "e-prefix-diff", source: "prefix_sum", target: "diff_array" } },
+        { data: { id: "e-diff-2d", source: "diff_array", target: "matrix_2d" } },
+        { data: { id: "e-arr-tp", source: "array_root", target: "arr_two_pointers" } },
+        { data: { id: "e-tp-sw", source: "arr_two_pointers", target: "sliding_window" } },
+        { data: { id: "e-sw-bs", source: "sliding_window", target: "binary_search" } },
+        { data: { id: "e-bs-rand", source: "binary_search", target: "random_algo" } },
+        { data: { id: "e-arr-bds", source: "array_root", target: "basic_ds" } },
+        { data: { id: "e-bds-ads", source: "basic_ds", target: "adv_ds" } },
+        { data: { id: "e-ll-tp", source: "linked_list_root", target: "ll_two_pointers" } },
+        { data: { id: "e-tp-rec", source: "ll_two_pointers", target: "recursion_tree" } },
+        { data: { id: "e-rec-bt", source: "recursion_tree", target: "binary_tree_root" } },
+        { data: { id: "e-bt-lo", source: "binary_tree_root", target: "level_order" } },
+        { data: { id: "e-lo-bfs", source: "level_order", target: "bfs_search" } },
+        { data: { id: "e-bfs-sp", source: "bfs_search", target: "shortest_path" } },
+        { data: { id: "e-bt-rec", source: "binary_tree_root", target: "recursive_traversal" } },
+        { data: { id: "e-rec-btk", source: "recursive_traversal", target: "backtracking" } },
+        { data: { id: "e-btk-dfs", source: "backtracking", target: "dfs_search" } },
+        { data: { id: "e-rec-dc", source: "recursive_traversal", target: "divide_and_conquer" } },
+        { data: { id: "e-dc-dp", source: "divide_and_conquer", target: "dynamic_programming" } },
+        { data: { id: "e-rec-math", source: "recursive_traversal", target: "math_algo" } },
+        { data: { id: "e-math-greedy", source: "math_algo", target: "greedy_algo" } }
+      ]
+    };
+    function switchRoadmapSubview(subview) {
+      currentRoadmapSubview = subview;
+      localStorage.setItem("roadmapSubview", subview);
+      const btnGraph = document.getElementById("btnSubviewGraph");
+      const btnGrid = document.getElementById("btnSubviewGrid");
+      const graphContainer = document.getElementById("roadmapGraphContainer");
+      const gridContainer = document.getElementById("roadmapGridContainer");
+      if (subview === "graph") {
+        if (btnGraph) btnGraph.classList.add("active");
+        if (btnGrid) btnGrid.classList.remove("active");
+        if (graphContainer) graphContainer.style.display = "flex";
+        if (gridContainer) gridContainer.style.display = "none";
+        setTimeout(() => {
+          if (!roadmapGraphInstance) {
+            initRoadmapGraph();
+          } else if (roadmapGraphInstance.cy) {
+            roadmapGraphInstance.cy.resize();
+            roadmapGraphInstance.cy.fit(undefined, 30);
+          }
+        }, 50);
+      } else {
+        if (btnGraph) btnGraph.classList.remove("active");
+        if (btnGrid) btnGrid.classList.add("active");
+        if (graphContainer) graphContainer.style.display = "none";
+        if (gridContainer) gridContainer.style.display = "block";
+      }
+    }
+    function loadNoteByTopicId(topicId) {
+      if (!topicId) return;
+      if (items[topicId]) {
+        setMainMode("workspace");
+        switchItem(topicId);
+        return;
+      }
+      const match = Object.keys(items).find(k => k === topicId || k.startsWith(topicId) || k.includes(topicId));
+      if (match) {
+        setMainMode("workspace");
+        switchItem(match);
+      } else {
+        setMainMode("workspace");
+        switchItem("ROADMAP.md");
+      }
+    }
+    function initRoadmapGraph() {
+      const container = document.getElementById("cy-roadmap");
+      if (!container || typeof cytoscape === "undefined") return;
+      if (typeof cytoscapeDagre !== "undefined") {
+        cytoscape.use(cytoscapeDagre);
+      }
+      const cy = cytoscape({
+        container: container,
+        elements: [...ROADMAP_GRAPH_DATA.nodes, ...ROADMAP_GRAPH_DATA.edges],
+        boxSelectionEnabled: false,
+        autounselectify: false,
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'shape': 'round-rectangle',
+              'background-color': '#161b22',
+              'border-width': 1.5,
+              'border-color': '#30363d',
+              'color': '#f0f6fc',
+              'label': 'data(label)',
+              'text-valign': 'center',
+              'text-halign': 'center',
+              'text-wrap': 'wrap',
+              'text-max-width': '140px',
+              'font-size': '11px',
+              'font-family': 'Consolas, -apple-system, sans-serif',
+              'line-height': 1.35,
+              'padding': '10px',
+              'width': 'label',
+              'height': 'label',
+              'transition-property': 'background-color, border-color, opacity, border-width, shadow-blur',
+              'transition-duration': '0.2s'
+            }
+          },
+          {
+            selector: 'node[status = "mastered"]',
+            style: { 'border-color': '#238636', 'border-width': 2 }
+          },
+          {
+            selector: 'node[status = "learning"]',
+            style: { 'border-color': '#d29922', 'border-width': 2 }
+          },
+          {
+            selector: 'node[status = "unvisited"]',
+            style: { 'border-color': '#30363d' }
+          },
+          {
+            selector: 'node#root',
+            style: {
+              'background-color': '#21262d',
+              'border-color': '#2dd4bf',
+              'border-width': 2.5,
+              'font-weight': 'bold',
+              'font-size': '12px'
+            }
+          },
+          {
+            selector: 'node:hover, node:selected',
+            style: {
+              'border-color': '#2dd4bf',
+              'border-width': 2.5,
+              'shadow-blur': 12,
+              'shadow-color': 'rgba(45, 212, 191, 0.4)',
+              'shadow-opacity': 0.8
+            }
+          },
+          {
+            selector: 'edge',
+            style: {
+              'width': 2,
+              'line-color': '#30363d',
+              'target-arrow-color': '#2dd4bf',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
+              'arrow-scale': 1.1,
+              'transition-property': 'line-color, opacity',
+              'transition-duration': '0.2s'
+            }
+          },
+          {
+            selector: '.highlighted',
+            style: {
+              'border-color': '#2dd4bf',
+              'border-width': 3,
+              'shadow-blur': 18,
+              'shadow-color': 'rgba(45, 212, 191, 0.7)',
+              'shadow-opacity': 1,
+              'opacity': 1
+            }
+          },
+          {
+            selector: '.dimmed',
+            style: {
+              'opacity': 0.2
+            }
+          }
+        ],
+        layout: {
+          name: 'dagre',
+          rankDir: 'TB',
+          nodeSep: 35,
+          rankSep: 55,
+          padding: 30
+        }
+      });
+      cy.on('tap', 'node', (evt) => {
+        const node = evt.target;
+        const topicId = node.data('topic_id');
+        loadNoteByTopicId(topicId);
+      });
+      roadmapGraphInstance = {
+        cy: cy,
+        fitView: () => cy.animate({ fit: { eles: cy.elements(), padding: 30 }, duration: 400 }),
+        zoomIn: () => cy.zoom({ level: cy.zoom() * 1.25, renderedPosition: { x: container.clientWidth / 2, y: container.clientHeight / 2 } }),
+        zoomOut: () => cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: container.clientWidth / 2, y: container.clientHeight / 2 } }),
+        highlightNodes: (query) => {
+          const q = (query || "").trim().toLowerCase();
+          cy.batch(() => {
+            if (!q) {
+              cy.elements().removeClass('dimmed highlighted');
+              return;
+            }
+            let firstMatch = null;
+            cy.nodes().forEach(n => {
+              const label = (n.data('label') || "").toLowerCase();
+              const cat = (n.data('category') || "").toLowerCase();
+              const tid = (n.data('topic_id') || "").toLowerCase();
+              if (label.includes(q) || cat.includes(q) || tid.includes(q)) {
+                n.removeClass('dimmed').addClass('highlighted');
+                if (!firstMatch) firstMatch = n;
+              } else {
+                n.removeClass('highlighted').addClass('dimmed');
+              }
+            });
+            cy.edges().addClass('dimmed');
+            if (firstMatch) {
+              cy.animate({
+                center: { eles: firstMatch },
+                zoom: 1.15,
+                duration: 500
+              });
+            }
+          });
+        }
+      };
     }
     function renderRoadmap(selectedPhase = 'all') {
       const root = document.getElementById("roadmapPhasesRoot");
@@ -541,6 +829,9 @@
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
         renderTree(query);
+        if (roadmapGraphInstance) {
+          roadmapGraphInstance.highlightNodes(query);
+        }
       }, 75);
     }
     function clearSearch() {
@@ -549,6 +840,9 @@
       document.getElementById("searchClear").classList.remove("visible");
       clearTimeout(searchDebounceTimer);
       renderTree("");
+      if (roadmapGraphInstance) {
+        roadmapGraphInstance.highlightNodes("");
+      }
       input.focus();
     }
     function renderProtectedMarkdown(markdownText) {

@@ -2,6 +2,8 @@ const items = {items_json};
     const roadmapData = {roadmap_json};
 
     let mainMode = localStorage.getItem("mainMode") || "roadmap";
+    let currentRoadmapSubview = localStorage.getItem("roadmapSubview") || "graph";
+    let roadmapGraphInstance = null;
     let currentKey = "README.md";
     let viewMode = "dual"; // 'dual', 'notes', 'code'
     let mobileTab = "notes"; // 'notes', 'code'
@@ -176,6 +178,7 @@ const items = {items_json};
         if (history.replaceState) {
           history.replaceState(null, null, "#roadmap");
         }
+        switchRoadmapSubview(currentRoadmapSubview);
       } else {
         if (btnRoadmap) btnRoadmap.classList.remove("active");
         if (btnWorkspace) btnWorkspace.classList.add("active");
@@ -193,6 +196,281 @@ const items = {items_json};
           switchItem(currentKey, false);
         }
       }
+    }
+
+    const ROADMAP_GRAPH_DATA = {
+      nodes: [
+        { data: { id: "root", topic_id: "ROADMAP.md", label: "数据结构与算法\nDSA Master", category: "Root", status: "mastered" } },
+        { data: { id: "array_root", topic_id: "topic-01-arrays-sliding-window", label: "数组 (Array)", category: "Linear", status: "mastered" } },
+        { data: { id: "linked_list_root", topic_id: "topic-05-linked-lists", label: "链表 (Linked List)", category: "Linear", status: "mastered" } },
+
+        // 数组分支 1: 数组操作流水线
+        { data: { id: "arr_ops", topic_id: "topic-01-arrays-sliding-window", label: "数组操作", category: "Array", status: "mastered" } },
+        { data: { id: "prefix_sum", topic_id: "topic-03-prefix-sum", label: "前缀和 (Prefix Sum)", category: "Array", status: "mastered" } },
+        { data: { id: "diff_array", topic_id: "topic-03-prefix-sum", label: "差分数组 (Diff Array)", category: "Array", status: "learning" } },
+        { data: { id: "matrix_2d", topic_id: "topic-04-intervals", label: "二维数组 (2D Matrix)", category: "Array", status: "learning" } },
+
+        // 数组分支 2: 双指针流水线
+        { data: { id: "arr_two_pointers", topic_id: "topic-01-arrays-sliding-window", label: "数组双指针", category: "Two Pointers", status: "mastered" } },
+        { data: { id: "sliding_window", topic_id: "topic-01-arrays-sliding-window", label: "滑动窗口 (Sliding Window)", category: "Two Pointers", status: "mastered" } },
+        { data: { id: "binary_search", topic_id: "topic-02-binary-search", label: "二分搜索 (Binary Search)", category: "Searching", status: "mastered" } },
+        { data: { id: "random_algo", topic_id: "topic-02-binary-search", label: "随机算法 (Randomized)", category: "Searching", status: "unvisited" } },
+
+        // 数组分支 3: 数据结构流水线
+        { data: { id: "basic_ds", topic_id: "topic-06-stacks-queues", label: "基础数据结构\n(循环数组/栈/队列/哈希/设计)", category: "Data Structures", status: "mastered" } },
+        { data: { id: "adv_ds", topic_id: "topic-07-trees-bst", label: "高级数据结构\n(BST/堆/字典树/图论)", category: "Data Structures", status: "learning" } },
+
+        // 链表与树分支 1: 穿针引线到二叉树
+        { data: { id: "ll_two_pointers", topic_id: "topic-05-linked-lists", label: "链表双指针", category: "Linked List", status: "mastered" } },
+        { data: { id: "recursion_tree", topic_id: "topic-07-trees-bst", label: "递归本原 (Recursion)", category: "Recursive", status: "mastered" } },
+        { data: { id: "binary_tree_root", topic_id: "topic-07-trees-bst", label: "二叉树 (Binary Tree)", category: "Tree", status: "mastered" } },
+
+        // 二叉树 -> 层序遍历 & BFS 路线
+        { data: { id: "level_order", topic_id: "topic-07-trees-bst", label: "层序遍历", category: "BFS", status: "mastered" } },
+        { data: { id: "bfs_search", topic_id: "topic-09-graphs", label: "广度优先搜索 (BFS)", category: "BFS", status: "mastered" } },
+        { data: { id: "shortest_path", topic_id: "topic-09-graphs", label: "最短路径 (Shortest Path)", category: "BFS", status: "learning" } },
+
+        // 二叉树 -> 递归遍历分流
+        { data: { id: "recursive_traversal", topic_id: "topic-07-trees-bst", label: "递归遍历 (Traversal)", category: "Tree Paradigms", status: "mastered" } },
+
+        // 遍历视角：回溯 -> DFS
+        { data: { id: "backtracking", topic_id: "topic-08-backtracking", label: "回溯算法 (Backtracking)", category: "Exhaustive", status: "mastered" } },
+        { data: { id: "dfs_search", topic_id: "topic-09-graphs", label: "深度优先搜索 (DFS)", category: "Exhaustive", status: "mastered" } },
+
+        // 子问题视角：分治 -> DP
+        { data: { id: "divide_and_conquer", topic_id: "topic-07-trees-bst", label: "分治算法 (Divide & Conquer)", category: "Subproblems", status: "mastered" } },
+        { data: { id: "dynamic_programming", topic_id: "topic-10-dp-math", label: "动态规划 (DP)", category: "Optimization", status: "learning" } },
+
+        // 其他算法：数学 -> 贪心
+        { data: { id: "math_algo", topic_id: "topic-10-dp-math", label: "数学思维 (Math)", category: "Discrete Math", status: "mastered" } },
+        { data: { id: "greedy_algo", topic_id: "topic-10-dp-math", label: "贪心算法 (Greedy)", category: "Optimization", status: "learning" } }
+      ],
+      edges: [
+        { data: { id: "e-root-arr", source: "root", target: "array_root" } },
+        { data: { id: "e-root-ll", source: "root", target: "linked_list_root" } },
+        { data: { id: "e-arr-ops", source: "array_root", target: "arr_ops" } },
+        { data: { id: "e-ops-prefix", source: "arr_ops", target: "prefix_sum" } },
+        { data: { id: "e-prefix-diff", source: "prefix_sum", target: "diff_array" } },
+        { data: { id: "e-diff-2d", source: "diff_array", target: "matrix_2d" } },
+        { data: { id: "e-arr-tp", source: "array_root", target: "arr_two_pointers" } },
+        { data: { id: "e-tp-sw", source: "arr_two_pointers", target: "sliding_window" } },
+        { data: { id: "e-sw-bs", source: "sliding_window", target: "binary_search" } },
+        { data: { id: "e-bs-rand", source: "binary_search", target: "random_algo" } },
+        { data: { id: "e-arr-bds", source: "array_root", target: "basic_ds" } },
+        { data: { id: "e-bds-ads", source: "basic_ds", target: "adv_ds" } },
+        { data: { id: "e-ll-tp", source: "linked_list_root", target: "ll_two_pointers" } },
+        { data: { id: "e-tp-rec", source: "ll_two_pointers", target: "recursion_tree" } },
+        { data: { id: "e-rec-bt", source: "recursion_tree", target: "binary_tree_root" } },
+        { data: { id: "e-bt-lo", source: "binary_tree_root", target: "level_order" } },
+        { data: { id: "e-lo-bfs", source: "level_order", target: "bfs_search" } },
+        { data: { id: "e-bfs-sp", source: "bfs_search", target: "shortest_path" } },
+        { data: { id: "e-bt-rec", source: "binary_tree_root", target: "recursive_traversal" } },
+        { data: { id: "e-rec-btk", source: "recursive_traversal", target: "backtracking" } },
+        { data: { id: "e-btk-dfs", source: "backtracking", target: "dfs_search" } },
+        { data: { id: "e-rec-dc", source: "recursive_traversal", target: "divide_and_conquer" } },
+        { data: { id: "e-dc-dp", source: "divide_and_conquer", target: "dynamic_programming" } },
+        { data: { id: "e-rec-math", source: "recursive_traversal", target: "math_algo" } },
+        { data: { id: "e-math-greedy", source: "math_algo", target: "greedy_algo" } }
+      ]
+    };
+
+    function switchRoadmapSubview(subview) {
+      currentRoadmapSubview = subview;
+      localStorage.setItem("roadmapSubview", subview);
+
+      const btnGraph = document.getElementById("btnSubviewGraph");
+      const btnGrid = document.getElementById("btnSubviewGrid");
+      const graphContainer = document.getElementById("roadmapGraphContainer");
+      const gridContainer = document.getElementById("roadmapGridContainer");
+
+      if (subview === "graph") {
+        if (btnGraph) btnGraph.classList.add("active");
+        if (btnGrid) btnGrid.classList.remove("active");
+        if (graphContainer) graphContainer.style.display = "flex";
+        if (gridContainer) gridContainer.style.display = "none";
+        setTimeout(() => {
+          if (!roadmapGraphInstance) {
+            initRoadmapGraph();
+          } else if (roadmapGraphInstance.cy) {
+            roadmapGraphInstance.cy.resize();
+            roadmapGraphInstance.cy.fit(undefined, 30);
+          }
+        }, 50);
+      } else {
+        if (btnGraph) btnGraph.classList.remove("active");
+        if (btnGrid) btnGrid.classList.add("active");
+        if (graphContainer) graphContainer.style.display = "none";
+        if (gridContainer) gridContainer.style.display = "block";
+      }
+    }
+
+    function loadNoteByTopicId(topicId) {
+      if (!topicId) return;
+      if (items[topicId]) {
+        setMainMode("workspace");
+        switchItem(topicId);
+        return;
+      }
+      const match = Object.keys(items).find(k => k === topicId || k.startsWith(topicId) || k.includes(topicId));
+      if (match) {
+        setMainMode("workspace");
+        switchItem(match);
+      } else {
+        setMainMode("workspace");
+        switchItem("ROADMAP.md");
+      }
+    }
+
+    function initRoadmapGraph() {
+      const container = document.getElementById("cy-roadmap");
+      if (!container || typeof cytoscape === "undefined") return;
+
+      if (typeof cytoscapeDagre !== "undefined") {
+        cytoscape.use(cytoscapeDagre);
+      }
+
+      const cy = cytoscape({
+        container: container,
+        elements: [...ROADMAP_GRAPH_DATA.nodes, ...ROADMAP_GRAPH_DATA.edges],
+        boxSelectionEnabled: false,
+        autounselectify: false,
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'shape': 'round-rectangle',
+              'background-color': '#161b22',
+              'border-width': 1.5,
+              'border-color': '#30363d',
+              'color': '#f0f6fc',
+              'label': 'data(label)',
+              'text-valign': 'center',
+              'text-halign': 'center',
+              'text-wrap': 'wrap',
+              'text-max-width': '140px',
+              'font-size': '11px',
+              'font-family': 'Consolas, -apple-system, sans-serif',
+              'line-height': 1.35,
+              'padding': '10px',
+              'width': 'label',
+              'height': 'label',
+              'transition-property': 'background-color, border-color, opacity, border-width, shadow-blur',
+              'transition-duration': '0.2s'
+            }
+          },
+          {
+            selector: 'node[status = "mastered"]',
+            style: { 'border-color': '#238636', 'border-width': 2 }
+          },
+          {
+            selector: 'node[status = "learning"]',
+            style: { 'border-color': '#d29922', 'border-width': 2 }
+          },
+          {
+            selector: 'node[status = "unvisited"]',
+            style: { 'border-color': '#30363d' }
+          },
+          {
+            selector: 'node#root',
+            style: {
+              'background-color': '#21262d',
+              'border-color': '#2dd4bf',
+              'border-width': 2.5,
+              'font-weight': 'bold',
+              'font-size': '12px'
+            }
+          },
+          {
+            selector: 'node:hover, node:selected',
+            style: {
+              'border-color': '#2dd4bf',
+              'border-width': 2.5,
+              'shadow-blur': 12,
+              'shadow-color': 'rgba(45, 212, 191, 0.4)',
+              'shadow-opacity': 0.8
+            }
+          },
+          {
+            selector: 'edge',
+            style: {
+              'width': 2,
+              'line-color': '#30363d',
+              'target-arrow-color': '#2dd4bf',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
+              'arrow-scale': 1.1,
+              'transition-property': 'line-color, opacity',
+              'transition-duration': '0.2s'
+            }
+          },
+          {
+            selector: '.highlighted',
+            style: {
+              'border-color': '#2dd4bf',
+              'border-width': 3,
+              'shadow-blur': 18,
+              'shadow-color': 'rgba(45, 212, 191, 0.7)',
+              'shadow-opacity': 1,
+              'opacity': 1
+            }
+          },
+          {
+            selector: '.dimmed',
+            style: {
+              'opacity': 0.2
+            }
+          }
+        ],
+        layout: {
+          name: 'dagre',
+          rankDir: 'TB',
+          nodeSep: 35,
+          rankSep: 55,
+          padding: 30
+        }
+      });
+
+      cy.on('tap', 'node', (evt) => {
+        const node = evt.target;
+        const topicId = node.data('topic_id');
+        loadNoteByTopicId(topicId);
+      });
+
+      roadmapGraphInstance = {
+        cy: cy,
+        fitView: () => cy.animate({ fit: { eles: cy.elements(), padding: 30 }, duration: 400 }),
+        zoomIn: () => cy.zoom({ level: cy.zoom() * 1.25, renderedPosition: { x: container.clientWidth / 2, y: container.clientHeight / 2 } }),
+        zoomOut: () => cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: container.clientWidth / 2, y: container.clientHeight / 2 } }),
+        highlightNodes: (query) => {
+          const q = (query || "").trim().toLowerCase();
+          cy.batch(() => {
+            if (!q) {
+              cy.elements().removeClass('dimmed highlighted');
+              return;
+            }
+            let firstMatch = null;
+            cy.nodes().forEach(n => {
+              const label = (n.data('label') || "").toLowerCase();
+              const cat = (n.data('category') || "").toLowerCase();
+              const tid = (n.data('topic_id') || "").toLowerCase();
+              if (label.includes(q) || cat.includes(q) || tid.includes(q)) {
+                n.removeClass('dimmed').addClass('highlighted');
+                if (!firstMatch) firstMatch = n;
+              } else {
+                n.removeClass('highlighted').addClass('dimmed');
+              }
+            });
+            cy.edges().addClass('dimmed');
+            if (firstMatch) {
+              cy.animate({
+                center: { eles: firstMatch },
+                zoom: 1.15,
+                duration: 500
+              });
+            }
+          });
+        }
+      };
     }
 
     function renderRoadmap(selectedPhase = 'all') {
@@ -420,6 +698,9 @@ const items = {items_json};
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
         renderTree(query);
+        if (roadmapGraphInstance) {
+          roadmapGraphInstance.highlightNodes(query);
+        }
       }, 75);
     }
 
@@ -429,6 +710,9 @@ const items = {items_json};
       document.getElementById("searchClear").classList.remove("visible");
       clearTimeout(searchDebounceTimer);
       renderTree("");
+      if (roadmapGraphInstance) {
+        roadmapGraphInstance.highlightNodes("");
+      }
       input.focus();
     }
 
