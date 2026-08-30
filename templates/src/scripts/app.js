@@ -205,105 +205,7 @@ const items = {items_json};
       }
     }
 
-    const ROADMAP_GRAPH_DATA = {
-      nodes: [
-        // 根节点
-        { data: { id: "root", topic_id: "topic-all", label: "数据结构与算法\nDSA Master", category: "Root Paradigm", status: "mastered", summary: "程序 = 数据结构 + 算法。涵盖核心线性结构、树图非线性拓扑与高级搜索/动规范式。" } },
-        
-        // 第一层分流
-        { data: { id: "array_root", topic_id: "topic-01-arrays-sliding-window", label: "数组 (Array)", category: "Linear Structures", status: "mastered", summary: "连续内存分配，O(1) 随机访问。重点考察区间操作、原地修改与指针移动。" } },
-        { data: { id: "linked_list_root", topic_id: "topic-05-linked-lists", label: "链表 (Linked List)", category: "Linear Structures", status: "mastered", summary: "离散内存指针连接。核心技巧：虚拟头节点 (Dummy Node)、快慢指针与反转操作。" } },
-
-        // 数组分支 1: 数组操作流水线
-        { data: { id: "arr_ops", topic_id: "topic-01-arrays-sliding-window", label: "数组操作", category: "Array Basics", status: "mastered", summary: "原地删除元素、移动零、区间覆盖与基础数组重排。" } },
-        { data: { id: "prefix_sum", topic_id: "topic-03-prefix-sum", label: "前缀和 (Prefix Sum)", category: "Array Techniques", status: "mastered", summary: "预处理 O(N) 实现静态区间查询 O(1)，结合哈希表快速求解子数组和为 K 问题。" } },
-        { data: { id: "diff_array", topic_id: "topic-03-prefix-sum", label: "差分数组 (Diff Array)", category: "Array Techniques", status: "learning", summary: "频繁对区间 [i, j] 进行 +val 更新时，借助差分数组将区间修改从 O(N) 降至 O(1)。" } },
-        { data: { id: "matrix_2d", topic_id: "topic-04-intervals", label: "二维数组 (2D Matrix)", category: "Array Techniques", status: "learning", summary: "二维前缀和、顺时针旋转矩阵、螺旋遍历与对角线对称折叠技巧。" } },
-
-        // 数组分支 2: 双指针流水线
-        { data: { id: "two_pointers_tech", topic_id: "topic-01-arrays-sliding-window", label: "双指针技巧", category: "Two Pointers", status: "mastered", summary: "快慢指针、左右对撞指针与首尾滑动指针，用单调性减少暴力搜索维度。" } },
-        { data: { id: "arr_two_pointers", topic_id: "topic-01-arrays-sliding-window", label: "数组双指针", category: "Two Pointers", status: "mastered", summary: "左右对撞双指针、有序数组两数之和、接雨水体积计算。" } },
-        { data: { id: "sliding_window", topic_id: "topic-01-arrays-sliding-window", label: "滑动窗口 (Sliding Window)", category: "Two Pointers", status: "mastered", summary: "维护左右动态闭区间窗口，通过扩张与收缩寻找极值或可行解。" } },
-        { data: { id: "binary_search", topic_id: "topic-02-binary-search", label: "二分搜索 (Binary Search)", category: "Searching", status: "mastered", summary: "利用单调性每次将搜索空间减半。涵盖闭区间模版、红蓝染色法与二分答案法。" } },
-        { data: { id: "random_algo", topic_id: "topic-02-binary-search", label: "随机算法 (Randomized)", category: "Searching", status: "unvisited", summary: "蓄水池抽样算法 (Reservoir Sampling)、Fisher-Yates 原地随机洗牌算法。" } },
-
-        // 数组分支 3: 数据结构流水线
-        { data: { id: "basic_ds", topic_id: "topic-06-stacks-queues", label: "基础数据结构\n(循环数组/栈与队列/哈希/设计)", category: "Data Structures", status: "mastered", summary: "循环队列、单调栈/单调队列、哈希表冲突处理与 LRU/LFU 缓存机制设计。" } },
-        { data: { id: "adv_ds", topic_id: "topic-07-trees-bst", label: "高级数据结构\n(二叉搜索树/堆/字典树/图论)", category: "Data Structures", status: "learning", summary: "二叉搜索树性质与平衡、大顶堆/小顶堆优先队列、Trie 前缀树与图论邻接表。" } },
-
-        // 链表与树分支 1: 穿针引线到二叉树
-        { data: { id: "ll_two_pointers", topic_id: "topic-05-linked-lists", label: "链表双指针", category: "Linked List", status: "mastered", summary: "寻找链表中点、Floyd 判圈算法检测环形链表、合并 K 个有序链表。" } },
-        { data: { id: "recursion_tree", topic_id: "topic-07-trees-bst", label: "递归 (Recursion)", category: "Recursive Mindset", status: "mastered", summary: "数学归纳法与调用栈本原：明确递归基、单层处理逻辑与返回值契约。" } },
-        { data: { id: "binary_tree_root", topic_id: "topic-07-trees-bst", label: "二叉树 (Binary Tree)", category: "Tree Hierarchies", status: "mastered", summary: "所有高级搜索与动态规划的母体结构。分为层序遍历视角与递归遍历视角。" } },
-
-        // 二叉树 -> 层序遍历 & BFS 路线
-        { data: { id: "level_order", topic_id: "topic-07-trees-bst", label: "层序遍历 (Level-order)", category: "Tree Traversal", status: "mastered", summary: "基于队列 Queue 实现自顶向下的逐层扫描与树的广度探索。" } },
-        { data: { id: "bfs_search", topic_id: "topic-09-graphs", label: "广度优先搜索 (BFS)", category: "Search Algorithms", status: "mastered", summary: "水波纹扩散模型，求解无权图中的全局最短步数与路径。" } },
-        { data: { id: "shortest_path", topic_id: "topic-09-graphs", label: "最短路径 (Shortest Path)", category: "Search Algorithms", status: "learning", summary: "Dijkstra 带权最短路、双向 BFS 搜索剪枝与 0-1 BFS 双端队列。" } },
-
-        // 二叉树 -> 递归遍历分流
-        { data: { id: "recursive_traversal", topic_id: "topic-07-trees-bst", label: "递归遍历 (Recursive Traversal)", category: "Tree Paradigms", status: "mastered", summary: "前序/中序/后序遍历，是回溯搜索与分治降维的算法理论源泉。" } },
-
-        // 遍历视角：回溯 -> DFS
-        { data: { id: "backtracking", topic_id: "topic-08-backtracking", label: "回溯算法 (Backtracking)", category: "Exhaustive Search", status: "mastered", summary: "在多叉决策树上做选择、递归深入、撤销选择 (Choose -> Explore -> Unchoose)。" } },
-        { data: { id: "dfs_search", topic_id: "topic-09-graphs", label: "深度优先搜索 (DFS)", category: "Exhaustive Search", status: "mastered", summary: "连通分量计数、网格岛屿沉没、拓扑排序与状态空间深度穷举。" } },
-
-        // 子问题视角：分治 -> DP
-        { data: { id: "divide_and_conquer", topic_id: "topic-07-trees-bst", label: "分治算法 (Divide & Conquer)", category: "Subproblems", status: "mastered", summary: "大问题拆解为互不相交的子问题，分别求解后归并（如归并排序、快速排序）。" } },
-        { data: { id: "dynamic_programming", topic_id: "topic-10-dp-math", label: "动态规划 (DP)", category: "Optimization", status: "learning", summary: "重叠子问题、最优子结构与状态转移方程。分为自顶向下带备忘录与自底向上递推表格。" } },
-
-        // 其他算法：数学 -> 贪心
-        { data: { id: "math_algo", topic_id: "topic-10-dp-math", label: "数学 (Math)", category: "Discrete Math", status: "mastered", summary: "位运算 (Bit Manipulation)、快速幂、辗转相除法 GCD 与素数筛法。" } },
-        { data: { id: "greedy_algo", topic_id: "topic-10-dp-math", label: "贪心算法 (Greedy)", category: "Optimization", status: "learning", summary: "局部最优解能推导至全局最优解，需严格证明无后效性（如区间调度、跳跃游戏）。" } }
-      ],
-      edges: [
-        // 根节点分流
-        { data: { id: "e-root-arr", source: "root", target: "array_root", label: "数组分支" } },
-        { data: { id: "e-root-ll", source: "root", target: "linked_list_root", label: "链表分支" } },
-
-        // 数组分支 1: 数组操作流水线
-        { data: { id: "e-arr-ops", source: "array_root", target: "arr_ops" } },
-        { data: { id: "e-ops-prefix", source: "arr_ops", target: "prefix_sum" } },
-        { data: { id: "e-prefix-diff", source: "prefix_sum", target: "diff_array" } },
-        { data: { id: "e-diff-2d", source: "diff_array", target: "matrix_2d" } },
-
-        // 数组分支 2: 双指针流水线
-        { data: { id: "e-arr-tp", source: "array_root", target: "two_pointers_tech" } },
-        { data: { id: "e-tp-arrtp", source: "two_pointers_tech", target: "arr_two_pointers" } },
-        { data: { id: "e-arrtp-sw", source: "arr_two_pointers", target: "sliding_window" } },
-        { data: { id: "e-sw-bs", source: "sliding_window", target: "binary_search" } },
-        { data: { id: "e-bs-rand", source: "binary_search", target: "random_algo" } },
-
-        // 数组分支 3: 数据结构流水线
-        { data: { id: "e-arr-bds", source: "array_root", target: "basic_ds" } },
-        { data: { id: "e-bds-ads", source: "basic_ds", target: "adv_ds" } },
-
-        // 链表与树分支: Bridge (链表 -> 链表双指针 -> 递归 -> 二叉树)
-        { data: { id: "e-ll-tp", source: "linked_list_root", target: "ll_two_pointers" } },
-        { data: { id: "e-tp-rec", source: "ll_two_pointers", target: "recursion_tree" } },
-        { data: { id: "e-rec-bt", source: "recursion_tree", target: "binary_tree_root" } },
-
-        // 二叉树 -> 层序遍历 -> BFS -> 最短路径
-        { data: { id: "e-bt-lo", source: "binary_tree_root", target: "level_order", label: "层序遍历" } },
-        { data: { id: "e-lo-bfs", source: "level_order", target: "bfs_search" } },
-        { data: { id: "e-bfs-sp", source: "bfs_search", target: "shortest_path" } },
-
-        // 二叉树 -> 递归遍历，并分流为三路
-        { data: { id: "e-bt-rec", source: "binary_tree_root", target: "recursive_traversal", label: "递归遍历" } },
-
-        // 遍历视角：回溯算法 -> 深度优先搜索 (DFS)
-        { data: { id: "e-rec-btk", source: "recursive_traversal", target: "backtracking", label: "遍历视角" } },
-        { data: { id: "e-btk-dfs", source: "backtracking", target: "dfs_search" } },
-
-        // 子问题视角：分治算法 -> 动态规划 (DP)
-        { data: { id: "e-rec-dc", source: "recursive_traversal", target: "divide_and_conquer", label: "子问题视角" } },
-        { data: { id: "e-dc-dp", source: "divide_and_conquer", target: "dynamic_programming" } },
-
-        // 其他算法：数学 -> 贪心算法
-        { data: { id: "e-rec-math", source: "recursive_traversal", target: "math_algo", label: "其他算法" } },
-        { data: { id: "e-math-greedy", source: "math_algo", target: "greedy_algo" } }
-      ]
-    };
+    const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
 
     function loadNoteByTopicId(topicId) {
       hideNodePopover();
@@ -343,11 +245,15 @@ const items = {items_json};
 
       const currentStatus = nodeData.status || "unvisited";
       const title = (nodeData.label || "").replace(/\n/g, " ");
+      const countBadge = nodeData.problem_count ? `<span class="popover-count-badge">${nodeData.problem_count} 题收录</span>` : '';
 
       popover.innerHTML = `
         <div class="popover-header">
           <div>
-            <div class="popover-category">${nodeData.category || "DSA Topic"}</div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="popover-category">${nodeData.category || "DSA Topic"}</span>
+              ${countBadge}
+            </div>
             <div class="popover-title">${title}</div>
           </div>
           <button class="popover-close-btn" onclick="hideNodePopover()">✕</button>

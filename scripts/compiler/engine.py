@@ -5,6 +5,7 @@ from typing import Optional, Dict, Any
 from .entities import BuildResult, read_file
 from .collector import collect_workspace_documents
 from .parser import parse_roadmap_data
+from .graph_builder import build_topology_graph
 from .bundler import TemplateBundler
 
 class StudyStationCompiler:
@@ -27,8 +28,9 @@ class StudyStationCompiler:
             # 1. Collect all documents
             all_items = collect_workspace_documents(self.repo_root)
 
-            # 2. Parse roadmap topology
+            # 2. Parse roadmap topology / graph
             roadmap_data = parse_roadmap_data(base_dir=self.repo_root)
+            graph_data = build_topology_graph(all_items)
 
             # 3. Bundle template assets in-memory
             bundler = TemplateBundler(self.repo_root / "templates")
@@ -46,11 +48,14 @@ class StudyStationCompiler:
             # 4. Inject payload into template
             compact_items_json = json.dumps(all_items, separators=(',', ':'), ensure_ascii=False)
             compact_roadmap_json = json.dumps(roadmap_data, separators=(',', ':'), ensure_ascii=False)
+            compact_graph_json = json.dumps(graph_data, separators=(',', ':'), ensure_ascii=False)
 
             html_content = template.replace(
                 "{items_json}", compact_items_json
             ).replace(
                 "{roadmap_json}", compact_roadmap_json
+            ).replace(
+                "{roadmap_graph_json}", compact_graph_json
             )
 
             # 5. Write index.html artifact
