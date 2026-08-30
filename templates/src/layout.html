@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode-SH | Algorithm Master Station</title>
+  <!-- Marked for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <!-- KaTeX for Math Formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <style>
+    <!-- @inject: styles/base.css -->
+    <!-- @inject: styles/roadmap.css -->
+    <!-- @inject: styles/mobile.css -->
+  </style>
+</head>
+<body>
+
+  <!-- Mobile Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
+  <!-- Left Sidebar Navigation (Tree Explorer) -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="header-brand">
+        <div class="brand-title">
+          <svg class="brand-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span>LeetCode-SH</span>
+        </div>
+        <span class="progress-badge" id="progressStats" title="Total Indexed Problems">0 Problems</span>
+      </div>
+      <div class="search-box-wrapper">
+        <span class="search-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <input type="text" id="search" class="search-box" placeholder="Search problems, patterns... (/)" oninput="handleSearch(this.value)">
+        <button id="searchClear" class="search-clear-btn" onclick="clearSearch()" title="Clear search (Esc)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+    </div>
+
+    <div class="explorer-bar">
+      <span>EXPLORER</span>
+      <div class="explorer-actions">
+        <button class="icon-btn" onclick="setAllFoldersCollapsed(false)" title="Expand All Folders">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+        </button>
+        <button class="icon-btn" onclick="setAllFoldersCollapsed(true)" title="Collapse All Folders">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="tree-container" id="treeRoot">
+      <!-- Injected dynamically by JavaScript -->
+    </div>
+
+    <!-- Draggable Resize Splitter Handle -->
+    <div id="resizer" class="resizer" title="Drag to resize sidebar"></div>
+  </aside>
+
+  <!-- Main Content Workspace -->
+  <main id="main-container">
+    <header class="top-toolbar">
+      <div class="toolbar-left">
+        <button class="toggle-sidebar-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle Sidebar (Cmd+B / Ctrl+B)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z"></path>
+          </svg>
+        </button>
+
+        <!-- Main Mode Switcher: Roadmap vs Workspace -->
+        <div class="main-mode-switcher">
+          <button class="mode-nav-btn active" id="btnModeRoadmap" onclick="setMainMode('roadmap')" title="Interactive Visual Roadmap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+            <span>Roadmap</span>
+          </button>
+          <button class="mode-nav-btn" id="btnModeWorkspace" onclick="setMainMode('workspace')" title="Dual-Split Problem Workspace">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            <span>Workspace</span>
+          </button>
+        </div>
+
+        <div class="breadcrumb" id="itemBreadcrumb">Loading...</div>
+      </div>
+
+      <div class="toolbar-right">
+        <div class="segmented-control" id="viewSwitcher" style="display: none;">
+          <button class="seg-btn" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+            <span class="seg-label">Split</span>
+          </button>
+          <button class="seg-btn active" id="btnNotes" onclick="setViewMode('notes')" title="Notes Only">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span class="seg-label">Notes</span>
+          </button>
+          <button class="seg-btn" id="btnCode" onclick="setViewMode('code')" title="Code Only">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <span class="seg-label">Code</span>
+          </button>
+        </div>
+
+        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution" style="display: none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span id="copyBtnLabel">Copy Code</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Roadmap Interactive View -->
+    <div id="roadmap-view" class="roadmap-container active">
+      <div class="roadmap-hero">
+        <div class="hero-badge">CURRICULUM TOPOLOGY</div>
+        <h1>算法刷题全景路线图</h1>
+        <p>灵茶山艾府基础算法精讲 × labuladong 核心解题框架 · 5 大递进阶段 · 12 核心专题全覆盖</p>
+        <div class="phase-filter-bar">
+          <button class="phase-filter-btn active" onclick="filterRoadmapPhase('all', this)">全部阶段 (All)</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(1, this)">Phase 1: 线性与双指针</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(2, this)">Phase 2: 经典二分</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(3, this)">Phase 3: 树与递归</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(4, this)">Phase 4: 回溯决策树</button>
+          <button class="phase-filter-btn" onclick="filterRoadmapPhase(5, this)">Phase 5: 动态规划与进阶</button>
+        </div>
+      </div>
+
+      <div class="roadmap-phases-container" id="roadmapPhasesRoot">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Workspace Dual Split View -->
+    <div id="workspace" class="hidden-view">
+      <!-- Left Pane: Syntax-Highlighted Code -->
+      <section class="pane" id="left-pane">
+        <div class="pane-header">
+          <span class="pane-title"><svg class="pane-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>Solution Source Code</span>
+          <button class="action-btn" onclick="copyActiveCode()">Copy Python</button>
+        </div>
+        <div class="code-viewer">
+          <pre><code class="language-python" id="codeViewer"># Solution code</code></pre>
+        </div>
+      </section>
+
+      <!-- Draggable Splitter between Code & Notes -->
+      <div id="workspace-resizer" class="workspace-resizer" title="Drag to adjust split (Double-click to reset 50/50)"></div>
+
+      <!-- Right Pane: Notes & Walkthrough -->
+      <section class="pane" id="right-pane">
+        <div class="markdown-body" id="notesViewer">
+          <!-- Markdown Rendered Here -->
+        </div>
+      </section>
+    </div>
+    <!-- Mobile Bottom Navigation Bar (Workspace Mode Only) -->
+    <nav class="mobile-bottom-nav hidden" id="mobileBottomNav">
+      <button class="mobile-tab-btn active" id="mobileTabNotes" onclick="setMobileTab('notes')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <span>题解笔记 (Notes)</span>
+      </button>
+      <button class="mobile-tab-btn" id="mobileTabCode" onclick="setMobileTab('code')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        <span>Python 源码 (Code)</span>
+      </button>
+    </nav>
+  </main>
+
+  <script>
+    <!-- @inject: scripts/app.js -->
+  </script>
+</body>
+</html>
+

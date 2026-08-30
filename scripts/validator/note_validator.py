@@ -1,0 +1,123 @@
+import re
+from pathlib import Path
+from typing import List, Dict, Optional, Any
+from dataclasses import dataclass, field
+
+@dataclass
+class ValidationResult:
+    is_valid: bool
+    missing_sections: List[str] = field(default_factory=list)
+    errors: List[str] = field(default_factory=list)
+    note_path: Optional[str] = None
+
+    def summary(self) -> str:
+        if self.is_valid:
+            return f"VALID: {self.note_path or 'Note'}"
+        err_str = "; ".join(self.errors)
+        return f"INVALID ({len(self.errors)} error(s)): {self.note_path or 'Note'} -> {err_str}"
+
+class NoteStructureValidator:
+    """Validator enforcing the 7 Active Recall components mandated by AGENTS.md."""
+
+    def validate(self, markdown_content: str, note_path: Optional[str] = None) -> ValidationResult:
+        """Validates a markdown note's adherence to the 7-component active recall standard."""
+        errors: List[str] = []
+        missing_sections: List[str] = []
+
+        if not markdown_content or not markdown_content.strip():
+            return ValidationResult(
+                is_valid=False,
+                missing_sections=["All components (empty note)"],
+                errors=["Markdown content is empty."],
+                note_path=note_path
+            )
+
+        # 1. Component 1: Header & File Links (Title + Metadata or Explicit Section)
+        has_title = bool(re.search(r'#\s+.*?(?:LeetCode|LC|\d+)', markdown_content, re.IGNORECASE))
+        has_meta = bool(
+            re.search(r'\*\*(?:Difficulty|Tags|Solution File|Corresponding Python File|LeetCode ID)', markdown_content, re.IGNORECASE) or
+            re.search(r'##\s*\d*\.?\s*Header\s*&', markdown_content, re.IGNORECASE) or
+            re.search(r'(?:Problem Link|Companion Source|Solution File)', markdown_content, re.IGNORECASE)
+        )
+        if not (has_title and has_meta):
+            missing_sections.append("Component 1: Header & File Links")
+            errors.append("Missing required Component 1: Header & File Links metadata.")
+
+        # 2. Component 2: Problem Statement & Constraints (Bilingual [EN] and [CN])
+        has_problem_stmt = bool(re.search(r'##\s*\d*\.?\s*Problem\s*Statement', markdown_content, re.IGNORECASE))
+        if not has_problem_stmt:
+            missing_sections.append("Component 2: Problem Statement & Constraints")
+            errors.append("Missing required Problem Statement section.")
+        else:
+            has_en = bool(re.search(r'\[EN\]', markdown_content))
+            has_cn = bool(re.search(r'\[CN\]', markdown_content))
+            if not (has_en and has_cn):
+                errors.append("Problem Statement is missing bilingual [EN] or [CN] tags.")
+
+        # 3. Component 3: Core Idea, Mental Model & Pattern Lineage
+        has_core_idea = bool(re.search(r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)', markdown_content, re.IGNORECASE))
+        if not has_core_idea:
+            missing_sections.append("Component 3: Core Idea & Mental Model")
+            errors.append("Missing required Component 3: Core Idea, Mental Model & Pattern Lineage.")
+
+        # 4. Component 4: Step-by-Step Code Walkthrough
+        has_walkthrough = bool(re.search(r'##\s*\d*\.?\s*Step-by-Step\s*Code\s*Walkthrough', markdown_content, re.IGNORECASE))
+        if not has_walkthrough:
+            missing_sections.append("Component 4: Step-by-Step Code Walkthrough")
+            errors.append("Missing required Component 4: Step-by-Step Code Walkthrough.")
+
+        # 5. Component 5: Interview Simulation
+        has_interview = bool(re.search(r'##\s*\d*\.?\s*Interview\s*Simulation', markdown_content, re.IGNORECASE))
+        if not has_interview:
+            missing_sections.append("Component 5: Interview Simulation")
+            errors.append("Missing required Component 5: Interview Simulation.")
+
+        # 6. Component 6: The Error Log & Complete Dry-Run
+        has_error_log = bool(re.search(r'##\s*\d*\.?\s*(?:The\s*Error\s*Log|Error\s*Log|Anti-Patterns)', markdown_content, re.IGNORECASE))
+        if not has_error_log:
+            missing_sections.append("Component 6: The Error Log & Complete Dry-Run")
+            errors.append("Missing required Component 6: The Error Log & Complete Dry-Run.")
+        else:
+            has_error_table = bool(re.search(
+                r'\|\s*(?:Buggy Pattern|Anti-Patterns|Traps|典型错误|常见陷阱).*?\|\s*(?:Symptom|Fail Case|触发场景|典型报错).*?\|\s*(?:Root Cause|根因|根本原因).*?\|\s*(?:Defensive Fix|Invariant|防御性修复)',
+                markdown_content,
+                re.IGNORECASE
+            ))
+            if not has_error_table:
+                errors.append("Component 6 is missing standard 4-column Error Log table schema.")
+
+        # 7. Component 7: Complexity Analysis
+        has_complexity = bool(re.search(r'##\s*\d*\.?\s*Complexity\s*Analysis', markdown_content, re.IGNORECASE))
+        if not has_complexity:
+            missing_sections.append("Component 7: Complexity Analysis")
+            errors.append("Missing required Component 7: Complexity Analysis.")
+        else:
+            has_complexity_table = bool(re.search(
+                r'(?:Time\s*Complexity|时间复杂度).*?(?:Space\s*Complexity|空间复杂度)',
+                markdown_content,
+                re.DOTALL | re.IGNORECASE
+            ))
+            if not has_complexity_table:
+                errors.append("Component 7 is missing Time / Space Complexity analysis table.")
+
+        return ValidationResult(
+            is_valid=len(errors) == 0,
+            missing_sections=missing_sections,
+            errors=errors,
+            note_path=note_path
+        )
+
+def validate_note(markdown_content: str, note_path: Optional[str] = None) -> ValidationResult:
+    """Convenience function for validating note structure."""
+    validator = NoteStructureValidator()
+    return validator.validate(markdown_content, note_path)
+
+def audit_notes_directory(dir_path: Path) -> Dict[str, ValidationResult]:
+    """Audits all companion markdown notes within a directory."""
+    validator = NoteStructureValidator()
+    results: Dict[str, ValidationResult] = {}
+    for md_file in sorted(dir_path.glob("*.md")):
+        if md_file.name.startswith("lc-"):
+            content = md_file.read_text(encoding="utf-8", errors="ignore")
+            results[md_file.name] = validator.validate(content, str(md_file))
+    return results
