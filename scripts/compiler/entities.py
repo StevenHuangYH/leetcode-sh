@@ -16,6 +16,7 @@ class DocumentEntity:
     search_blob: str
     path: str
     type: str = "problem"
+    en_title: str = ""
     notes: str = ""
     code: str = ""
     diff: str = "All"

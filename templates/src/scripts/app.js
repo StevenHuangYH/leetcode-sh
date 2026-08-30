@@ -24,13 +24,6 @@ const items = {items_json};
     // Tree folder structure definitions matching README.md repo structure
     const treeStructure = [
       {
-        id: "roadmap-doc",
-        name: "ROADMAP.md",
-        label: "Master Roadmap",
-        isLeaf: true,
-        filter: k => k === "ROADMAP.md"
-      },
-      {
         id: "overview",
         name: "README.md",
         label: "Overview",
@@ -333,11 +326,12 @@ const items = {items_json};
               'text-valign': 'center',
               'text-halign': 'center',
               'text-wrap': 'wrap',
-              'text-max-width': '140px',
-              'font-size': '11px',
-              'font-family': 'Consolas, -apple-system, sans-serif',
-              'line-height': 1.35,
-              'padding': '10px',
+              'text-max-width': '165px',
+              'font-size': '13px',
+              'font-weight': '500',
+              'font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif',
+              'line-height': 1.4,
+              'padding': '14px 16px',
               'width': 'label',
               'height': 'label',
               'transition-property': 'background-color, border-color, opacity, border-width, shadow-blur',
@@ -363,7 +357,7 @@ const items = {items_json};
               'border-color': '#2dd4bf',
               'border-width': 2.5,
               'font-weight': 'bold',
-              'font-size': '12px'
+              'font-size': '14px'
             }
           },
           {
@@ -371,9 +365,9 @@ const items = {items_json};
             style: {
               'border-color': '#2dd4bf',
               'border-width': 2.5,
-              'shadow-blur': 12,
-              'shadow-color': 'rgba(45, 212, 191, 0.4)',
-              'shadow-opacity': 0.8
+              'shadow-blur': 14,
+              'shadow-color': 'rgba(45, 212, 191, 0.45)',
+              'shadow-opacity': 0.85
             }
           },
           {
@@ -384,7 +378,7 @@ const items = {items_json};
               'target-arrow-color': '#2dd4bf',
               'target-arrow-shape': 'triangle',
               'curve-style': 'bezier',
-              'arrow-scale': 1.1,
+              'arrow-scale': 1.15,
               'transition-property': 'line-color, opacity',
               'transition-duration': '0.2s'
             }
@@ -393,17 +387,17 @@ const items = {items_json};
             selector: 'edge[label]',
             style: {
               'label': 'data(label)',
-              'font-size': '9.5px',
+              'font-size': '11px',
               'font-weight': '600',
-              'font-family': 'ui-monospace, Consolas, -apple-system, sans-serif',
+              'font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", sans-serif',
               'color': '#2dd4bf',
               'text-background-color': '#0d1117',
-              'text-background-opacity': 0.92,
-              'text-background-padding': '3px 5px',
+              'text-background-opacity': 0.95,
+              'text-background-padding': '4px 7px',
               'text-background-shape': 'roundrectangle',
               'text-border-color': '#30363d',
               'text-border-width': 1,
-              'text-border-opacity': 0.8,
+              'text-border-opacity': 0.85,
               'text-rotation': 'autorotate'
             }
           },
@@ -595,14 +589,30 @@ const items = {items_json};
           const isActive = itemKey === currentKey && mainMode === "workspace";
           const diffClass = `diff-${item.diff}`;
 
-          let displayTitle = item.title;
-          if (item.category.includes("Luffy")) {
-            displayTitle = item.title.replace(/^LC \\d+\\s*/, "");
+          let numBadge = "";
+          let mainTitle = item.title;
+          let enSubtitle = "";
+
+          if (item.type === "problem") {
+            if (item.lc_num) {
+              const numOnly = item.lc_num.replace(/^LC\s*/, '');
+              numBadge = `<span class="tree-prob-num">${numOnly}</span>`;
+            }
+            mainTitle = item.cn_title || item.en_title || item.title;
+            if (item.cn_title && item.en_title && item.cn_title !== item.en_title) {
+              enSubtitle = `<span class="tree-prob-en">${item.en_title}</span>`;
+            }
+          } else {
+            mainTitle = item.cn_title || item.title;
           }
 
           html += `
             <div class="nav-item ${isActive ? 'active' : ''}" data-key="${itemKey}" onclick="switchItem('${itemKey}')" title="${item.title}">
-              <span class="tree-title">${displayTitle}</span>
+              ${numBadge}
+              <div class="tree-title-group">
+                <span class="tree-main-title">${mainTitle}</span>
+                ${enSubtitle}
+              </div>
               <span class="tree-diff-dot ${diffClass}"></span>
             </div>
           `;
@@ -730,7 +740,7 @@ const items = {items_json};
       breadcrumb.innerHTML = `
         <span class="breadcrumb-folder">${folderLabel}</span>
         <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-file">${item.short || item.title}</span>
+        <span class="breadcrumb-file">${item.title}</span>
         ${diffHtml}
       `;
 

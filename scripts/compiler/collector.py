@@ -122,21 +122,42 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 md_content = read_file(md_path) if md_path else ""
 
                 m_num = re.search(r'(?:lc-)?(\d{4})', stem)
-                lc_num = f"LC {int(m_num.group(1))}" if m_num else ""
-                title = f"{lc_num} {stem}" if lc_num else stem.replace("-", " ").title()
+                if m_num:
+                    num_int = int(m_num.group(1))
+                    lc_num = f"LC {num_int}"
+                    raw_slug = re.sub(r'^lc-\d{4}-', '', stem)
+                else:
+                    m_luffy = re.search(r'^(\d{2}-\d{2})-(.+)$', stem)
+                    if m_luffy:
+                        lc_num = m_luffy.group(1)
+                        raw_slug = m_luffy.group(2)
+                    else:
+                        lc_num = ""
+                        raw_slug = stem
 
-                cn_match = re.search(r'# .*?\| ([\u4e00-\u9fa5A-Za-z0-9\s\(\)]+)', md_content) if md_content else None
+                en_title = raw_slug.replace("-", " ").title()
+
+                cn_match = re.search(r'# .*?\|\s*([\u4e00-\u9fa5A-Za-z0-9\s\(\)·\-—]+)', md_content) if md_content else None
                 cn_title = cn_match.group(1).strip() if cn_match else ""
 
                 diff_match = re.search(r'\*\*Difficulty:\*\*\s*(Easy|Medium|Hard)', md_content, re.IGNORECASE) if md_content else None
                 diff = diff_match.group(1).capitalize() if diff_match else "Medium"
 
-                clean_slug = normalize_slug(f"{stem} {cn_title}")
-                search_blob = build_search_blob([stem, title, cn_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
+                if cn_title and en_title:
+                    title = f"{lc_num} · {cn_title} ({en_title})" if lc_num else f"{cn_title} ({en_title})"
+                elif cn_title:
+                    title = f"{lc_num} · {cn_title}" if lc_num else cn_title
+                else:
+                    title = f"{lc_num} · {en_title}" if lc_num else en_title
+
+                short_display = f"{lc_num} {cn_title or en_title}".strip()
+
+                clean_slug = normalize_slug(f"{stem} {cn_title} {en_title}")
+                search_blob = build_search_blob([stem, title, cn_title, en_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
 
                 entity_dict = asdict(DocumentEntity(
-                    key=primary_key, category=cat_title, title=title, short=py_file if py_file else md_file,
-                    slug=clean_slug, cn_title=cn_title, tags=f"{dir_name} {diff.lower()}", lc_num=lc_num,
+                    key=primary_key, category=cat_title, title=title, short=short_display or (py_file if py_file else md_file),
+                    slug=clean_slug, cn_title=cn_title, en_title=en_title, tags=f"{dir_name} {diff.lower()}", lc_num=lc_num,
                     search_blob=search_blob, path=f"{dir_name}/{stem}", type="problem", notes=md_content,
                     code=py_content, diff=diff, py_file=f"{dir_name}/{py_file}" if py_file else "",
                     md_file=f"{dir_name}/{md_file}" if md_file else ""
