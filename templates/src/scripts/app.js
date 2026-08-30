@@ -409,6 +409,7 @@ const items = {items_json};
       root.innerHTML = html;
     }
 
+    let searchDebounceTimer = null;
     function handleSearch(query) {
       const clearBtn = document.getElementById("searchClear");
       if (query.trim().length > 0) {
@@ -416,13 +417,17 @@ const items = {items_json};
       } else {
         clearBtn.classList.remove("visible");
       }
-      renderTree(query);
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        renderTree(query);
+      }, 75);
     }
 
     function clearSearch() {
       const input = document.getElementById("search");
       input.value = "";
       document.getElementById("searchClear").classList.remove("visible");
+      clearTimeout(searchDebounceTimer);
       renderTree("");
       input.focus();
     }
@@ -540,7 +545,8 @@ const items = {items_json};
         }
 
         try {
-          if (typeof renderMathInElement === "function") {
+          const hasMath = item.notes && (item.notes.includes("$") || item.notes.includes("\(") || item.notes.includes("\["));
+          if (hasMath && typeof renderMathInElement === "function") {
             renderMathInElement(notesViewer, {
               delimiters: [
                 {left: "$$", right: "$$", display: true},

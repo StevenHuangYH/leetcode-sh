@@ -59,5 +59,13 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertIn("setMobileTab", content)
         self.assertIn("100dvh", content)
 
+    def test_runtime_optimizations_and_compact_payload(self):
+        """Assert index.html includes search debouncing, KaTeX math checks, and size is under 1.8MB."""
+        content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn("searchDebounceTimer", content)
+        self.assertIn("hasMath", content)
+        file_size_mb = self.index_html_path.stat().st_size / (1024 * 1024)
+        self.assertLess(file_size_mb, 1.8, f"index.html size should be compact (< 1.8MB), got {file_size_mb:.2f}MB")
+
 if __name__ == "__main__":
     unittest.main()

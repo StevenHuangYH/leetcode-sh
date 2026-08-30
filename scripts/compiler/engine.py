@@ -44,10 +44,13 @@ class StudyStationCompiler:
                 )
 
             # 4. Inject payload into template
+            compact_items_json = json.dumps(all_items, separators=(',', ':'), ensure_ascii=False)
+            compact_roadmap_json = json.dumps(roadmap_data, separators=(',', ':'), ensure_ascii=False)
+
             html_content = template.replace(
-                "{items_json}", json.dumps(all_items)
+                "{items_json}", compact_items_json
             ).replace(
-                "{roadmap_json}", json.dumps(roadmap_data)
+                "{roadmap_json}", compact_roadmap_json
             )
 
             # 5. Write index.html artifact

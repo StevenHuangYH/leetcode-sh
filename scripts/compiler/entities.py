@@ -64,14 +64,17 @@ def normalize_slug(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().lower()
 
 def build_search_blob(tokens: List[str], text_content: str = "") -> str:
-    """Builds a normalized, space-separated searchable string."""
-    combined = " ".join(tokens)
+    """Builds a normalized, space-separated searchable string with deduplicated tokens."""
+    token_str = normalize_slug(" ".join(tokens))
+    seen = set(token_str.split())
     if text_content:
         clean_text = re.sub(r"[\r\n\t]+", " ", text_content)
-        clean_text = re.sub(r"[#\*`_\[\]\(\)\{\}\.,:;!\?'\"]", " ", clean_text)
-        clean_text = re.sub(r"\s+", " ", clean_text)
-        combined += " " + clean_text[:3000]
-    return normalize_slug(combined)
+        clean_text = re.sub(r"[#\*`_\[\]\(\)\{\}\.,:;!\?'\"/\\<>=~^$|&%@+-]", " ", clean_text)
+        words = clean_text.lower().split()
+        for w in words[:300]:
+            if len(w) > 1 and w not in seen:
+                seen.add(w)
+    return " ".join(sorted(seen))
 
 def read_file(path: Path) -> str:
     """Safely reads a text file."""
