@@ -1,19 +1,29 @@
 import unittest
+import json
 from pathlib import Path
 from scripts.compiler.graph_builder import build_topology_graph, TopologyNodeData, TopologyEdgeData
 from scripts.compiler.collector import collect_workspace_documents
+from scripts.compiler.engine import compile_study_station
 
 REPO_ROOT = Path(__file__).parent.parent
 
 class TestGraphBuilder(unittest.TestCase):
 
     def test_topology_graph_structure_integrity(self):
-        """Assert topology graph contains standard nodes, edges, and valid DAG connectivity."""
+        """Assert topology graph contains standard nodes, edges, valid attributes, and DAG connectivity."""
         graph = build_topology_graph()
         self.assertIn("nodes", graph)
         self.assertIn("edges", graph)
 
-        node_ids = {node["data"]["id"] for node in graph["nodes"]}
+        node_ids = set()
+        for node in graph["nodes"]:
+            data = node["data"]
+            node_id = data["id"]
+            node_ids.add(node_id)
+            self.assertTrue(len(data.get("label", "")) > 0, f"Node {node_id} must have non-empty label")
+            self.assertTrue(len(data.get("category", "")) > 0, f"Node {node_id} must have non-empty category")
+            self.assertTrue(len(data.get("topic_id", "")) > 0, f"Node {node_id} must have non-empty topic_id")
+
         self.assertIn("root", node_ids)
         self.assertIn("array_root", node_ids)
         self.assertIn("linked_list_root", node_ids)
@@ -41,3 +51,14 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertGreaterEqual(nodes_by_id["prefix_sum"]["problem_count"], 1)
         self.assertGreaterEqual(nodes_by_id["binary_search"]["problem_count"], 1)
         self.assertGreaterEqual(nodes_by_id["sliding_window"]["problem_count"], 1)
+        self.assertGreaterEqual(nodes_by_id["root"]["problem_count"], 150)
+
+    def test_end_to_end_topology_payload_in_index_html(self):
+        """Assert compiled index.html contains the dynamic roadmap_graph payload."""
+        result = compile_study_station(REPO_ROOT)
+        self.assertTrue(result.success)
+        self.assertTrue(result.output_path.exists())
+
+        html_content = result.output_path.read_text(encoding="utf-8")
+        self.assertIn("ROADMAP_GRAPH_DATA", html_content)
+        self.assertNotIn("{roadmap_graph_json}", html_content, "Token {roadmap_graph_json} must be replaced")

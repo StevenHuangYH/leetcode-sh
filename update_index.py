@@ -34,7 +34,7 @@ def build_index_html(output_path: Path = None, use_cache: bool = True) -> Path:
     print(f"✨ [Success] Built {result.output_path.name} ({result.total_entities} problem entities & curriculum tracks){cache_msg}.")
     return result.output_path
 
-def run_lint_check():
+def run_lint_check(strict: bool = False) -> bool:
     """Audits all companion markdown notes across tracks."""
     tracks = ["top-100", "daily-practice", "luffy"]
     total_audited = 0
@@ -54,26 +54,37 @@ def run_lint_check():
 
     if total_invalid == 0:
         print(f"✅ [Pass] All {total_audited} companion notes adhere to the standard 7-section format.")
+        return True
     else:
         print(f"⚠️  [Notice] {total_invalid}/{total_audited} notes have structural anomalies.")
+        if strict:
+            print("❌ [Strict Failure] Lint errors detected under strict mode.", file=sys.stderr)
+            sys.exit(1)
+        return False
 
 def main():
     parser = argparse.ArgumentParser(description="Auto-update index.html for LeetCode workspace.")
     parser.add_argument("--open", action="store_true", help="Build and open index.html in browser")
     parser.add_argument("--lint", action="store_true", help="Audit companion notes 7-section structure")
+    parser.add_argument("--strict", action="store_true", help="Fail with non-zero exit code if lint errors are detected")
     parser.add_argument("--watch", action="store_true", help="Continuously watch workspace and rebuild on change")
     parser.add_argument("--clean", "--force", action="store_true", dest="clean", help="Force full rebuild bypassing manifest cache")
     args = parser.parse_args()
 
     if args.lint:
-        run_lint_check()
+        run_lint_check(strict=args.strict)
 
     build_index_html(use_cache=not args.clean)
 
     if args.open:
-        cmd_exe = Path("/mnt/c/WINDOWS/System32/cmd.exe")
-        if cmd_exe.exists():
-            subprocess.run([str(cmd_exe), "/c", "start", "", "C:\\Users\\steve\\iCloudDrive\\desktop\\leetcode-sh\\index.html"])
+        index_file = BASE_DIR / "index.html"
+        try:
+            import webbrowser
+            webbrowser.open(index_file.as_uri())
+        except Exception:
+            cmd_exe = Path("/mnt/c/WINDOWS/System32/cmd.exe")
+            if cmd_exe.exists():
+                subprocess.run([str(cmd_exe), "/c", "start", "", str(index_file)])
 
 if __name__ == "__main__":
     main()

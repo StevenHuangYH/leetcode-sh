@@ -290,10 +290,16 @@ def build_topology_graph(items: Optional[Dict[str, Any]] = None) -> Dict[str, Li
             count = 0
             for k, entity in items.items():
                 if entity.get("type") == "problem":
-                    search_blob = entity.get("search_blob", "").lower()
+                    if node.id == "root":
+                        count += 1
+                        continue
                     slug = entity.get("slug", "").lower()
                     tags = entity.get("tags", "").lower()
-                    if any(kw.lower() in search_blob or kw.lower() in slug or kw.lower() in tags for kw in keywords):
+                    title = entity.get("title", "").lower()
+                    cn_title = entity.get("cn_title", "").lower()
+                    key = entity.get("key", "").lower()
+                    search_target = f"{slug} {tags} {title} {cn_title} {key}"
+                    if any(kw.lower() in search_target for kw in keywords):
                         count += 1
             node_dict["problem_count"] = count
         nodes.append({"data": node_dict})
