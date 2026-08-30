@@ -133,6 +133,27 @@
         font-size: 14px;
       }
 
+      /* Mobile Declarative Tab Modes */
+      #workspace.tab-notes #left-pane {
+        display: flex;
+        width: 100%;
+        flex: 1;
+      }
+      #workspace.tab-notes #right-pane,
+      #workspace.tab-notes #workspace-resizer {
+        display: none !important;
+      }
+
+      #workspace.tab-code #right-pane {
+        display: flex;
+        width: 100%;
+        flex: 1;
+      }
+      #workspace.tab-code #left-pane,
+      #workspace.tab-code #workspace-resizer {
+        display: none !important;
+      }
+
       /* Mobile Bottom Navigation (Workspace Only) */
       .mobile-bottom-nav {
         display: flex;

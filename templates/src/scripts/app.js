@@ -65,12 +65,17 @@ const items = {items_json};
       const leftPane = document.getElementById("left-pane");
       const rightPane = document.getElementById("right-pane");
       if (!leftPane || !rightPane) return;
-      if (viewMode === "dual") {
+      if (viewMode === "dual" && window.innerWidth > 768) {
         const clamped = Math.max(15, Math.min(85, ratio));
         leftPane.style.width = `calc(${clamped}% - 2.5px)`;
         leftPane.style.flex = "none";
         rightPane.style.width = `calc(${100 - clamped}% - 2.5px)`;
         rightPane.style.flex = "none";
+      } else {
+        leftPane.style.width = "";
+        leftPane.style.flex = "";
+        rightPane.style.width = "";
+        rightPane.style.flex = "";
       }
     }
 
@@ -81,35 +86,16 @@ const items = {items_json};
       if (tabNotes) tabNotes.classList.toggle("active", tab === "notes");
       if (tabCode) tabCode.classList.toggle("active", tab === "code");
 
-      const leftPane = document.getElementById("left-pane");
-      const rightPane = document.getElementById("right-pane");
-      const resizer = document.getElementById("workspace-resizer");
-
-      if (window.innerWidth <= 768) {
-        if (resizer) resizer.style.display = "none";
-        if (tab === "code") {
-          if (leftPane) leftPane.style.display = "none";
-          if (rightPane) {
-            rightPane.style.display = "flex";
-            rightPane.style.width = "100%";
-            rightPane.style.flex = "1";
-          }
-        } else {
-          if (leftPane) {
-            leftPane.style.display = "flex";
-            leftPane.style.width = "100%";
-            leftPane.style.flex = "1";
-          }
-          if (rightPane) rightPane.style.display = "none";
-        }
+      const workspace = document.getElementById("workspace");
+      if (workspace) {
+        workspace.classList.toggle("tab-notes", tab === "notes");
+        workspace.classList.toggle("tab-code", tab === "code");
       }
     }
 
     function setViewMode(mode) {
       viewMode = mode;
-      const leftPane = document.getElementById("left-pane");
-      const rightPane = document.getElementById("right-pane");
-      const resizer = document.getElementById("workspace-resizer");
+      const workspace = document.getElementById("workspace");
 
       document.getElementById("btnDual").classList.toggle("active", mode === "dual");
       document.getElementById("btnNotes").classList.toggle("active", mode === "notes");
@@ -120,23 +106,15 @@ const items = {items_json};
         return;
       }
 
+      if (workspace) {
+        workspace.classList.remove("mode-dual", "mode-notes", "mode-code");
+        workspace.classList.add(`mode-${mode}`);
+      }
+
       if (mode === "dual") {
-        leftPane.style.display = "flex";
-        rightPane.style.display = "flex";
-        resizer.style.display = "block";
         applyWorkspaceSplit(workspaceSplitRatio);
-      } else if (mode === "code") {
-        leftPane.style.display = "none";
-        rightPane.style.display = "flex";
-        rightPane.style.width = "100%";
-        rightPane.style.flex = "1";
-        resizer.style.display = "none";
-      } else { // notes only
-        leftPane.style.display = "flex";
-        leftPane.style.width = "100%";
-        leftPane.style.flex = "1";
-        rightPane.style.display = "none";
-        resizer.style.display = "none";
+      } else {
+        applyWorkspaceSplit(50);
       }
     }
 

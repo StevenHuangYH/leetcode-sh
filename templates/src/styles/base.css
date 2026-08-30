@@ -646,6 +646,36 @@
     .workspace-resizer:hover, .workspace-resizer.dragging {
       background-color: var(--accent);
     }
+
+    /* Declarative Workspace View Modes (Desktop) */
+    #workspace.mode-notes #left-pane {
+      display: flex;
+      width: 100%;
+      flex: 1;
+      border-right: none;
+    }
+    #workspace.mode-notes #right-pane,
+    #workspace.mode-notes #workspace-resizer {
+      display: none !important;
+    }
+
+    #workspace.mode-code #right-pane {
+      display: flex;
+      width: 100%;
+      flex: 1;
+    }
+    #workspace.mode-code #left-pane,
+    #workspace.mode-code #workspace-resizer {
+      display: none !important;
+    }
+
+    #workspace.mode-dual #left-pane,
+    #workspace.mode-dual #right-pane {
+      display: flex;
+    }
+    #workspace.mode-dual #workspace-resizer {
+      display: block;
+    }
     .pane-header {
       display: flex;
       align-items: center;
