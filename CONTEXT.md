@@ -12,6 +12,7 @@ This file serves as the single source of truth for domain vocabulary, topologica
 * **CurriculumParser**: The parsing engine that scans `README.md` and extracts 11 standard curriculum topics, mapping problem links to their underlying track locations (`top-100/`, `daily-practice/`, `luffy/`).
 * **TopologyGraph**: The directed acyclic graph (DAG) domain model representing the algorithm learning lineage. Composed of `TopologyNode` entities (with status markers: `mastered`, `learning`, `unvisited`, and mental model summaries) and `TopologyEdge` entities (with perspective labels: `层序遍历`, `遍历视角`, `子问题视角`, `其他算法`).
 * **TemplateBundler**: The asset bundler that inlines modular CSS, JS, and HTML template sources into `index.html` without requiring external Node.js/npm dependencies.
+* **ProblemTitleFormatter**: The entity normalization model responsible for stripping raw file prefixes (e.g. `01-lc-2235-` -> `LC 2235`), formatting standard bilingual titles (`LC {num} · {English Title} ({Chinese Title})`), and providing semantic non-problem catalog titles for top breadcrumb and tree display.
 
 ### 2. Integrity & Quality Guardians
 * **NoteStructureValidator**: The quality enforcement module that audits companion `.md` notes against the standard 7-Section Active Recall template mandated by `AGENTS.md`.
@@ -48,3 +49,6 @@ This file serves as the single source of truth for domain vocabulary, topologica
 
 5. **Notes-First Layout & Declarative View Architecture**:
    * Notes-only default viewing (`viewMode = "notes"`), dual split-pane orientation with notes on the left and code on the right, driven by declarative CSS classes (`.mode-notes`, `.mode-code`, `.mode-dual`) rather than imperative JavaScript mutations.
+
+6. **Semantic Breadcrumb & Bilingual Title Normalization**:
+   * Top breadcrumb and UI headers display formatted semantic titles (`LC {num} · {English Title} ({Chinese Title})` for problems, and human-readable topic names for catalogs) with graceful ellipsis truncation and full-title tooltips, completely abstracting disk filenames.
