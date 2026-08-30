@@ -45,3 +45,6 @@ This file serves as the single source of truth for domain vocabulary, topologica
 
 4. **Minimalist IDE Aesthetic & Interactive Topology**:
    * Clean dark theme (`#0d1117` background, `#161b22` cards, `#2dd4bf` teal accents) with full-viewport interactive DAG topology, floating HUD controls, and instant note loading hooks.
+
+5. **Notes-First Layout & Declarative View Architecture**:
+   * Notes-only default viewing (`viewMode = "notes"`), dual split-pane orientation with notes on the left and code on the right, driven by declarative CSS classes (`.mode-notes`, `.mode-code`, `.mode-dual`) rather than imperative JavaScript mutations.

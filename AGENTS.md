@@ -9,7 +9,7 @@ This file establishes the operational rules and standards for all AI coding assi
 * **`top-100/`**: High-frequency LeetCode Top 100 Liked problems with paired `.py` solutions and `.md` walkthrough notes.
 * **`luffy/`**: Structured 42-topic algorithmic curriculum problems and notes.
 * **`daily-practice/`**: Daily challenges, contest problems, and algorithmic practice.
-* **`index.html`**: Self-contained Single Page App (SPA) study station with dual split-pane viewer.
+* **`index.html`**: Self-contained Single Page App (SPA) study station with notes-first default layout and dual split-pane viewer (Notes Left, Python Code Right).
 * **`update_index.py`**: Automated script that scans the repository, pairs `.py` and `.md` files, and compiles `index.html`.
 
 ---
@@ -104,6 +104,22 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 2. **Clean Monochromatic SVG Iconography on `index.html`**:
    * The web viewer (`index.html`) and automated generator (`update_index.py`) use clean, theme-matched SVG / monochrome icons (VS Code / GitHub Dark aesthetic).
    * **No Multi-Colored Platform Emojis**: Category labels, accordion folders, and navigation nodes must avoid platform-dependent multi-colored emojis to ensure a consistent, developer-focused IDE aesthetic across all operating systems.
+
+---
+
+## 🖥️ Core Rule 5: SPA Viewer Layout & Declarative Architecture Standards
+
+1. **Default View Mode**:
+   * The workspace viewer (`index.html`) defaults strictly to **Notes-Only mode** (`viewMode = "notes"`).
+   * Promotes active recall, algorithmic intuition, and pattern breakdown before revealing solution code.
+
+2. **Split View Orientation**:
+   * In Dual Split mode (`viewMode = "dual"`), **Notes reside in the Left Pane (`#left-pane`)** and **Python Solution Code resides in the Right Pane (`#right-pane`)**.
+   * Split ratio is managed via `#workspace-resizer` (draggable, double-click to reset 50/50, persisted to `localStorage`).
+
+3. **Declarative CSS State Management**:
+   * Workspace display states (`.mode-notes`, `.mode-code`, `.mode-dual`) and mobile single-pane tabs (`.tab-notes`, `.tab-code`) must be driven declaratively via CSS class modifiers on the `#workspace` container.
+   * NEVER mutate imperative inline styles (`style.display`, `style.width`) in JavaScript for pane visibility toggling.
 
 ---
 
