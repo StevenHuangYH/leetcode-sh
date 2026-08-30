@@ -777,6 +777,56 @@
       line-height: 1.68;
     }
 
+    /* ========================================================= */
+    /* High-Contrast Modern IDE Syntax Highlighting Theme        */
+    /* ========================================================= */
+    pre code.hljs, code.hljs, .code-viewer pre code {
+      color: #e6edf3;
+    }
+    .hljs-keyword, .hljs-doctag {
+      color: #ff7b72 !important;
+      font-weight: 600;
+    }
+    .hljs-title.function_, .hljs-function, .hljs-title.function_.invoke__ {
+      color: #d2a8ff !important;
+      font-weight: 600;
+    }
+    .hljs-title.class_, .hljs-class, .hljs-title.class_.inherited__ {
+      color: #ffa657 !important;
+      font-weight: 600;
+    }
+    .hljs-built_in, .hljs-type {
+      color: #7ee787 !important;
+      font-weight: 500;
+    }
+    .hljs-literal {
+      color: #79c0ff !important;
+      font-weight: 600;
+    }
+    .hljs-string, .hljs-subst {
+      color: #a5d6ff !important;
+    }
+    .hljs-number {
+      color: #79c0ff !important;
+    }
+    .hljs-comment, .hljs-quote {
+      color: #8b949e !important;
+      font-style: italic;
+    }
+    .hljs-params {
+      color: #e6edf3;
+    }
+    .hljs-variable, .hljs-attr, .hljs-property {
+      color: #79c0ff;
+    }
+    .hljs-operator, .hljs-punctuation {
+      color: #f0f6fc;
+    }
+    .hljs-meta, .hljs-meta .hljs-keyword {
+      color: #ffa657 !important;
+      font-weight: 600;
+    }
+
     /* Mobile Bottom Navigation Bar */
     .mobile-bottom-nav {
       display: none;

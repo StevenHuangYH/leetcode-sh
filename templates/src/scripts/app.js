@@ -746,8 +746,17 @@ const items = {items_json};
 
       const codeViewer = document.getElementById("codeViewer");
       if (item.code) {
-        codeViewer.textContent = item.code;
-        hljs.highlightElement(codeViewer);
+        if (typeof hljs !== "undefined" && hljs.highlight) {
+          try {
+            codeViewer.innerHTML = hljs.highlight(item.code, { language: "python", ignoreIllegals: true }).value;
+          } catch (e) {
+            codeViewer.textContent = item.code;
+            delete codeViewer.dataset.highlighted;
+            hljs.highlightElement(codeViewer);
+          }
+        } else {
+          codeViewer.textContent = item.code;
+        }
       } else {
         codeViewer.textContent = "# No python solution source available for this item.";
       }
