@@ -143,17 +143,17 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 diff_match = re.search(r'\*\*Difficulty:\*\*\s*(Easy|Medium|Hard)', md_content, re.IGNORECASE) if md_content else None
                 diff = diff_match.group(1).capitalize() if diff_match else "Medium"
 
-                if cn_title and en_title:
-                    title = f"{lc_num} · {cn_title} ({en_title})" if lc_num else f"{cn_title} ({en_title})"
-                elif cn_title:
-                    title = f"{lc_num} · {cn_title}" if lc_num else cn_title
-                else:
+                if en_title and cn_title:
+                    title = f"{lc_num} · {en_title} ({cn_title})" if lc_num else f"{en_title} ({cn_title})"
+                elif en_title:
                     title = f"{lc_num} · {en_title}" if lc_num else en_title
+                else:
+                    title = f"{lc_num} · {cn_title}" if lc_num else cn_title
 
-                short_display = f"{lc_num} {cn_title or en_title}".strip()
+                short_display = f"{lc_num} {en_title or cn_title}".strip()
 
-                clean_slug = normalize_slug(f"{stem} {cn_title} {en_title}")
-                search_blob = build_search_blob([stem, title, cn_title, en_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
+                clean_slug = normalize_slug(f"{stem} {en_title} {cn_title}")
+                search_blob = build_search_blob([stem, title, en_title, cn_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
 
                 entity_dict = asdict(DocumentEntity(
                     key=primary_key, category=cat_title, title=title, short=short_display or (py_file if py_file else md_file),

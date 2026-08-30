@@ -238,7 +238,7 @@ const items = {items_json};
 
       const currentStatus = nodeData.status || "unvisited";
       const title = (nodeData.label || "").replace(/\n/g, " ");
-      const countBadge = nodeData.problem_count ? `<span class="popover-count-badge">${nodeData.problem_count} 题收录</span>` : '';
+      const countBadge = nodeData.problem_count ? `<span class="popover-count-badge">${nodeData.problem_count} Problems</span>` : '';
 
       popover.innerHTML = `
         <div class="popover-header">
@@ -252,19 +252,19 @@ const items = {items_json};
           <button class="popover-close-btn" onclick="hideNodePopover()">✕</button>
         </div>
         <div class="popover-summary">
-          ${nodeData.summary || "核心数据结构与算法解题心法，掌握对应递归基、状态转移与时间空间最优边界。"}
+          ${nodeData.summary || "Core data structure & algorithm paradigms with time/space complexity invariants and recursion contracts."}
         </div>
         <div class="popover-status-row">
-          <span class="popover-status-label">掌握状态:</span>
+          <span class="popover-status-label">Mastery Status:</span>
           <div class="status-pill-group">
-            <button class="status-opt-btn mastered ${currentStatus === 'mastered' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'mastered')">● 已掌握</button>
-            <button class="status-opt-btn learning ${currentStatus === 'learning' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'learning')">● 学习中</button>
-            <button class="status-opt-btn unvisited ${currentStatus === 'unvisited' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'unvisited')">● 未开始</button>
+            <button class="status-opt-btn mastered ${currentStatus === 'mastered' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'mastered')">● Mastered</button>
+            <button class="status-opt-btn learning ${currentStatus === 'learning' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'learning')">● In Progress</button>
+            <button class="status-opt-btn unvisited ${currentStatus === 'unvisited' ? 'active' : ''}" onclick="updateGraphNodeStatus('${nodeData.id}', 'unvisited')">● Unvisited</button>
           </div>
         </div>
         <button class="popover-action-btn" onclick="loadNoteByTopicId('${nodeData.topic_id}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          <span>查看题解与源码</span>
+          <span>View Solution & Notes</span>
         </button>
       `;
 
@@ -598,12 +598,12 @@ const items = {items_json};
               const numOnly = item.lc_num.replace(/^LC\s*/, '');
               numBadge = `<span class="tree-prob-num">${numOnly}</span>`;
             }
-            mainTitle = item.cn_title || item.en_title || item.title;
+            mainTitle = item.en_title || item.title;
             if (item.cn_title && item.en_title && item.cn_title !== item.en_title) {
-              enSubtitle = `<span class="tree-prob-en">${item.en_title}</span>`;
+              enSubtitle = `<span class="tree-prob-en">${item.cn_title}</span>`;
             }
           } else {
-            mainTitle = item.cn_title || item.title;
+            mainTitle = item.title || item.cn_title;
           }
 
           html += `
