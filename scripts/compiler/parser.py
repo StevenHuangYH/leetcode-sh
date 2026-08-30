@@ -44,9 +44,9 @@ def parse_curriculum_topics(readme_text: str) -> dict:
 
         slug = normalize_slug(title)
         topic_docs[key] = asdict(DocumentEntity(
-            key=key, category="Problem Index", title=title, short=short, slug=slug,
+            key=key, category="Curriculum", title=title, short=short, slug=slug,
             cn_title="", tags="topic curriculum problem index", lc_num="",
-            search_blob=build_search_blob([title, short, slug, "problem index topic"], topic_content),
+            search_blob=build_search_blob([title, short, slug, "problem index topic curriculum"], topic_content),
             path=f"problem-index/{key}", type="doc", notes=topic_content, diff="All"
         ))
     return topic_docs

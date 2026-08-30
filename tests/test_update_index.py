@@ -1,5 +1,6 @@
 import unittest
 from update_index import collect_workspace_documents
+from scripts.compiler.entities import format_problem_title
 
 class TestUpdateIndexParser(unittest.TestCase):
     def test_all_11_topics_curriculum_are_parsed_without_empty_content(self):
@@ -30,6 +31,48 @@ class TestUpdateIndexParser(unittest.TestCase):
                     f"Topic '{key}' failed to parse content from README.md"
                 )
                 self.assertTrue(len(doc["notes"].strip()) > 50, f"Topic '{key}' content is too short")
+                self.assertEqual(doc["category"], "Curriculum")
+
+    def test_format_problem_title_extraction(self):
+        # 1. Standard problem with markdown
+        lc_num, en, cn, full = format_problem_title(
+            "lc-0153-find-minimum-in-rotated-sorted-array",
+            "# LC 0153: Find Minimum in Rotated Sorted Array | 寻找旋转排序数组中的最小值\n\n**Difficulty:** Medium"
+        )
+        self.assertEqual(lc_num, "LC 153")
+        self.assertEqual(en, "Find Minimum In Rotated Sorted Array")
+        self.assertEqual(cn, "寻找旋转排序数组中的最小值")
+        self.assertEqual(full, "LC 153 · Find Minimum In Rotated Sorted Array (寻找旋转排序数组中的最小值)")
+
+        # 2. Luffy curriculum problem with batch prefix
+        lc_num, en, cn, full = format_problem_title(
+            "01-lc-2235-add-two-integers",
+            "# LC 2235: Add Two Integers | 两整数相加\n\n**Difficulty:** Easy"
+        )
+        self.assertEqual(lc_num, "LC 2235")
+        self.assertEqual(en, "Add Two Integers")
+        self.assertEqual(cn, "两整数相加")
+        self.assertEqual(full, "LC 2235 · Add Two Integers (两整数相加)")
+
+        # 3. Non-LC tutorial script without markdown
+        lc_num, en, cn, full = format_problem_title("10-oop-pre-main-practice", "")
+        self.assertEqual(lc_num, "")
+        self.assertEqual(en, "OOP Pre Main Practice")
+        self.assertEqual(cn, "")
+        self.assertEqual(full, "OOP Pre Main Practice")
+
+        # 4. Roman numerals and acronym preservation
+        lc_num, en, cn, full = format_problem_title("09-lc-0059-spiral-matrix-ii-alt", "")
+        self.assertEqual(lc_num, "LC 59")
+        self.assertEqual(en, "Spiral Matrix II Alt")
+        self.assertEqual(full, "LC 59 · Spiral Matrix II Alt")
+
+    def test_overview_document_semantic_title(self):
+        documents = collect_workspace_documents()
+        self.assertIn("README.md", documents)
+        readme_doc = documents["README.md"]
+        self.assertEqual(readme_doc["title"], "LeetCode Self-Practices Overview")
+        self.assertEqual(readme_doc["category"], "Overview")
 
 if __name__ == "__main__":
     unittest.main()

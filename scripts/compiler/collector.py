@@ -9,9 +9,13 @@ from .entities import (
     DocumentEntity,
     normalize_slug,
     build_search_blob,
-    read_file
+    read_file,
+    format_problem_title
 )
 from .parser import parse_curriculum_topics
+
+
+MANIFEST_VERSION = "2.1"
 
 
 def _get_file_stat(file_path: Optional[Path]) -> Tuple[float, int]:
@@ -36,11 +40,13 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
 
     if use_cache and manifest_file.exists():
         try:
-            cached_manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+            loaded = json.loads(manifest_file.read_text(encoding="utf-8"))
+            if loaded.get("__version__") == MANIFEST_VERSION:
+                cached_manifest = loaded
         except Exception:
             cached_manifest = {}
 
-    new_manifest = {}
+    new_manifest = {"__version__": MANIFEST_VERSION}
 
     # 1. Overview & Curriculum Docs
     readme_path = base_dir / "README.md"
@@ -60,9 +66,9 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
         topic_docs = parse_curriculum_topics(readme_text)
         overview_docs = {
             "README.md": asdict(DocumentEntity(
-                key="README.md", category="Overview", title="LeetCode Self-Practices Overview (README)",
+                key="README.md", category="Overview", title="LeetCode Self-Practices Overview",
                 short="README.md", slug="readme overview", cn_title="项目总览", tags="readme overview index",
-                lc_num="", search_blob=build_search_blob(["README.md", "overview", "项目总览"], readme_text),
+                lc_num="", search_blob=build_search_blob(["README.md", "overview", "项目总览", "leetcode self practices overview"], readme_text),
                 path="README.md", type="doc", notes=readme_text, diff="All"
             ))
         }
@@ -121,34 +127,10 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 py_content = read_file(py_path) if py_path else ""
                 md_content = read_file(md_path) if md_path else ""
 
-                m_num = re.search(r'(?:lc-)?(\d{4})', stem)
-                if m_num:
-                    num_int = int(m_num.group(1))
-                    lc_num = f"LC {num_int}"
-                    raw_slug = re.sub(r'^lc-\d{4}-', '', stem)
-                else:
-                    m_luffy = re.search(r'^(\d{2}-\d{2})-(.+)$', stem)
-                    if m_luffy:
-                        lc_num = m_luffy.group(1)
-                        raw_slug = m_luffy.group(2)
-                    else:
-                        lc_num = ""
-                        raw_slug = stem
-
-                en_title = raw_slug.replace("-", " ").title()
-
-                cn_match = re.search(r'# .*?\|\s*([\u4e00-\u9fa5A-Za-z0-9\s\(\)·\-—]+)', md_content) if md_content else None
-                cn_title = cn_match.group(1).strip() if cn_match else ""
+                lc_num, en_title, cn_title, title = format_problem_title(stem, md_content)
 
                 diff_match = re.search(r'\*\*Difficulty:\*\*\s*(Easy|Medium|Hard)', md_content, re.IGNORECASE) if md_content else None
                 diff = diff_match.group(1).capitalize() if diff_match else "Medium"
-
-                if en_title and cn_title:
-                    title = f"{lc_num} · {en_title} ({cn_title})" if lc_num else f"{en_title} ({cn_title})"
-                elif en_title:
-                    title = f"{lc_num} · {en_title}" if lc_num else en_title
-                else:
-                    title = f"{lc_num} · {cn_title}" if lc_num else cn_title
 
                 short_display = f"{lc_num} {en_title or cn_title}".strip()
 

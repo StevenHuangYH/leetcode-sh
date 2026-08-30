@@ -81,6 +81,7 @@ const items = {items_json};
 
     function setMobileTab(tab) {
       mobileTab = tab;
+      applyWorkspaceSplit(50);
       const tabNotes = document.getElementById("mobileTabNotes");
       const tabCode = document.getElementById("mobileTabCode");
       if (tabNotes) tabNotes.classList.toggle("active", tab === "notes");
@@ -115,6 +116,14 @@ const items = {items_json};
         applyWorkspaceSplit(workspaceSplitRatio);
       } else {
         applyWorkspaceSplit(50);
+      }
+    }
+
+    function syncResponsiveLayout() {
+      if (window.innerWidth <= 768) {
+        setMobileTab(mobileTab);
+      } else {
+        setViewMode(viewMode);
       }
     }
 
@@ -165,11 +174,7 @@ const items = {items_json};
         if (viewSwitcher) viewSwitcher.style.display = window.innerWidth <= 768 ? "none" : "inline-flex";
         if (copyBtn) copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
         if (mobileNav) mobileNav.classList.remove("hidden");
-        if (window.innerWidth <= 768) {
-          setMobileTab(mobileTab);
-        } else {
-          setViewMode(viewMode);
-        }
+        syncResponsiveLayout();
         if (triggerSwitch) {
           switchItem(currentKey, false);
         }
@@ -712,13 +717,13 @@ const items = {items_json};
       }
 
       const breadcrumb = document.getElementById("itemBreadcrumb");
-      let folderLabel = item.category;
-      let diffHtml = item.diff !== "All" ? `<span class="diff-badge ${item.diff}">${item.diff}</span>` : "";
+      let folderLabel = item.category || "Workspace";
+      let diffHtml = item.diff && item.diff !== "All" ? `<span class="diff-badge ${item.diff}">${item.diff}</span>` : "";
 
       breadcrumb.innerHTML = `
         <span class="breadcrumb-folder">${folderLabel}</span>
         <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-file">${item.title}</span>
+        <span class="breadcrumb-file" title="${item.title}">${item.title}</span>
         ${diffHtml}
       `;
 
@@ -896,11 +901,7 @@ const items = {items_json};
     // Handle Window Resize Responsiveness
     window.addEventListener("resize", () => {
       if (mainMode === "workspace") {
-        if (window.innerWidth <= 768) {
-          setMobileTab(mobileTab);
-        } else {
-          setViewMode(viewMode);
-        }
+        syncResponsiveLayout();
       }
     });
 

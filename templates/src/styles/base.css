@@ -515,20 +515,27 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      min-width: 0;
     }
     .breadcrumb-folder {
       color: var(--text-muted);
       font-size: 13px;
+      flex-shrink: 0;
     }
     .breadcrumb-sep {
       color: var(--text-muted);
       opacity: 0.5;
       font-size: 12px;
+      flex-shrink: 0;
     }
     .breadcrumb-file {
       font-weight: 600;
       color: var(--text-bright);
       font-size: 13.5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
     }
     .diff-badge {
       font-size: 11px;
@@ -536,6 +543,7 @@
       padding: 2.5px 8px;
       border-radius: 12px;
       margin-left: 4px;
+      flex-shrink: 0;
     }
     .diff-badge.Easy {
       background-color: rgba(63, 185, 80, 0.15);

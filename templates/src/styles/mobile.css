@@ -136,8 +136,8 @@
       /* Mobile Declarative Tab Modes */
       #workspace.tab-notes #left-pane {
         display: flex;
-        width: 100%;
-        flex: 1;
+        width: 100% !important;
+        flex: 1 !important;
       }
       #workspace.tab-notes #right-pane,
       #workspace.tab-notes #workspace-resizer {
@@ -146,8 +146,8 @@
 
       #workspace.tab-code #right-pane {
         display: flex;
-        width: 100%;
-        flex: 1;
+        width: 100% !important;
+        flex: 1 !important;
       }
       #workspace.tab-code #left-pane,
       #workspace.tab-code #workspace-resizer {
