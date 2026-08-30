@@ -23,3 +23,7 @@ venv/
 *.swp
 *.swo
 *~
+
+# Compiler build cache
+.cache/
+

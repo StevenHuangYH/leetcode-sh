@@ -17,7 +17,7 @@ class StudyStationCompiler:
         else:
             self.repo_root = Path(repo_root).resolve()
 
-    def compile(self, output_path: Optional[Path] = None) -> BuildResult:
+    def compile(self, output_path: Optional[Path] = None, use_cache: bool = True) -> BuildResult:
         """Executes the end-to-end compilation pipeline."""
         try:
             if output_path is None:
@@ -25,8 +25,8 @@ class StudyStationCompiler:
             else:
                 output_path = Path(output_path).resolve()
 
-            # 1. Collect all documents
-            all_items = collect_workspace_documents(self.repo_root)
+            # 1. Collect all documents (with incremental caching)
+            all_items = collect_workspace_documents(self.repo_root, use_cache=use_cache)
 
             # 2. Parse roadmap topology / graph
             roadmap_data = parse_roadmap_data(base_dir=self.repo_root)
@@ -81,7 +81,8 @@ class StudyStationCompiler:
                 error_message=str(e)
             )
 
-def compile_study_station(repo_root: Optional[Path] = None, output_path: Optional[Path] = None) -> BuildResult:
+def compile_study_station(repo_root: Optional[Path] = None, output_path: Optional[Path] = None, use_cache: bool = True) -> BuildResult:
     """Convenience functional interface for compiling the study station SPA."""
     compiler = StudyStationCompiler(repo_root)
-    return compiler.compile(output_path)
+    return compiler.compile(output_path, use_cache=use_cache)
+
