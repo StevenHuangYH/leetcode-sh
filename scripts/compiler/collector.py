@@ -18,7 +18,6 @@ def collect_workspace_documents(base_dir: Optional[Path] = None) -> Dict[str, An
         base_dir = Path(__file__).parent.parent.parent.resolve()
     """Scans repository folders and aggregates structured problem entities."""
     readme_text = read_file(base_dir / "README.md")
-    roadmap_text = read_file(base_dir / "ROADMAP.md")
     
     topic_docs = parse_curriculum_topics(readme_text)
     overview_docs = {
@@ -27,12 +26,6 @@ def collect_workspace_documents(base_dir: Optional[Path] = None) -> Dict[str, An
             short="README.md", slug="readme overview", cn_title="项目总览", tags="readme overview index",
             lc_num="", search_blob=build_search_blob(["README.md", "overview", "项目总览"], readme_text),
             path="README.md", type="doc", notes=readme_text, diff="All"
-        )),
-        "ROADMAP.md": asdict(DocumentEntity(
-            key="ROADMAP.md", category="Overview", title="Algorithm Master Roadmap (ROADMAP.md)",
-            short="ROADMAP.md", slug="algorithm master roadmap", cn_title="算法全景路线图", tags="roadmap",
-            lc_num="", search_blob=build_search_blob(["ROADMAP.md", "roadmap", "路线图"], roadmap_text),
-            path="ROADMAP.md", type="doc", notes=roadmap_text, diff="All"
         ))
     }
 

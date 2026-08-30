@@ -172,13 +172,20 @@ const items = {items_json};
           breadcrumb.innerHTML = `
             <span class="breadcrumb-folder">Curriculum</span>
             <span class="breadcrumb-sep">/</span>
-            <span class="breadcrumb-file">Algorithm Master Roadmap</span>
+            <span class="breadcrumb-file">Interactive Topology Graph</span>
           `;
         }
         if (history.replaceState) {
           history.replaceState(null, null, "#roadmap");
         }
-        switchRoadmapSubview(currentRoadmapSubview);
+        setTimeout(() => {
+          if (!roadmapGraphInstance) {
+            initRoadmapGraph();
+          } else if (roadmapGraphInstance.cy) {
+            roadmapGraphInstance.cy.resize();
+            roadmapGraphInstance.cy.fit(undefined, 35);
+          }
+        }, 50);
       } else {
         if (btnRoadmap) btnRoadmap.classList.remove("active");
         if (btnWorkspace) btnWorkspace.classList.add("active");
@@ -201,7 +208,7 @@ const items = {items_json};
     const ROADMAP_GRAPH_DATA = {
       nodes: [
         // 根节点
-        { data: { id: "root", topic_id: "ROADMAP.md", label: "数据结构与算法\nDSA Master", category: "Root Paradigm", status: "mastered", summary: "程序 = 数据结构 + 算法。涵盖核心线性结构、树图非线性拓扑与高级搜索/动规范式。" } },
+        { data: { id: "root", topic_id: "topic-all", label: "数据结构与算法\nDSA Master", category: "Root Paradigm", status: "mastered", summary: "程序 = 数据结构 + 算法。涵盖核心线性结构、树图非线性拓扑与高级搜索/动规范式。" } },
         
         // 第一层分流
         { data: { id: "array_root", topic_id: "topic-01-arrays-sliding-window", label: "数组 (Array)", category: "Linear Structures", status: "mastered", summary: "连续内存分配，O(1) 随机访问。重点考察区间操作、原地修改与指针移动。" } },
@@ -298,36 +305,6 @@ const items = {items_json};
       ]
     };
 
-    function switchRoadmapSubview(subview) {
-      currentRoadmapSubview = subview;
-      localStorage.setItem("roadmapSubview", subview);
-
-      const btnGraph = document.getElementById("btnSubviewGraph");
-      const btnGrid = document.getElementById("btnSubviewGrid");
-      const graphContainer = document.getElementById("roadmapGraphContainer");
-      const gridContainer = document.getElementById("roadmapGridContainer");
-
-      if (subview === "graph") {
-        if (btnGraph) btnGraph.classList.add("active");
-        if (btnGrid) btnGrid.classList.remove("active");
-        if (graphContainer) graphContainer.style.display = "flex";
-        if (gridContainer) gridContainer.style.display = "none";
-        setTimeout(() => {
-          if (!roadmapGraphInstance) {
-            initRoadmapGraph();
-          } else if (roadmapGraphInstance.cy) {
-            roadmapGraphInstance.cy.resize();
-            roadmapGraphInstance.cy.fit(undefined, 30);
-          }
-        }, 50);
-      } else {
-        if (btnGraph) btnGraph.classList.remove("active");
-        if (btnGrid) btnGrid.classList.add("active");
-        if (graphContainer) graphContainer.style.display = "none";
-        if (gridContainer) gridContainer.style.display = "block";
-      }
-    }
-
     function loadNoteByTopicId(topicId) {
       hideNodePopover();
       if (!topicId) return;
@@ -342,7 +319,7 @@ const items = {items_json};
         switchItem(match);
       } else {
         setMainMode("workspace");
-        switchItem("ROADMAP.md");
+        switchItem("README.md");
       }
     }
 
@@ -352,7 +329,7 @@ const items = {items_json};
 
       const nodeData = node.data();
       const renderedPos = node.renderedPosition();
-      const container = document.getElementById("roadmapGraphContainer");
+      const container = document.getElementById("roadmap-view");
       const containerRect = container.getBoundingClientRect();
 
       let posX = renderedPos.x + 15;
@@ -610,89 +587,6 @@ const items = {items_json};
           });
         }
       };
-    }
-
-    function renderRoadmap(selectedPhase = 'all') {
-      const root = document.getElementById("roadmapPhasesRoot");
-      if (!root) return;
-
-      const diffColorMap = {
-        "Easy": "var(--diff-easy)",
-        "Medium": "var(--diff-medium)",
-        "Hard": "var(--diff-hard)",
-      };
-
-      let html = "";
-      roadmapData.forEach(p => {
-        if (selectedPhase !== 'all' && p.phase !== parseInt(selectedPhase)) return;
-
-        let totalProblemsInPhase = 0;
-        p.topics.forEach(t => totalProblemsInPhase += t.problems.length);
-
-        html += `
-          <section class="phase-section" id="phase-sec-${p.phase}">
-            <div class="phase-header">
-              <div class="phase-title-group">
-                <span class="phase-badge-pill">${p.phase_badge}</span>
-                <h2 class="phase-title-text">${p.phase_name}</h2>
-              </div>
-              <span class="topic-card-count">${p.topics.length} 专题 · ${totalProblemsInPhase} 题解</span>
-            </div>
-            <p class="phase-desc">${p.phase_desc}</p>
-            <div class="phase-topics-grid">
-        `;
-
-        p.topics.forEach(t => {
-          html += `
-            <div class="topic-card">
-              <div class="topic-card-top">
-                <div>
-                  <h3 class="topic-card-title">${t.title}</h3>
-                  <div class="topic-card-subtitle">${t.subtitle}</div>
-                </div>
-                <span class="topic-card-count">${t.problems.length} 题</span>
-              </div>
-              <div class="topic-formula-badge" title="Core Mental Model / Formula">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-                <span>${t.formula}</span>
-              </div>
-              <div class="topic-pills-container">
-          `;
-
-          t.problems.forEach(prob => {
-            const dotColor = diffColorMap[prob.diff] || "var(--diff-medium)";
-            html += `
-              <div class="topic-problem-pill" onclick="openProblemFromRoadmap('${prob.key}')" title="${prob.name} (${prob.cn})">
-                <span class="pill-diff-dot" style="background-color: ${dotColor};"></span>
-                <span>LC ${prob.num} ${prob.cn || prob.name}</span>
-              </div>
-            `;
-          });
-
-          html += `
-              </div>
-            </div>
-          `;
-        });
-
-        html += `
-            </div>
-          </section>
-        `;
-      });
-
-      root.innerHTML = html;
-    }
-
-    function filterRoadmapPhase(phase, btnEl) {
-      document.querySelectorAll(".phase-filter-btn").forEach(b => b.classList.remove("active"));
-      if (btnEl) btnEl.classList.add("active");
-      renderRoadmap(phase);
-    }
-
-    function openProblemFromRoadmap(key) {
-      setMainMode("workspace", false);
-      switchItem(key);
     }
 
     function getCategoryIcon(catId) {
@@ -1132,7 +1026,6 @@ const items = {items_json};
     // Initialize SPA
     renderTree();
     updateProgressBadge();
-    renderRoadmap('all');
 
     if (mainMode === "roadmap") {
       setMainMode("roadmap");
