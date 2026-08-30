@@ -146,24 +146,24 @@
 
     <!-- Workspace Dual Split View -->
     <div id="workspace" class="hidden-view">
-      <!-- Left Pane: Syntax-Highlighted Code -->
+      <!-- Left Pane: Notes & Walkthrough -->
       <section class="pane" id="left-pane">
+        <div class="markdown-body" id="notesViewer">
+          <!-- Markdown Rendered Here -->
+        </div>
+      </section>
+
+      <!-- Draggable Splitter between Notes & Code -->
+      <div id="workspace-resizer" class="workspace-resizer" title="Drag to adjust split (Double-click to reset 50/50)"></div>
+
+      <!-- Right Pane: Syntax-Highlighted Code -->
+      <section class="pane" id="right-pane">
         <div class="pane-header">
           <span class="pane-title"><svg class="pane-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>Solution Source Code</span>
           <button class="action-btn" onclick="copyActiveCode()">Copy Python</button>
         </div>
         <div class="code-viewer">
           <pre><code class="language-python" id="codeViewer"># Solution code</code></pre>
-        </div>
-      </section>
-
-      <!-- Draggable Splitter between Code & Notes -->
-      <div id="workspace-resizer" class="workspace-resizer" title="Drag to adjust split (Double-click to reset 50/50)"></div>
-
-      <!-- Right Pane: Notes & Walkthrough -->
-      <section class="pane" id="right-pane">
-        <div class="markdown-body" id="notesViewer">
-          <!-- Markdown Rendered Here -->
         </div>
       </section>
     </div>

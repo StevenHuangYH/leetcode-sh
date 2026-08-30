@@ -14,14 +14,14 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertTrue(self.index_html_path.exists(), "index.html must exist")
         self.assertTrue(self.update_index_path.exists(), "update_index.py must exist")
 
-    def test_index_html_defaults_to_dual_view_mode(self):
-        """Assert index.html defaults to dual split-pane view instead of notes-only."""
+    def test_index_html_defaults_to_notes_view_mode(self):
+        """Assert index.html defaults to notes-only view instead of dual."""
         content = self.index_html_path.read_text(encoding="utf-8")
-        # Assert viewMode is initialized to 'dual'
+        # Assert viewMode is initialized to 'notes'
         self.assertRegex(
             content,
-            r'let\s+viewMode\s*=\s*["\']dual["\']',
-            "viewMode in index.html must default to 'dual' so both code and notes appear side-by-side"
+            r'let\s+viewMode\s*=\s*["\']notes["\']',
+            "viewMode in index.html must default to 'notes'"
         )
 
     def test_latex_math_formula_protection_logic(self):

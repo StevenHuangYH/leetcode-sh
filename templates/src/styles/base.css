@@ -629,11 +629,11 @@
       min-width: 0;
     }
     #left-pane {
-      background-color: var(--bg-sidebar);
+      background-color: var(--bg-main);
       border-right: 1px solid var(--border-color);
     }
     #right-pane {
-      background-color: var(--bg-main);
+      background-color: var(--bg-sidebar);
     }
     .workspace-resizer {
       width: 5px;

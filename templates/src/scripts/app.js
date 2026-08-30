@@ -5,7 +5,7 @@ const items = {items_json};
     let currentRoadmapSubview = localStorage.getItem("roadmapSubview") || "graph";
     let roadmapGraphInstance = null;
     let currentKey = "README.md";
-    let viewMode = "dual"; // 'dual', 'notes', 'code'
+    let viewMode = "notes"; // 'notes', 'dual', 'code'
     let mobileTab = "notes"; // 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
@@ -88,19 +88,19 @@ const items = {items_json};
       if (window.innerWidth <= 768) {
         if (resizer) resizer.style.display = "none";
         if (tab === "code") {
-          if (leftPane) {
-            leftPane.style.display = "flex";
-            leftPane.style.width = "100%";
-            leftPane.style.flex = "1";
-          }
-          if (rightPane) rightPane.style.display = "none";
-        } else {
           if (leftPane) leftPane.style.display = "none";
           if (rightPane) {
             rightPane.style.display = "flex";
             rightPane.style.width = "100%";
             rightPane.style.flex = "1";
           }
+        } else {
+          if (leftPane) {
+            leftPane.style.display = "flex";
+            leftPane.style.width = "100%";
+            leftPane.style.flex = "1";
+          }
+          if (rightPane) rightPane.style.display = "none";
         }
       }
     }
@@ -126,16 +126,16 @@ const items = {items_json};
         resizer.style.display = "block";
         applyWorkspaceSplit(workspaceSplitRatio);
       } else if (mode === "code") {
-        leftPane.style.display = "flex";
-        leftPane.style.width = "100%";
-        leftPane.style.flex = "1";
-        rightPane.style.display = "none";
-        resizer.style.display = "none";
-      } else { // notes only
         leftPane.style.display = "none";
         rightPane.style.display = "flex";
         rightPane.style.width = "100%";
         rightPane.style.flex = "1";
+        resizer.style.display = "none";
+      } else { // notes only
+        leftPane.style.display = "flex";
+        leftPane.style.width = "100%";
+        leftPane.style.flex = "1";
+        rightPane.style.display = "none";
         resizer.style.display = "none";
       }
     }
@@ -806,7 +806,7 @@ const items = {items_json};
         notesViewer.innerHTML = `
           <div style="padding: 28px; text-align: center; color: var(--text-muted);">
             <div style="font-size: 15px; font-weight: 600; color: var(--text-bright); margin-bottom: 8px;">Python Solution Code Available</div>
-            <p style="font-size: 13px; max-width: 460px; margin: 0 auto 16px;">This problem is tracked with verified Python code in the left pane.</p>
+            <p style="font-size: 13px; max-width: 460px; margin: 0 auto 16px;">This problem is tracked with verified Python code in the code pane.</p>
             <button onclick="setViewMode('code')" style="background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-bright); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;">
               Expand Code Fullscreen
             </button>
