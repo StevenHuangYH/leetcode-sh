@@ -11,12 +11,11 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ## Table of Contents
 
-1. [Core Algorithmic Competencies & Domain Mastery](#core-algorithmic-competencies--domain-mastery)
-2. [Practice Statistics & Summary](#practice-statistics--summary)
-3. [Repository Structure](#repository-structure)
-4. [Top 100 Liked Track](#top-100-liked-track)
-5. [Daily Practice Track](#daily-practice-track)
-6. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
+1. [Practice Statistics & Summary](#practice-statistics--summary)
+2. [Repository Structure](#repository-structure)
+3. [Top 100 Liked Track](#top-100-liked-track)
+4. [Daily Practice Track](#daily-practice-track)
+5. [Topic-Wise Curriculum & Problem Index](#topic-wise-curriculum--problem-index)
    - [1. Arrays, Strings, Two Pointers & Sliding Window](#1-arrays-strings-two-pointers--sliding-window)
    - [2. Binary Search](#2-binary-search)
    - [3. Prefix Sum & Difference Arrays](#3-prefix-sum--difference-arrays)
@@ -28,21 +27,8 @@ Welcome to my personal LeetCode question cracking collections. This repository i
    - [9. Graph Algorithms (DFS, BFS, Topological Sort)](#9-graph-algorithms-dfs-bfs-topological-sort)
    - [10. Dynamic Programming & Math / Game Theory](#10-dynamic-programming--math--game-theory)
    - [11. Object-Oriented Programming (OOP) & Foundations](#11-object-oriented-programming-oop--foundations)
-7. [Interactive Web Viewer & Study Station](#interactive-web-viewer--study-station)
-8. [How to Run & Practice](#how-to-run--practice)
-
----
-
-## Core Algorithmic Competencies & Domain Mastery
-
-### 1. Core Linear Structures & Array Techniques
-Proficient in fundamental linear data structures and contiguous memory manipulations, with strong capabilities in prefix sums, difference arrays, and multi-dimensional matrices. Skilled in applying array-based pointer optimizations, including two-pointer techniques, sliding window mechanics, binary search variants, and randomized algorithms. Well-versed in the practical design and implementation of circular arrays, stacks, queues, and hash-based structures to solve complex storage and lookup requirements.
-
-### 2. Non-Linear Architectures & Tree Hierarchies
-Experienced in pointer-based dynamic data structures, beginning with linked list manipulation, two-pointer traversals, and recursive modeling. Deep understanding of tree structures and their specialized variants, including binary trees, Binary Search Trees (BST), heaps/priority queues, and tries (prefix trees). Capable of modeling complex network relationships and abstract state machines through foundational graph theory and modular object design.
-
-### 3. Search Algorithms & Dynamic Problem-Solving Paradigms
-Adept at systematic state-space exploration and advanced algorithmic paradigms. Proficient in both level-order traversals (Breadth-First Search and shortest-path calculation) and recursive tree traversals. Capable of analyzing complex problems through both traversal-based perspectives (Depth-First Search, Backtracking) and subproblem-decomposition perspectives (Divide and Conquer, Dynamic Programming), complemented by practical mastery of greedy strategies and applied mathematical logic.
+6. [Interactive Web Viewer & Study Station](#interactive-web-viewer--study-station)
+7. [How to Run & Practice](#how-to-run--practice)
 
 ---
 
