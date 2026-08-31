@@ -61,12 +61,6 @@ class StudyStationCompiler:
             # 5. Write index.html artifact
             output_path.write_text(html_content, encoding="utf-8")
 
-            # 6. Keep station_template.html in sync as auto-generated artifact
-            fallback_template = self.repo_root / "templates" / "station_template.html"
-            if fallback_template.exists():
-                generated_notice = "<!-- NOTE: AUTO-GENERATED TEMPLATE FROM templates/src/. DO NOT EDIT MANUALLY. -->\n"
-                fallback_template.write_text(generated_notice + template, encoding="utf-8")
-
             return BuildResult(
                 output_path=output_path,
                 total_entities=len(all_items),

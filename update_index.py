@@ -22,7 +22,6 @@ from scripts.compiler import (
 from scripts.validator import audit_notes_directory
 
 BASE_DIR = Path(__file__).parent.resolve()
-TEMPLATE_PATH = BASE_DIR / "templates" / "station_template.html"
 
 def build_index_html(output_path: Path = None, use_cache: bool = True) -> Path:
     """Compiles the single-page index.html file."""
@@ -33,6 +32,51 @@ def build_index_html(output_path: Path = None, use_cache: bool = True) -> Path:
     cache_msg = " [Cached]" if use_cache else " [Clean Rebuild]"
     print(f"✨ [Success] Built {result.output_path.name} ({result.total_entities} problem entities & curriculum tracks){cache_msg}.")
     return result.output_path
+
+def watch_mode():
+    """Watches tracks, ROADMAP.md, README.md, and templates/src/ for changes and auto-rebuilds."""
+    import time
+    print("👀 [Watch Mode] Monitoring tracks and templates/src/ for changes... (Ctrl+C to stop)")
+    watch_dirs = [
+        BASE_DIR / "top-100",
+        BASE_DIR / "daily-practice",
+        BASE_DIR / "luffy",
+        BASE_DIR / "templates" / "src",
+    ]
+    watch_files = [
+        BASE_DIR / "README.md",
+        BASE_DIR / "ROADMAP.md",
+    ]
+
+    def get_snapshot() -> dict:
+        snapshot = {}
+        for d in watch_dirs:
+            if d.exists():
+                for p in d.rglob("*"):
+                    if p.is_file() and not p.name.startswith("."):
+                        try:
+                            snapshot[str(p)] = p.stat().st_mtime
+                        except OSError:
+                            pass
+        for f in watch_files:
+            if f.exists():
+                try:
+                    snapshot[str(f)] = f.stat().st_mtime
+                except OSError:
+                    pass
+        return snapshot
+
+    last_snapshot = get_snapshot()
+    try:
+        while True:
+            time.sleep(0.5)
+            curr = get_snapshot()
+            if curr != last_snapshot:
+                last_snapshot = curr
+                print("\n🔄 [Change Detected] Rebuilding index.html...")
+                build_index_html(use_cache=True)
+    except KeyboardInterrupt:
+        print("\n👋 [Watch Mode] Stopped.")
 
 def run_lint_check(strict: bool = False) -> bool:
     """Audits all companion markdown notes across tracks."""
@@ -75,6 +119,9 @@ def main():
         run_lint_check(strict=args.strict)
 
     build_index_html(use_cache=not args.clean)
+
+    if args.watch:
+        watch_mode()
 
     if args.open:
         index_file = BASE_DIR / "index.html"

@@ -35,9 +35,7 @@ class TemplateBundler:
         """Bundles modular layout and asset sources into a single template string."""
         layout_path = self.templates_dir / "src" / "layout.html"
         if not layout_path.exists():
-            # Fallback to monolithic station_template.html
-            fallback_path = self.templates_dir / "station_template.html"
-            return read_file(fallback_path)
+            raise FileNotFoundError(f"Authoritative layout template not found: {layout_path}")
 
         layout_content = read_file(layout_path)
         src_dir = self.templates_dir / "src"

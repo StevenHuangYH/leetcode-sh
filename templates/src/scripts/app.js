@@ -700,8 +700,14 @@ const items = {items_json};
     }
 
     
+    const renderedMarkdownCache = new Map();
+    const MAX_MD_CACHE_SIZE = 64;
+
     function renderProtectedMarkdown(markdownText) {
       if (!markdownText) return "";
+      if (renderedMarkdownCache.has(markdownText)) {
+        return renderedMarkdownCache.get(markdownText);
+      }
       const mathBlocks = [];
       
       // 1. Protect block math $$...$$
@@ -726,6 +732,12 @@ const items = {items_json};
         const rawMath = display ? `$$${formula}$$` : `$${formula}$`;
         html = html.split(token).join(rawMath);
       });
+
+      if (renderedMarkdownCache.size >= MAX_MD_CACHE_SIZE) {
+        const oldestKey = renderedMarkdownCache.keys().next().value;
+        renderedMarkdownCache.delete(oldestKey);
+      }
+      renderedMarkdownCache.set(markdownText, html);
       
       return html;
     }

@@ -815,8 +815,13 @@
       }
       input.focus();
     }
+    const renderedMarkdownCache = new Map();
+    const MAX_MD_CACHE_SIZE = 64;
     function renderProtectedMarkdown(markdownText) {
       if (!markdownText) return "";
+      if (renderedMarkdownCache.has(markdownText)) {
+        return renderedMarkdownCache.get(markdownText);
+      }
       const mathBlocks = [];
       let text = markdownText.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
         const token = `@@MATH_BLOCK_${mathBlocks.length}@@`;
@@ -833,6 +838,11 @@
         const rawMath = display ? `$$${formula}$$` : `$${formula}$`;
         html = html.split(token).join(rawMath);
       });
+      if (renderedMarkdownCache.size >= MAX_MD_CACHE_SIZE) {
+        const oldestKey = renderedMarkdownCache.keys().next().value;
+        renderedMarkdownCache.delete(oldestKey);
+      }
+      renderedMarkdownCache.set(markdownText, html);
       return html;
     }
     function switchItem(key, rerenderSearch = true) {

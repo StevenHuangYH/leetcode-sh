@@ -42,15 +42,21 @@ class TestPreviewAndGenerator(unittest.TestCase):
             f"update_index.py must be modularized and under 350 lines (currently {len(lines)} lines)"
         )
 
-    def test_station_template_exists_and_is_valid(self):
-        """Assert frontend template is decoupled into templates/station_template.html."""
-        self.assertTrue(
-            self.template_path.exists(),
-            "templates/station_template.html must exist to decouple frontend from update_index.py"
-        )
-        template_text = self.template_path.read_text(encoding="utf-8")
-        self.assertIn("{items_json}", template_text)
-        self.assertIn("{roadmap_json}", template_text)
+    def test_modular_template_sources_and_bundler_integrity(self):
+        """Assert modular frontend templates exist under templates/src/ and TemplateBundler bundles successfully."""
+        src_dir = REPO_ROOT / "templates" / "src"
+        self.assertTrue((src_dir / "layout.html").exists(), "templates/src/layout.html must exist as primary layout")
+        self.assertTrue((src_dir / "styles" / "base.css").exists())
+        self.assertTrue((src_dir / "styles" / "roadmap.css").exists())
+        self.assertTrue((src_dir / "styles" / "mobile.css").exists())
+        self.assertTrue((src_dir / "scripts" / "app.js").exists())
+
+        from scripts.compiler import TemplateBundler
+        bundler = TemplateBundler(REPO_ROOT / "templates")
+        bundled = bundler.bundle()
+        self.assertIn("{items_json}", bundled)
+        self.assertIn("{roadmap_json}", bundled)
+        self.assertIn("{roadmap_graph_json}", bundled)
 
     def test_mobile_responsive_features_present(self):
         """Assert station template and index.html include mobile bottom nav and 100dvh."""
