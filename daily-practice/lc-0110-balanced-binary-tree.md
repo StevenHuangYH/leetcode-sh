@@ -239,10 +239,8 @@ class SolutionTuple:
 
 | 输入用例 (Input Case) | 结构形态 (Structure) | 递归推演路径 (Trace) | 判定结果 (Result) |
 | :--- | :--- | :--- | :---: |
-| **空树 `root = []`** | `None` | `get_height(None)` 返回 0 $
-ightarrow$ `0 != -1` | `True` |
-| **单节点 `root = [1]`** | 仅根节点 | 左右子树均为 0，`abs(0-0) <= 1`，返回 1 $
-ightarrow$ `1 != -1` | `True` |
+| **空树 `root = []`** | `None` | `get_height(None)` 返回 0 $\rightarrow$ `0 != -1` | `True` |
+| **单节点 `root = [1]`** | 仅根节点 | 左右子树均为 0，`abs(0-0) <= 1`，返回 1 $\rightarrow$ `1 != -1` | `True` |
 | **完美平衡树 `[3,9,20,null,null,15,7]`** | 满二叉子树 | 左子树高度 1，右子树高度 2，高度差 1 $\le 1$，根返回 3 | `True` |
 | **极左倾斜链表 `[1,2,null,3,null,4]`** | 退化为单链表 | 节点 (3) 高度 2，右为 0，高度差 2 > 1，立即触发 `-1` 短路 | `False` |
 

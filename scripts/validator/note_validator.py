@@ -18,6 +18,19 @@ class ValidationResult:
         return f"INVALID ({len(self.errors)} error(s)): {self.note_path or 'Note'} -> {err_str}"
 
 
+def _normalize_token_aliases(text: str) -> Set[str]:
+    """Generates normalized aliases (lower-cased, space/hyphen/underscore variants) for a token."""
+    cleaned = text.strip().lower()
+    if not cleaned:
+        return set()
+    aliases = {cleaned}
+    if "-" in cleaned:
+        aliases.add(cleaned.replace("-", " "))
+    if "_" in cleaned:
+        aliases.add(cleaned.replace("_", " "))
+    return aliases
+
+
 @functools.lru_cache(maxsize=1)
 def _get_canonical_topology_data() -> Tuple[List[str], Set[str]]:
     """Cached internal helper to extract both canonical keywords list and entities set in a single traversal."""
@@ -35,16 +48,12 @@ def _get_canonical_topology_data() -> Tuple[List[str], Set[str]]:
         # 1. Node ID (hyphenated and spaced)
         node_id = node.id.strip().lower()
         keywords.add(node_id)
-        entities.add(node_id)
-        entities.add(node_id.replace("-", " "))
-        entities.add(node_id.replace("_", " "))
+        entities.update(_normalize_token_aliases(node_id))
 
         # 2. Node Category
         category = getattr(node, "category", None)
         if category:
-            cat_clean = category.strip().lower()
-            entities.add(cat_clean)
-            entities.add(cat_clean.replace("-", " "))
+            entities.update(_normalize_token_aliases(category))
 
         # 3. Node Label lines
         label = getattr(node, "label", None)
@@ -56,7 +65,7 @@ def _get_canonical_topology_data() -> Tuple[List[str], Set[str]]:
                     for part in re.split(r'[/|&]', line_clean):
                         part_clean = part.strip()
                         if len(part_clean) > 1:
-                            entities.add(part_clean)
+                            entities.update(_normalize_token_aliases(part_clean))
 
         # 4. Canonical Keywords
         node_keywords = getattr(node, "keywords", None)
@@ -65,8 +74,7 @@ def _get_canonical_topology_data() -> Tuple[List[str], Set[str]]:
                 kw_clean = kw.strip().lower()
                 if len(kw_clean) > 1:
                     keywords.add(kw_clean)
-                    entities.add(kw_clean)
-                    entities.add(kw_clean.replace("-", " "))
+                    entities.update(_normalize_token_aliases(kw_clean))
 
     return sorted(keywords), entities
 
@@ -123,6 +131,16 @@ def validate_non_problem_document(markdown_content: str, doc_path: Optional[str]
             target_rel_cwd = Path(clean_target)
             if not (target_rel_doc.exists() or target_rel_cwd.exists()):
                 errors.append(f"Broken relative link target '{clean_target}' (file not found on disk).")
+
+    # 5. Verify overview structure (presence of # Topic or ## Overview or ## 概述 or introductory text)
+    has_overview = bool(
+        re.search(r'^#\s+.*Topic', markdown_content, re.MULTILINE | re.IGNORECASE) or
+        re.search(r'##\s*(?:Overview|概述)', markdown_content, re.IGNORECASE) or
+        re.search(r'^[^#\s\n\r][^\n\r]+', markdown_content, re.MULTILINE) or
+        len(markdown_content.strip()) > 30
+    )
+    if not has_overview:
+        errors.append("Document is missing overview structure (# Topic, ## Overview, ## 概述, or introductory body).")
 
     return ValidationResult(
         is_valid=len(errors) == 0,
@@ -182,17 +200,17 @@ class NoteStructureValidator:
                 errors.append("Problem Statement is missing bilingual [EN] or [CN] tags.")
 
         # 3. Component 3: Core Idea, Mental Model & Pattern Lineage
-        s3_match = re.search(
-            r'##\s*\d*\.?\s*(?:Core\s*Idea|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s|\Z)',
+        s3_matches = list(re.finditer(
+            r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s*\d*\.|\n##\s*(?:Step-by-Step|Interview|The\s*Error|Complexity)|\Z)',
             markdown_content,
             re.DOTALL | re.IGNORECASE
-        )
+        ))
 
-        if not s3_match:
+        if not s3_matches:
             missing_sections.append("Component 3: Core Idea & Mental Model")
             errors.append("Missing required Component 3: Core Idea, Mental Model & Pattern Lineage.")
         else:
-            s3_body = s3_match.group(1)
+            s3_body = "\n".join(m.group(1) for m in s3_matches)
 
             # Check mandatory Topology Node macro anchor
             topo_match = re.search(r'(?:(?:🗺️\s*)?`?\*?\*?Topology\s*Node\*?\*?\s*[:：]\s*)([^\n\r]+)', s3_body, re.IGNORECASE)
