@@ -17,7 +17,7 @@ class Solution:
             
             for j in range(i, d-1, -1):
                 path.append(j)
-                dfs(j-1, t-1)
+                dfs(j-1, t-j)
                 path.pop()
 
         dfs(9, n)

@@ -13,7 +13,7 @@ class Solution:
         path = []
         def dfs(i):
 
-            d = k - len(path) # m
+            d = k - len(path)
             
             if len(path) == k:
                 ans.append(path.copy())

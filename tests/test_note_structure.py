@@ -69,7 +69,14 @@ class TestNoteStructureValidator(unittest.TestCase):
         self.assertFalse(result.is_valid)
         self.assertTrue(any("topology taxonomy keyword" in err for err in result.errors))
 
+    def test_missing_topology_lineage_diagram_fails(self):
+        broken_note = VALID_NOTE_SAMPLE.replace("```\n[LC 0033] -> [LC 0153] -> [LC 0154]\n```", "Just plain text without diagram or model.")
+        result = self.validator.validate(broken_note, "mock-no-lineage.md")
+        self.assertFalse(result.is_valid)
+        self.assertTrue(any("Topology Anchor" in err or "Pattern Lineage" in err for err in result.errors))
+
     def test_sample_repository_notes(self):
+
         sample_paths = [
             REPO_ROOT / "top-100" / "lc-0015-3sum.md",
             REPO_ROOT / "daily-practice" / "lc-0153-find-minimum-in-rotated-sorted-array.md",

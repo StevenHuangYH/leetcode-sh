@@ -16,8 +16,34 @@ class ValidationResult:
         err_str = "; ".join(self.errors)
         return f"INVALID ({len(self.errors)} error(s)): {self.note_path or 'Note'} -> {err_str}"
 
+
+def get_canonical_topology_keywords() -> List[str]:
+
+    """Dynamically extracts all canonical topology taxonomy keywords and node IDs from the registry."""
+    keywords = set()
+    try:
+        from scripts.compiler.topology_definitions import CANONICAL_TOPOLOGY_NODES
+        for node in CANONICAL_TOPOLOGY_NODES:
+            keywords.add(node.id.lower())
+            for kw in node.keywords:
+                if len(kw) > 1:
+                    keywords.add(kw.lower())
+    except Exception:
+        pass
+    if not keywords:
+        keywords = {
+            "array", "linked-list", "linked", "diff", "difference", "matrix", "prefix",
+            "stack", "queue", "hash", "design", "pointer", "sliding-window", "binary-search",
+            "search", "random", "recursion", "recursive", "tree", "level-order", "bfs",
+            "shortest-path", "dijkstra", "dfs", "backtracking", "divide", "conquer",
+            "dp", "dynamic", "math", "greedy", "bst", "heap", "trie", "graph", "bit",
+            "palindrome", "fast-slow", "sentinel", "string", "combinatorics"
+        }
+    return sorted(keywords)
+
 class NoteStructureValidator:
     """Validator enforcing the 7 Active Recall components mandated by AGENTS.md."""
+
 
     def validate(self, markdown_content: str, note_path: Optional[str] = None) -> ValidationResult:
         """Validates a markdown note's adherence to the 7-component active recall standard."""
@@ -44,14 +70,7 @@ class NoteStructureValidator:
             errors.append("Missing required Component 1: Header & File Links metadata.")
         else:
             # Verify topology taxonomy keyword alignment
-            topology_keywords = [
-                "array", "linked-list", "linked", "diff", "difference", "matrix", "prefix",
-                "stack", "queue", "hash", "design", "pointer", "sliding-window", "binary-search",
-                "search", "random", "recursion", "recursive", "tree", "level-order", "bfs",
-                "shortest-path", "dijkstra", "dfs", "backtracking", "divide", "conquer",
-                "dp", "dynamic", "math", "greedy", "bst", "heap", "trie", "graph", "bit",
-                "palindrome", "fast-slow", "sentinel", "string", "combinatorics"
-            ]
+            topology_keywords = get_canonical_topology_keywords()
             tag_match = re.search(r'(?:Tags|标签)\s*[:：*]+\s*([^\n\r]+)', markdown_content, re.IGNORECASE)
             if tag_match:
                 tag_text = tag_match.group(1).lower()
@@ -71,10 +90,20 @@ class NoteStructureValidator:
                 errors.append("Problem Statement is missing bilingual [EN] or [CN] tags.")
 
         # 3. Component 3: Core Idea, Mental Model & Pattern Lineage
-        has_core_idea = bool(re.search(r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)', markdown_content, re.IGNORECASE))
-        if not has_core_idea:
+        s3_match = re.search(r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s*\d*\.|\Z)', markdown_content, re.DOTALL | re.IGNORECASE)
+        if not s3_match:
             missing_sections.append("Component 3: Core Idea & Mental Model")
             errors.append("Missing required Component 3: Core Idea, Mental Model & Pattern Lineage.")
+        else:
+            s3_body = s3_match.group(1)
+            has_lineage_or_model = bool(
+                re.search(r'(?:Topology\s*Node|Pattern\s*Lineage|思维演化|演化树|演化图|决策树|状态转移|```)', s3_body, re.IGNORECASE)
+            )
+            if not has_lineage_or_model:
+                errors.append("Component 3 is missing Topology Anchor or Pattern Lineage ASCII diagram.")
+
+
+
 
         # 4. Component 4: Step-by-Step Code Walkthrough
         has_walkthrough = bool(re.search(r'##\s*\d*\.?\s*Step-by-Step\s*Code\s*Walkthrough', markdown_content, re.IGNORECASE))
