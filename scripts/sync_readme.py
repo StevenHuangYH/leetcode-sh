@@ -9,6 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.compiler.collector import ProblemCollector
+from scripts.compiler.track_definitions import TrackRegistry
 
 
 def format_markdown_link(rel_path: str) -> str:
@@ -88,7 +89,9 @@ def parse_existing_descriptions(readme_text: str) -> Dict[int, Tuple[str, str, s
 
 
 def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
-    top_100_dir = REPO_ROOT / "problems" / "top-100"
+    top_100_track = TrackRegistry.get_track_by_id("top-100")
+    top_100_rel = top_100_track.dir_path if top_100_track else "problems/top-100"
+    top_100_dir = REPO_ROOT / top_100_rel
     stems = sorted(list(set(f.stem for f in top_100_dir.glob("lc-*"))))
     
     def get_num(stem):
@@ -111,9 +114,9 @@ def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
         
         sol_parts = []
         if py_path.exists():
-            sol_parts.append(format_markdown_link(f"problems/top-100/{stem}.py"))
+            sol_parts.append(format_markdown_link(f"{top_100_rel}/{stem}.py"))
         if md_path.exists():
-            sol_parts.append(format_markdown_link(f"problems/top-100/{stem}.md"))
+            sol_parts.append(format_markdown_link(f"{top_100_rel}/{stem}.md"))
         sol_str = "<br>".join(sol_parts)
         
         if num in existing_desc:

@@ -6,6 +6,7 @@ from .entities import BuildResult, read_file
 from .collector import collect_workspace_documents
 from .graph_builder import build_topology_graph
 from .bundler import TemplateBundler
+from .track_definitions import TrackRegistry
 
 class StudyStationCompiler:
     """Deep engine module for compiling the leetcode-sh study station SPA."""
@@ -46,9 +47,12 @@ class StudyStationCompiler:
             # 4. Inject payload into template
             compact_items_json = json.dumps(all_items, separators=(',', ':'), ensure_ascii=False)
             compact_graph_json = json.dumps(graph_data, separators=(',', ':'), ensure_ascii=False)
+            compact_tracks_json = json.dumps(TrackRegistry.to_client_json_payload(), separators=(',', ':'), ensure_ascii=False)
 
             html_content = template.replace(
                 "{items_json}", compact_items_json
+            ).replace(
+                "{tracks_json}", compact_tracks_json
             ).replace(
                 "{roadmap_json}", "[]"
             ).replace(

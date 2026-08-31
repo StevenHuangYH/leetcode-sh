@@ -23,6 +23,7 @@ from .graph_builder import build_topology_graph
 from .collector import collect_workspace_documents
 from .parser import parse_curriculum_topics
 from .bundler import TemplateBundler
+from .track_definitions import TrackConfig, CANONICAL_TRACKS, TrackRegistry
 from .engine import StudyStationCompiler, compile_study_station
 
 __all__ = [
@@ -43,6 +44,9 @@ __all__ = [
     "collect_workspace_documents",
     "parse_curriculum_topics",
     "TemplateBundler",
+    "TrackConfig",
+    "CANONICAL_TRACKS",
+    "TrackRegistry",
     "StudyStationCompiler",
     "compile_study_station",
 ]

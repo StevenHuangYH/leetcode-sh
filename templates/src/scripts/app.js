@@ -1,4 +1,5 @@
 const items = {items_json};
+    const configuredTracks = {tracks_json};
     const roadmapData = {roadmap_json};
 
     let mainMode = localStorage.getItem("mainMode") || "roadmap";
@@ -21,7 +22,7 @@ const items = {items_json};
     }
 
     // Tree folder structure definitions matching README.md repo structure
-    const treeStructure = [
+    const staticFolders = [
       {
         id: "overview",
         name: "README.md",
@@ -34,25 +35,38 @@ const items = {items_json};
         name: "problem-index/",
         label: "Curriculum Index",
         filter: k => k.startsWith("topic-")
-      },
-      {
-        id: "top-100",
-        name: "problems/top-100/",
-        label: "Top 100 Liked",
-        filter: k => k.startsWith("problems/top-100/") || k.startsWith("top-100/")
-      },
-      {
-        id: "daily-practice",
-        name: "problems/daily-practice/",
-        label: "Daily Practice",
-        filter: k => k.startsWith("problems/daily-practice/") || k.startsWith("daily-practice/")
-      },
-      {
-        id: "luffy",
-        name: "problems/luffy/",
-        label: "Curriculum (01-42)",
-        filter: k => k.startsWith("problems/luffy/") || k.startsWith("luffy/")
       }
+    ];
+
+    const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({
+      id: t.id,
+      name: `${t.dir_path}/`,
+      label: t.display_label,
+      filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`) || (t.legacy_prefix && k.startsWith(t.legacy_prefix))
+    }));
+
+    const treeStructure = [
+      ...staticFolders,
+      ...(dynamicTrackFolders.length > 0 ? dynamicTrackFolders : [
+        {
+          id: "top-100",
+          name: "problems/top-100/",
+          label: "Top 100 Liked",
+          filter: k => k.startsWith("problems/top-100/") || k.startsWith("top-100/")
+        },
+        {
+          id: "daily-practice",
+          name: "problems/daily-practice/",
+          label: "Daily Practice",
+          filter: k => k.startsWith("problems/daily-practice/") || k.startsWith("daily-practice/")
+        },
+        {
+          id: "luffy",
+          name: "problems/luffy/",
+          label: "Curriculum (01-42)",
+          filter: k => k.startsWith("problems/luffy/") || k.startsWith("luffy/")
+        }
+      ])
     ];
 
     function updateProgressBadge() {
@@ -587,8 +601,21 @@ const items = {items_json};
 
       // 4. Track prefix fallback & Stem matching
       const stem = cleanPath.split("/").pop().replace(/\.(py|md)$/, "").toLowerCase();
-      const tracks = ["problems/top-100", "problems/daily-practice", "problems/luffy", "top-100", "daily-practice", "luffy"];
-      for (const track of tracks) {
+      const searchTracks = [];
+      if (Array.isArray(configuredTracks)) {
+        for (const t of configuredTracks) {
+          if (t.dir_path && !searchTracks.includes(t.dir_path)) searchTracks.push(t.dir_path);
+          if (t.id && !searchTracks.includes(t.id)) searchTracks.push(t.id);
+          if (t.legacy_prefix) {
+            const cleanLegacy = t.legacy_prefix.replace(/\/$/, "");
+            if (cleanLegacy && !searchTracks.includes(cleanLegacy)) searchTracks.push(cleanLegacy);
+          }
+        }
+      }
+      if (searchTracks.length === 0) {
+        searchTracks.push("problems/top-100", "problems/daily-practice", "problems/luffy", "top-100", "daily-practice", "luffy");
+      }
+      for (const track of searchTracks) {
         const tryPy = `${track}/${stem}.py`;
         const tryMd = `${track}/${stem}.md`;
         if (items[tryPy]) return { key: tryPy, anchor };

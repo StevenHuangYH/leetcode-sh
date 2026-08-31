@@ -13,6 +13,7 @@ from .entities import (
     format_problem_title
 )
 from .parser import parse_curriculum_topics
+from .track_definitions import TrackRegistry
 
 
 MANIFEST_VERSION = "2.3"
@@ -40,11 +41,7 @@ def _get_file_stat(file_path: Optional[Path]) -> Tuple[float, int]:
 class ProblemCollector:
     """Encapsulates document collection, pairing, and metadata extraction across repository tracks."""
 
-    TRACKS = [
-        ("problems/top-100", "Top 100 Liked Track"),
-        ("problems/daily-practice", "Daily Practice Track"),
-        ("problems/luffy", "Luffy Curriculum (01-42)")
-    ]
+    TRACKS = TrackRegistry.get_collector_tuples()
 
     @classmethod
     def collect(cls, base_dir: Optional[Path] = None, use_cache: bool = True) -> Dict[str, Any]:

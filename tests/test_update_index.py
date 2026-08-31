@@ -251,6 +251,54 @@ class TestUpdateIndexParser(unittest.TestCase):
         from update_index import run_lint_check
         self.assertTrue(run_lint_check(strict=True))
 
+    def test_track_registry_domain_model(self):
+        """Assert TrackRegistry encapsulates canonical track paths and client payloads."""
+        from scripts.compiler.track_definitions import TrackRegistry, CANONICAL_TRACKS
+        
+        tracks = TrackRegistry.get_all_tracks()
+        self.assertEqual(len(tracks), 3)
+        self.assertEqual([t.id for t in tracks], ["top-100", "daily-practice", "luffy"])
+        
+        paths = TrackRegistry.get_track_paths()
+        self.assertEqual(paths, ["problems/top-100", "problems/daily-practice", "problems/luffy"])
+        
+        tuples = TrackRegistry.get_collector_tuples()
+        self.assertEqual(tuples, [
+            ("problems/top-100", "Top 100 Liked Track"),
+            ("problems/daily-practice", "Daily Practice Track"),
+            ("problems/luffy", "Luffy Curriculum (01-42)")
+        ])
+        
+        top100 = TrackRegistry.get_track_by_id("top-100")
+        self.assertIsNotNone(top100)
+        self.assertEqual(top100.dir_path, "problems/top-100")
+        
+        payload = TrackRegistry.to_client_json_payload()
+        self.assertEqual(len(payload), 3)
+        self.assertEqual(payload[0]["id"], "top-100")
+        self.assertEqual(payload[0]["dir_path"], "problems/top-100")
+
+    def test_study_station_compiler_injects_tracks_payload(self):
+        """Assert StudyStationCompiler generates index.html containing valid tracks JSON and no unreplaced placeholders."""
+        from scripts.compiler.engine import compile_study_station
+        import tempfile
+        
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
+            self.assertTrue(result.success)
+            html_text = tmp_path.read_text(encoding="utf-8")
+            self.assertNotIn("{tracks_json}", html_text)
+            self.assertNotIn("{items_json}", html_text)
+            self.assertNotIn("{roadmap_graph_json}", html_text)
+            self.assertIn('"dir_path":"problems/top-100"', html_text)
+            self.assertIn('"dir_path":"problems/daily-practice"', html_text)
+            self.assertIn('"dir_path":"problems/luffy"', html_text)
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
+
 
 if __name__ == "__main__":
     unittest.main()

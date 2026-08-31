@@ -14,6 +14,7 @@ from pathlib import Path
 from scripts.compiler import (
     DocumentEntity,
     BuildResult,
+    TrackRegistry,
     collect_workspace_documents,
     parse_curriculum_topics,
     compile_study_station,
@@ -38,9 +39,8 @@ def watch_mode():
     import time
     print("👀 [Watch Mode] Monitoring tracks and templates/src/ for changes... (Ctrl+C to stop)")
     watch_dirs = [
-        BASE_DIR / "problems" / "top-100",
-        BASE_DIR / "problems" / "daily-practice",
-        BASE_DIR / "problems" / "luffy",
+        BASE_DIR / t.dir_path for t in TrackRegistry.get_all_tracks()
+    ] + [
         BASE_DIR / "templates" / "src",
     ]
     watch_files = [
@@ -79,7 +79,7 @@ def watch_mode():
 
 def run_lint_check(strict: bool = False) -> bool:
     """Audits all companion markdown notes across tracks."""
-    tracks = ["problems/top-100", "problems/daily-practice", "problems/luffy"]
+    tracks = TrackRegistry.get_track_paths()
     total_audited = 0
     total_invalid = 0
 

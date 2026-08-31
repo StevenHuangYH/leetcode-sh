@@ -76,7 +76,7 @@ class TestGraphBuilder(unittest.TestCase):
         """Assert DocumentEntity matches_keywords and to_topology_summary encapsulation."""
         from scripts.compiler.entities import DocumentEntity
         entity = DocumentEntity.create_problem(
-            key="daily-practice/lc-0216-combination-sum-3.py",
+            key="problems/daily-practice/lc-0216-combination-sum-3.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 216 · Combination Sum III (组合总和 III)",
@@ -86,7 +86,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Combination Sum III",
             tags="backtracking recursion dfs combinatorics",
             lc_num="LC 216",
-            path="daily-practice/lc-0216-combination-sum-3",
+            path="problems/daily-practice/lc-0216-combination-sum-3",
             diff="Medium"
         )
         self.assertTrue(entity.matches_keywords(["backtracking"]))
@@ -97,7 +97,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertFalse(entity.matches_keywords(["linked-list"]))
 
         summary = entity.to_topology_summary()
-        self.assertEqual(summary["key"], "daily-practice/lc-0216-combination-sum-3.py")
+        self.assertEqual(summary["key"], "problems/daily-practice/lc-0216-combination-sum-3.py")
         self.assertEqual(summary["lc_num"], "LC 216")
         self.assertEqual(summary["diff"], "Medium")
 
@@ -105,7 +105,7 @@ class TestGraphBuilder(unittest.TestCase):
         """Assert DocumentEntity lazily computes and caches _token_set, _word_sequence, and _cleaned_cjk."""
         from scripts.compiler.entities import DocumentEntity
         entity = DocumentEntity.create_problem(
-            key="top-100/lc-0022-generate-parentheses.py",
+            key="problems/top-100/lc-0022-generate-parentheses.py",
             category="Top 100 Liked Track",
             category_display="Top 100",
             title="LC 22 · Generate Parentheses (括号生成)",
@@ -115,7 +115,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Generate Parentheses",
             tags="backtracking string",
             lc_num="LC 22",
-            path="top-100/lc-0022-generate-parentheses",
+            path="problems/top-100/lc-0022-generate-parentheses",
             diff="Medium"
         )
         self.assertIsNone(entity._token_set)
@@ -144,7 +144,7 @@ class TestGraphBuilder(unittest.TestCase):
 
         # 1. Exact token match: backtracking, binary-tree, lc-0216
         entity_bt = DocumentEntity.create_problem(
-            key="daily-practice/lc-0216-combination-sum-3.py",
+            key="problems/daily-practice/lc-0216-combination-sum-3.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 216 · Combination Sum III (组合总和 III)",
@@ -154,7 +154,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Combination Sum III",
             tags="backtracking recursion dfs combinatorics",
             lc_num="LC 216",
-            path="daily-practice/lc-0216-combination-sum-3",
+            path="problems/daily-practice/lc-0216-combination-sum-3",
             diff="Medium"
         )
         self.assertTrue(entity_bt.matches_keywords(["backtracking"]))
@@ -164,7 +164,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertTrue(entity_bt.matches_keywords(["combination-sum"]))
 
         entity_tree = DocumentEntity.create_problem(
-            key="top-100/lc-0104-maximum-depth-of-binary-tree.py",
+            key="problems/top-100/lc-0104-maximum-depth-of-binary-tree.py",
             category="Top 100 Liked Track",
             category_display="Top 100",
             title="LC 104 · Maximum Depth of Binary Tree (二叉树的最大深度)",
@@ -174,7 +174,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Maximum Depth of Binary Tree",
             tags="binary-tree tree dfs",
             lc_num="LC 104",
-            path="top-100/lc-0104-maximum-depth-of-binary-tree",
+            path="problems/top-100/lc-0104-maximum-depth-of-binary-tree",
             diff="Easy"
         )
         self.assertTrue(entity_tree.matches_keywords(["binary-tree"]))
@@ -186,7 +186,7 @@ class TestGraphBuilder(unittest.TestCase):
         # 2. Substring collisions rejected:
         # "tree" must NOT match "street"
         entity_street = DocumentEntity.create_problem(
-            key="daily-practice/lc-9999-easy-street.py",
+            key="problems/daily-practice/lc-9999-easy-street.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 9999 · Easy Street Problem (简单街道)",
@@ -196,7 +196,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Easy Street Problem",
             tags="array easy",
             lc_num="LC 9999",
-            path="daily-practice/lc-9999-easy-street",
+            path="problems/daily-practice/lc-9999-easy-street",
             diff="Easy"
         )
         self.assertFalse(entity_street.matches_keywords(["tree"]))
@@ -205,7 +205,7 @@ class TestGraphBuilder(unittest.TestCase):
 
         # "diff" must NOT match "difficult"
         entity_diff = DocumentEntity.create_problem(
-            key="daily-practice/lc-9998-difficult-sum.py",
+            key="problems/daily-practice/lc-9998-difficult-sum.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 9998 · Difficult Sum (困难求和)",
@@ -215,7 +215,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Difficult Sum",
             tags="dp math",
             lc_num="LC 9998",
-            path="daily-practice/lc-9998-difficult-sum",
+            path="problems/daily-practice/lc-9998-difficult-sum",
             diff="Hard"
         )
         self.assertFalse(entity_diff.matches_keywords(["diff"]))
@@ -224,7 +224,7 @@ class TestGraphBuilder(unittest.TestCase):
 
         # "path" must NOT match "empathy"
         entity_path = DocumentEntity.create_problem(
-            key="daily-practice/lc-9997-empathy-score.py",
+            key="problems/daily-practice/lc-9997-empathy-score.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 9997 · Empathy Score (同理心分数)",
@@ -234,7 +234,7 @@ class TestGraphBuilder(unittest.TestCase):
             en_title="Empathy Score",
             tags="greedy",
             lc_num="LC 9997",
-            path="daily-practice/lc-9997-empathy-score",
+            path="problems/daily-practice/lc-9997-empathy-score",
             diff="Medium"
         )
         self.assertFalse(entity_path.matches_keywords(["path"]))
