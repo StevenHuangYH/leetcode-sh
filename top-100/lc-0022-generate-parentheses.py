@@ -15,7 +15,7 @@ class Solution:
             if open < n:
                 path[i] = "("
                 dfs(i+1, open+1)
-            if open < open:
+            if i - open < open:
                 path[i] = ")"
                 dfs(i + 1, open)
 
