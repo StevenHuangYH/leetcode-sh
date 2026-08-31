@@ -23,6 +23,8 @@ Given a positive integer `n`, generate an `n x n` matrix filled with elements fr
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [2D Array]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 四界收缩法: top, bottom, left, right 顺时针依次推进    │

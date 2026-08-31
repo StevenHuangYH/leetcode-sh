@@ -23,6 +23,8 @@ Given an array of integers `nums` and an integer `target`, return indices of the
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Hashing]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 单遍哈希探测 target - x                                 │

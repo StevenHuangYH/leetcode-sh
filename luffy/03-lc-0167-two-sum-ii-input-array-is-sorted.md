@@ -23,6 +23,8 @@ Given a 1-indexed array of integers `numbers` that is already sorted in non-decr
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 相向双指针对撞: sum < target -> left++; sum > target -> right-- │

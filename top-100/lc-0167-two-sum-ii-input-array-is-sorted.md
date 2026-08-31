@@ -32,6 +32,8 @@ Your solution must use only constant extra space.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Two Pointer]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

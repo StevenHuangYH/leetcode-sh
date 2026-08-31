@@ -29,6 +29,8 @@ A subarray is a contiguous sequence of elements within an array.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Hashing]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

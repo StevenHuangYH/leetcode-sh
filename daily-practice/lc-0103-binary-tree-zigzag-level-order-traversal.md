@@ -46,6 +46,8 @@
 
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Tree Traversal] ➔ [Level Traverse]`
+
 ### 🧠 二叉树锯齿形层序思维谱系演化树 (Pattern Lineage)
 
 ```

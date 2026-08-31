@@ -23,6 +23,8 @@ Foundational node definitions and traversal alternatives for spiral structures a
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [2D Array]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 链表节点与矩阵结构演进模型                             │

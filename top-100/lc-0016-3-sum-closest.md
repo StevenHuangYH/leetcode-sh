@@ -42,6 +42,8 @@
 
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Two Pointer]`
+
 ### 🧠 3Sum 系列演化树 (Pattern Lineage)
 
 ```

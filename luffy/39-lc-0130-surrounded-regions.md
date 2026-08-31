@@ -23,6 +23,8 @@ Given an `m x n` matrix `board` containing 'X' and 'O', capture all regions that
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [DFS]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 逆向思维: 从四条边界的 'O' 出发 DFS 标记为 'A' (保活)  │

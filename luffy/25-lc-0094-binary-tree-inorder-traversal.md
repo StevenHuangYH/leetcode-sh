@@ -23,6 +23,8 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Tree Paradigms] ➔ [Recursive Traverse]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 中序遍历 DFS (Left -> Root -> Right)                   │

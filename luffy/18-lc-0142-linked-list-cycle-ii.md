@@ -23,6 +23,8 @@ Given the `head` of a linked list, return the node where the cycle begins. If th
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Linked List] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 数学推导与入环点相遇                                   │

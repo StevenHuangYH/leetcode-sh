@@ -23,6 +23,8 @@ You are given an `m x n` grid where each cell can have one of three values: 0 em
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Search Algorithms] ➔ [BFS]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 多源广度优先搜索 (Multi-source BFS)                   │

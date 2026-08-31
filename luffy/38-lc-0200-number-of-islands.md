@@ -23,6 +23,8 @@ m == grid.length, n == grid[i].length, 1 <= m, n <= 300
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [DFS]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 沉岛策略 / 泛洪填充 (Flood Fill)                       │

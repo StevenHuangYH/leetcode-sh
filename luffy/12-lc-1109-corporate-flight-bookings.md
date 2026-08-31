@@ -23,6 +23,8 @@ There are `n` flights labeled from 1 to `n`. Given a list of flight bookings `bo
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [Diff Array]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 差分数组区间修改: diff[first-1] += seats, diff[last] -= seats│

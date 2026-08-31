@@ -23,6 +23,8 @@ Validate BST using post-order tree DP returning (min_val, max_val) sub-tree boun
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 后序自底向上: 返回 (is_bst, min_val, max_val)          │

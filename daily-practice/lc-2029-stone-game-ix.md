@@ -29,6 +29,8 @@ Alice 和 Bob 轮流进行自己的回合，Alice 先手。每一回合，玩家
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Other] ➔ [Math]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

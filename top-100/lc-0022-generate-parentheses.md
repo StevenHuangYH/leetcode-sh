@@ -44,9 +44,7 @@
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
 ### 宏观拓扑图谱归属 (Topology Node Macro Anchor)
-```
-Topology Node: [Exhaustive Search] ➔ [Traverse View] ➔ [Backtracking]
-```
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
 
 ---
 

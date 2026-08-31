@@ -70,15 +70,21 @@ class TestNoteStructureValidator(unittest.TestCase):
         self.assertFalse(result.is_valid)
         self.assertTrue(any("topology taxonomy keyword" in err for err in result.errors))
 
-    def test_missing_topology_lineage_diagram_fails(self):
+    def test_missing_topology_macro_anchor_fails(self):
         broken_note = VALID_NOTE_SAMPLE.replace(
             "`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Binary Search]`\n", ""
-        ).replace(
+        )
+        result = self.validator.validate(broken_note, "mock-no-anchor.md")
+        self.assertFalse(result.is_valid)
+        self.assertIn("Component 3 is missing required 'Topology Node:' macro anchor.", result.errors)
+
+    def test_missing_topology_lineage_diagram_fails(self):
+        broken_note = VALID_NOTE_SAMPLE.replace(
             "```\n[LC 0033] -> [LC 0153] -> [LC 0154]\n```", "Just plain text without diagram or model."
         )
         result = self.validator.validate(broken_note, "mock-no-lineage.md")
         self.assertFalse(result.is_valid)
-        self.assertTrue(any("Topology Anchor" in err or "Pattern Lineage" in err for err in result.errors))
+        self.assertTrue(any("Pattern Lineage" in err for err in result.errors))
 
     def test_invalid_topology_macro_anchor_fails(self):
         broken_note = VALID_NOTE_SAMPLE.replace(
@@ -148,9 +154,17 @@ This guide provides a comprehensive overview of object-oriented programming foun
         """Assert all companion notes in daily-practice/ pass validation."""
         from scripts.validator.note_validator import audit_notes_directory
         daily_results = audit_notes_directory(REPO_ROOT / "daily-practice")
-        self.assertGreaterEqual(len(daily_results), 20, "Should audit all daily practice companion notes")
+        self.assertEqual(len(daily_results), 20, "Should audit all 20 daily practice companion notes")
         for name, res in daily_results.items():
             self.assertTrue(res.is_valid, f"Daily practice note {name} failed validation: {res.errors}")
+
+    def test_top_100_notes_auditing(self):
+        """Assert all companion notes in top-100/ pass validation."""
+        from scripts.validator.note_validator import audit_notes_directory
+        top_100_results = audit_notes_directory(REPO_ROOT / "top-100")
+        self.assertEqual(len(top_100_results), 23, "Should audit all 23 top-100 companion notes")
+        for name, res in top_100_results.items():
+            self.assertTrue(res.is_valid, f"Top-100 note {name} failed validation: {res.errors}")
 
     def test_canonical_topology_data_cache_consistency(self):
         """Assert _get_canonical_topology_data caches keywords and entities properly."""
@@ -197,6 +211,31 @@ This guide provides a comprehensive overview of object-oriented programming foun
         )
         self.assertFalse(res_broken.is_valid)
         self.assertTrue(any("Broken relative link" in err for err in res_broken.errors))
+
+    def test_normalize_token_aliases_helper(self):
+        """Assert _normalize_token_aliases generates expected token variants."""
+        from scripts.validator.note_validator import _normalize_token_aliases
+        self.assertEqual(_normalize_token_aliases(""), set())
+        self.assertEqual(_normalize_token_aliases("  "), set())
+        self.assertEqual(_normalize_token_aliases("binary-tree"), {"binary-tree", "binary tree"})
+        self.assertEqual(_normalize_token_aliases("sliding_window"), {"sliding_window", "sliding window"})
+        self.assertEqual(_normalize_token_aliases("Backtracking"), {"backtracking"})
+
+    def test_problem_blueprint_component_3_variant_passes(self):
+        """Assert notes with 'Problem Blueprint' in Section 2 or Section 3 pass Component 3 validation."""
+        blueprint_note = VALID_NOTE_SAMPLE.replace(
+            "## 3. Core Idea, Mental Model & Pattern Lineage",
+            "## 3. Problem Blueprint & Core Invariant"
+        )
+        res = self.validator.validate(blueprint_note, "mock-blueprint.md")
+        self.assertTrue(res.is_valid, f"Expected blueprint note to pass: {res.errors}")
+
+    def test_non_problem_doc_missing_overview_structure_fails(self):
+        """Assert non-problem docs missing overview structure or intro text fail."""
+        empty_overview_doc = "# Title Only\n"
+        res = self.validator.validate_non_problem_doc(empty_overview_doc, "empty_overview.md")
+        self.assertFalse(res.is_valid)
+        self.assertTrue(any("overview structure" in err for err in res.errors))
 
 
 if __name__ == "__main__":

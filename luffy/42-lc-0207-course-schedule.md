@@ -23,6 +23,8 @@ There are a total of `numCourses` courses you have to take, labeled from `0` to 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [Graph]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Kahn 拓扑排序 (入度表 + BFS)                           │

@@ -23,6 +23,8 @@ Given `head`, the head of a linked list, determine if the linked list has a cycl
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Linked List] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Floyd 快慢指针 (2:1 相对速度追击)                     │

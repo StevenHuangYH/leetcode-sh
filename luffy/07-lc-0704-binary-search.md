@@ -23,6 +23,8 @@ Given an array of integers `nums` which is sorted in ascending order, and an int
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Binary Search]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 闭区间二分: left=0, right=n-1, while left <= right     │

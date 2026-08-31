@@ -23,6 +23,8 @@ m == board.length, n = board[i].length, 1 <= m, n <= 6, 1 <= word.length <= 15
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 网格 DFS + 原地回溯标记                                │

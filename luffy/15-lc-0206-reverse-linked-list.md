@@ -23,6 +23,8 @@ Given the `head` of a singly linked list, reverse the list, and return the rever
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Linked List] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 三指针迭代反转: prev=None, curr=head                   │

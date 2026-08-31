@@ -23,6 +23,8 @@ Given the `root` of a binary tree, return its maximum depth.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Recursive Mindset] ➔ [Binary Tree]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 分治递推: depth = 1 + max(maxDepth(left), maxDepth(right)) │

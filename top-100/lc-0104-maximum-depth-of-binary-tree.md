@@ -42,6 +42,8 @@
 
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Recursive Mindset] ➔ [Binary Tree]`
+
 ### 🧠 树形递归与树形 DP 思维谱系演化树 (Pattern Lineage)
 
 ```

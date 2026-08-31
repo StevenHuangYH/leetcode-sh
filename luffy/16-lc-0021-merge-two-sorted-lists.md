@@ -23,6 +23,8 @@ You are given the heads of two sorted linked lists `list1` and `list2`. Merge th
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Linked List] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 哨兵头节点 + 双指针穿针引线                            │

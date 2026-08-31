@@ -23,6 +23,8 @@ Given the root of a binary tree, determine if it is a valid binary search tree (
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 开区间上下界递推: is_valid(node, low, high)            │

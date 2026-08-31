@@ -23,6 +23,8 @@ Given an integer array `nums` sorted in non-decreasing order, remove the duplica
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Two Pointer]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 快慢双指针: read 扫描，write 维护不重复前缀            │

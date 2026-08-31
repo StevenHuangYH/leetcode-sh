@@ -23,6 +23,8 @@ Given a string `s`, partition `s` such that every substring of the partition is 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 回溯切割线: 枚举当前切割子串 s[start...i]             │

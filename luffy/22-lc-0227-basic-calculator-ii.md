@@ -23,6 +23,8 @@ Given a string `s` which represents an expression, evaluate this expression and 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Stack & Queue]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 栈运算符优先级计算                                     │

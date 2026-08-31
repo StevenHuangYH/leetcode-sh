@@ -23,6 +23,8 @@ Given a collection of candidate numbers (`candidates`) and a target number (`tar
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 树层去重 (Breadth Deduplication)                       │

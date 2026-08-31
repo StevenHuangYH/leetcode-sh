@@ -23,6 +23,8 @@ Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 后序分治四态判定:                                      │
