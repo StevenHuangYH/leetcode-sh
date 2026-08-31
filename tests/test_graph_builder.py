@@ -101,6 +101,43 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertEqual(summary["lc_num"], "LC 216")
         self.assertEqual(summary["diff"], "Medium")
 
+    def test_document_entity_lazy_token_caching(self):
+        """Assert DocumentEntity lazily computes and caches _token_set, _word_sequence, and _cleaned_cjk."""
+        from scripts.compiler.entities import DocumentEntity
+        entity = DocumentEntity.create_problem(
+            key="top-100/lc-0022-generate-parentheses.py",
+            category="Top 100 Liked Track",
+            category_display="Top 100",
+            title="LC 22 · Generate Parentheses (括号生成)",
+            short="LC 22 Generate Parentheses",
+            slug="lc-0022-generate-parentheses generate-parentheses",
+            cn_title="括号生成",
+            en_title="Generate Parentheses",
+            tags="backtracking string",
+            lc_num="LC 22",
+            path="top-100/lc-0022-generate-parentheses",
+            diff="Medium"
+        )
+        self.assertIsNone(entity._token_set)
+        self.assertIsNone(entity._word_sequence)
+        self.assertIsNone(entity._cleaned_cjk)
+
+        # Trigger keyword match
+        res = entity.matches_keywords(["backtracking"])
+        self.assertTrue(res)
+        self.assertIsNotNone(entity._token_set)
+        self.assertIsNotNone(entity._word_sequence)
+        self.assertIsNotNone(entity._cleaned_cjk)
+        self.assertIn("backtracking", entity._token_set)
+        self.assertIn("parentheses", entity._word_sequence)
+        self.assertIn("括号生成", entity._cleaned_cjk)
+
+        # Subsequent matches reuse cache
+        token_set_ref = entity._token_set
+        res2 = entity.matches_keywords(["string"])
+        self.assertTrue(res2)
+        self.assertIs(entity._token_set, token_set_ref)
+
     def test_tokenized_keyword_matching_exact_and_collision_rejection(self):
         """Assert exact token matches work and substring collisions are strictly rejected."""
         from scripts.compiler.entities import DocumentEntity

@@ -152,6 +152,52 @@ This guide provides a comprehensive overview of object-oriented programming foun
         for name, res in daily_results.items():
             self.assertTrue(res.is_valid, f"Daily practice note {name} failed validation: {res.errors}")
 
+    def test_canonical_topology_data_cache_consistency(self):
+        """Assert _get_canonical_topology_data caches keywords and entities properly."""
+        from scripts.validator.note_validator import (
+            _get_canonical_topology_data,
+            get_canonical_topology_keywords,
+            get_canonical_topology_entities,
+        )
+        data1 = _get_canonical_topology_data()
+        data2 = _get_canonical_topology_data()
+        self.assertIs(data1, data2, "Cached helper should return identical tuple reference")
+        keywords = get_canonical_topology_keywords()
+        entities = get_canonical_topology_entities()
+        self.assertEqual(keywords, data1[0])
+        self.assertEqual(entities, data1[1])
+        self.assertIn("backtracking", keywords)
+        self.assertIn("binary search", entities)
+
+    def test_non_problem_documentation_relative_link_auditing(self):
+        """Assert validate_non_problem_document verifies relative links against disk."""
+        # 1. Valid links: existing local file, anchor link, and web URL
+        valid_doc = """# Guide Document
+
+## Links
+- [Python Source](./02-lc-0001-two-sum.py)
+- [Anchor Link](#guide-document)
+- [Web Link](https://example.com/docs)
+"""
+        res_valid = self.validator.validate_non_problem_doc(
+            valid_doc,
+            str(REPO_ROOT / "luffy" / "02-lc-0001-two-sum.md")
+        )
+        self.assertTrue(res_valid.is_valid, f"Expected valid doc to pass: {res_valid.errors}")
+
+        # 2. Broken relative link
+        broken_doc = """# Guide Document
+
+## Links
+- [Broken Link](./non_existent_file_xyz_123.py)
+"""
+        res_broken = self.validator.validate_non_problem_doc(
+            broken_doc,
+            str(REPO_ROOT / "luffy" / "02-lc-0001-two-sum.md")
+        )
+        self.assertFalse(res_broken.is_valid)
+        self.assertTrue(any("Broken relative link" in err for err in res_broken.errors))
+
 
 if __name__ == "__main__":
     unittest.main()

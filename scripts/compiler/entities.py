@@ -24,13 +24,18 @@ class DocumentEntity:
     py_file: str = ""
     md_file: str = ""
 
+    def __post_init__(self) -> None:
+        self._token_set: Optional[set] = None
+        self._word_sequence: Optional[List[str]] = None
+        self._cleaned_cjk: Optional[str] = None
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
-    def matches_keywords(self, keywords: List[str]) -> bool:
-        """Determines whether this entity matches any of the canonical topology keywords using tokenized word-boundary matching."""
-        if not keywords:
-            return False
+    def _ensure_token_cache(self) -> None:
+        """Lazily extracts and caches normalized tokens, word sequences, and CJK text for keyword matching."""
+        if getattr(self, "_token_set", None) is not None:
+            return
 
         # Gather metadata fields for token extraction and phrase matching
         raw_parts = [
@@ -46,15 +51,14 @@ class DocumentEntity:
             self.key or "",
             self.path or ""
         ]
-        raw_text = " ".join(raw_parts).lower()
+        self._cleaned_cjk = " ".join(raw_parts).lower()
 
         # Clean punctuation except hyphens, underscores, word characters and CJK
-        cleaned_text = re.sub(r"[^\w\-\u4e00-\u9fff]+", " ", raw_text)
-        word_sequence = [w for w in re.split(r"[-_\s]+", cleaned_text) if w]
-        word_seq_len = len(word_sequence)
+        cleaned_text = re.sub(r"[^\w\-\u4e00-\u9fff]+", " ", self._cleaned_cjk)
+        self._word_sequence = [w for w in re.split(r"[-_\s]+", cleaned_text) if w]
 
         # Build token set with individual words and preserved hyphenated/underscore chunks
-        token_set = set(word_sequence)
+        token_set = set(self._word_sequence)
         for chunk in cleaned_text.split():
             clean_chunk = chunk.strip("-_")
             if clean_chunk:
@@ -84,6 +88,21 @@ class DocumentEntity:
                 except ValueError:
                     pass
 
+        self._token_set = token_set
+
+    def matches_keywords(self, keywords: List[str]) -> bool:
+        """Determines whether this entity matches any of the canonical topology keywords using tokenized word-boundary matching."""
+        if not keywords:
+            return False
+
+        if getattr(self, "_token_set", None) is None:
+            self._ensure_token_cache()
+
+        token_set = self._token_set or set()
+        word_sequence = self._word_sequence or []
+        word_seq_len = len(word_sequence)
+        cleaned_cjk = self._cleaned_cjk or ""
+
         # Evaluate candidate keywords
         for kw in keywords:
             if not kw:
@@ -94,7 +113,7 @@ class DocumentEntity:
 
             # CJK characters matching
             if re.search(r'[\u4e00-\u9fff]', kw_clean):
-                if kw_clean in raw_text:
+                if kw_clean in cleaned_cjk:
                     return True
                 continue
 

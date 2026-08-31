@@ -1,6 +1,7 @@
+import functools
 import re
 from pathlib import Path
-from typing import List, Dict, Optional, Any, Set
+from typing import List, Dict, Optional, Any, Set, Tuple
 from dataclasses import dataclass, field
 
 @dataclass
@@ -17,39 +18,17 @@ class ValidationResult:
         return f"INVALID ({len(self.errors)} error(s)): {self.note_path or 'Note'} -> {err_str}"
 
 
-def get_canonical_topology_keywords() -> List[str]:
-    """Dynamically extracts all canonical topology taxonomy keywords and node IDs from the registry."""
+@functools.lru_cache(maxsize=1)
+def _get_canonical_topology_data() -> Tuple[List[str], Set[str]]:
+    """Cached internal helper to extract both canonical keywords list and entities set in a single traversal."""
     keywords = set()
-    try:
-        from scripts.compiler.topology_definitions import CANONICAL_TOPOLOGY_NODES
-        for node in CANONICAL_TOPOLOGY_NODES:
-            keywords.add(node.id.lower())
-            if hasattr(node, "keywords") and node.keywords:
-                for kw in node.keywords:
-                    if len(kw.strip()) > 1:
-                        keywords.add(kw.strip().lower())
-    except Exception:
-        pass
-    if not keywords:
-        keywords = {
-            "array", "linked-list", "linked", "diff", "difference", "matrix", "prefix",
-            "stack", "queue", "hash", "design", "pointer", "sliding-window", "binary-search",
-            "search", "random", "recursion", "recursive", "tree", "level-order", "bfs",
-            "shortest-path", "dijkstra", "dfs", "backtracking", "divide", "conquer",
-            "dp", "dynamic", "math", "greedy", "bst", "heap", "trie", "graph", "bit",
-            "palindrome", "fast-slow", "sentinel", "string", "combinatorics"
-        }
-    return sorted(keywords)
-
-
-def get_canonical_topology_entities() -> Set[str]:
-    """Dynamically extracts all canonical node IDs, categories, group labels, and keywords from the topology registry."""
     entities = set()
     try:
         from scripts.compiler.topology_definitions import CANONICAL_TOPOLOGY_NODES
         for node in CANONICAL_TOPOLOGY_NODES:
             # 1. Node ID (hyphenated and spaced)
             node_id = node.id.strip().lower()
+            keywords.add(node_id)
             entities.add(node_id)
             entities.add(node_id.replace("-", " "))
             entities.add(node_id.replace("_", " "))
@@ -74,15 +53,26 @@ def get_canonical_topology_entities() -> Set[str]:
                                 entities.add(part_clean)
 
             # 4. Canonical Keywords
-            keywords = getattr(node, "keywords", None)
-            if keywords:
-                for kw in keywords:
+            node_keywords = getattr(node, "keywords", None)
+            if node_keywords:
+                for kw in node_keywords:
                     kw_clean = kw.strip().lower()
                     if len(kw_clean) > 1:
+                        keywords.add(kw_clean)
                         entities.add(kw_clean)
                         entities.add(kw_clean.replace("-", " "))
     except Exception:
         pass
+
+    if not keywords:
+        keywords = {
+            "array", "linked-list", "linked", "diff", "difference", "matrix", "prefix",
+            "stack", "queue", "hash", "design", "pointer", "sliding-window", "binary-search",
+            "search", "random", "recursion", "recursive", "tree", "level-order", "bfs",
+            "shortest-path", "dijkstra", "dfs", "backtracking", "divide", "conquer",
+            "dp", "dynamic", "math", "greedy", "bst", "heap", "trie", "graph", "bit",
+            "palindrome", "fast-slow", "sentinel", "string", "combinatorics"
+        }
 
     if not entities:
         entities = {
@@ -98,7 +88,18 @@ def get_canonical_topology_entities() -> Set[str]:
             "subproblem view", "divide-conquer", "divide & conquer", "dp", "dynamic programming",
             "other-group", "math", "greedy", "advanced-ds-group", "bst", "heap", "trie", "graph"
         }
-    return entities
+
+    return sorted(keywords), entities
+
+
+def get_canonical_topology_keywords() -> List[str]:
+    """Dynamically extracts all canonical topology taxonomy keywords and node IDs from the registry."""
+    return _get_canonical_topology_data()[0]
+
+
+def get_canonical_topology_entities() -> Set[str]:
+    """Dynamically extracts all canonical node IDs, categories, group labels, and keywords from the topology registry."""
+    return _get_canonical_topology_data()[1]
 
 
 def validate_non_problem_document(markdown_content: str, doc_path: Optional[str] = None) -> ValidationResult:
@@ -125,6 +126,25 @@ def validate_non_problem_document(markdown_content: str, doc_path: Optional[str]
     if re.search(r'\[[^\]]+\]\(\s*\)', markdown_content):
         errors.append("Document contains broken empty markdown link targets [text]().")
 
+    # 4. Relative link disk verification when doc_path is provided
+    if doc_path:
+        doc_file_path = Path(doc_path)
+        doc_dir = doc_file_path.parent if doc_file_path.is_file() or doc_file_path.suffix else doc_file_path
+        for match in re.finditer(r'!?\[([^\]]+)\]\(([^)]+)\)', markdown_content):
+            target = match.group(2).strip()
+            if not target or target.startswith("#"):
+                continue
+            if re.match(r'^(?:https?|ftp|mailto|tel|javascript|data):', target, re.IGNORECASE):
+                continue
+            # Extract file part before any anchor or whitespace title
+            clean_target = target.split()[0].split("#")[0].strip()
+            if not clean_target:
+                continue
+            target_rel_doc = doc_dir / clean_target
+            target_rel_cwd = Path(clean_target)
+            if not (target_rel_doc.exists() or target_rel_cwd.exists()):
+                errors.append(f"Broken relative link target '{clean_target}' (file not found on disk).")
+
     return ValidationResult(
         is_valid=len(errors) == 0,
         missing_sections=[],
@@ -136,9 +156,7 @@ def validate_non_problem_document(markdown_content: str, doc_path: Optional[str]
 class NoteStructureValidator:
     """Validator enforcing the 7 Active Recall components mandated by AGENTS.md."""
 
-    def validate_non_problem_doc(self, markdown_content: str, doc_path: Optional[str] = None) -> ValidationResult:
-        """Validates non-problem documentation (guides, curriculum overviews)."""
-        return validate_non_problem_document(markdown_content, doc_path)
+    validate_non_problem_doc = staticmethod(validate_non_problem_document)
 
     def validate(self, markdown_content: str, note_path: Optional[str] = None) -> ValidationResult:
         """Validates a markdown note's adherence to the 7-component active recall standard."""
@@ -186,16 +204,10 @@ class NoteStructureValidator:
 
         # 3. Component 3: Core Idea, Mental Model & Pattern Lineage
         s3_match = re.search(
-            r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s*\d*\.?\s*(?:Step-by-Step|Interview|The\s*Error|Complexity)|\Z)',
+            r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s|\Z)',
             markdown_content,
             re.DOTALL | re.IGNORECASE
         )
-        if not s3_match:
-            s3_match = re.search(
-                r'##\s*\d*\.?\s*(?:Core\s*Idea|Problem\s*Blueprint|Mental\s*Model|Pattern\s*Lineage)[^\n]*\n(.*?)(?=\n##\s*\d*\.|\Z)',
-                markdown_content,
-                re.DOTALL | re.IGNORECASE
-            )
 
         if not s3_match:
             missing_sections.append("Component 3: Core Idea & Mental Model")
