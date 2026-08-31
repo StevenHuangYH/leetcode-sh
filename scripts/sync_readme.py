@@ -45,19 +45,19 @@ def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
         
         links = file_map.setdefault(num, [])
         
-        if py_file and (REPO_ROOT / py_file).exists():
-            py_link = f"[`{py_file}`]({py_file})"
-            if py_link not in links:
-                links.append(py_link)
-        elif key.endswith(".py") and (REPO_ROOT / key).exists():
-            key_link = f"[`{key}`]({key})"
-            if key_link not in links:
-                links.append(key_link)
-                
-        if md_file and (REPO_ROOT / md_file).exists():
-            md_link = f"[`{md_file}`]({md_file})"
-            if md_link not in links:
-                links.append(md_link)
+        def add_file_link(file_rel: Optional[str]):
+            if file_rel and (REPO_ROOT / file_rel).exists():
+                link = f"[`{file_rel}`]({file_rel})"
+                if link not in links:
+                    links.append(link)
+        
+        py_file = item.get("py_file")
+        if py_file:
+            add_file_link(py_file)
+        elif key.endswith(".py"):
+            add_file_link(key)
+            
+        add_file_link(item.get("md_file"))
                 
     return file_map
 

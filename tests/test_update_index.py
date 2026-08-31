@@ -193,6 +193,13 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertTrue(any("daily-practice/lc-0131-palindrome-partitioning.md" in l for l in lc_131_links))
         self.assertTrue(any("luffy/36-lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
 
+        # Verify all 10 core multi-track problems exist in file_map with >1 link
+        multi_track_ids = [77, 78, 131, 167, 3, 209, 59, 303, 20, 98]
+        for prob_id in multi_track_ids:
+            with self.subTest(prob_id=prob_id):
+                self.assertIn(prob_id, file_map)
+                self.assertGreater(len(file_map[prob_id]), 1, f"Problem {prob_id} should have multiple track links")
+
     def test_section_5_multi_track_readme_preservation(self):
         """Assert Section 5 in README.md retains both .py and .md companion links for multi-track problems."""
         from scripts.sync_readme import update_readme
@@ -200,9 +207,14 @@ class TestUpdateIndexParser(unittest.TestCase):
         
         readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         
-        # Verify LC 77 row in Section 5 includes companion notes
+        # Verify Section 5 rows include both code and companion notes across tracks
         self.assertIn("[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)", readme_text)
         self.assertIn("[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)", readme_text)
+        self.assertIn("[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)", readme_text)
+        self.assertIn("[`top-100/lc-0003-longest-substring-without-repeating-characters.md`](top-100/lc-0003-longest-substring-without-repeating-characters.md)", readme_text)
+        self.assertIn("[`top-100/lc-0209-minimum-size-subarray-sum.md`](top-100/lc-0209-minimum-size-subarray-sum.md)", readme_text)
+        self.assertIn("[`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)", readme_text)
+        self.assertIn("[`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)", readme_text)
 
 
 if __name__ == "__main__":
