@@ -11,6 +11,11 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.compiler.collector import ProblemCollector
 
 
+def format_markdown_link(rel_path: str) -> str:
+    """Formats a repository-relative path as a markdown link."""
+    return f"[`{rel_path}`]({rel_path})"
+
+
 def build_difficulty_map(collector_items: dict) -> Dict[int, str]:
     """Pre-builds an integer-keyed difficulty lookup map from collected problem entities."""
     diff_map = {}
@@ -32,7 +37,7 @@ def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
     
     def _add_link(target_dict: Dict[int, List[str]], num: int, file_rel: Optional[str]):
         if file_rel and (REPO_ROOT / file_rel).exists():
-            link = f"[`{file_rel}`]({file_rel})"
+            link = format_markdown_link(file_rel)
             links = target_dict.setdefault(num, [])
             if link not in links:
                 links.append(link)
@@ -106,9 +111,9 @@ def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
         
         sol_parts = []
         if py_path.exists():
-            sol_parts.append(f"[`top-100/{stem}.py`](top-100/{stem}.py)")
+            sol_parts.append(format_markdown_link(f"top-100/{stem}.py"))
         if md_path.exists():
-            sol_parts.append(f"[`top-100/{stem}.md`](top-100/{stem}.md)")
+            sol_parts.append(format_markdown_link(f"top-100/{stem}.md"))
         sol_str = "<br>".join(sol_parts)
         
         if num in existing_desc:

@@ -91,12 +91,117 @@ class TestGraphBuilder(unittest.TestCase):
         )
         self.assertTrue(entity.matches_keywords(["backtracking"]))
         self.assertTrue(entity.matches_keywords(["0216"]))
+        self.assertTrue(entity.matches_keywords(["lc-0216"]))
+        self.assertTrue(entity.matches_keywords(["combination-sum"]))
+        self.assertTrue(entity.matches_keywords(["组合"]))
         self.assertFalse(entity.matches_keywords(["linked-list"]))
 
         summary = entity.to_topology_summary()
         self.assertEqual(summary["key"], "daily-practice/lc-0216-combination-sum-3.py")
         self.assertEqual(summary["lc_num"], "LC 216")
         self.assertEqual(summary["diff"], "Medium")
+
+    def test_tokenized_keyword_matching_exact_and_collision_rejection(self):
+        """Assert exact token matches work and substring collisions are strictly rejected."""
+        from scripts.compiler.entities import DocumentEntity
+
+        # 1. Exact token match: backtracking, binary-tree, lc-0216
+        entity_bt = DocumentEntity.create_problem(
+            key="daily-practice/lc-0216-combination-sum-3.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 216 · Combination Sum III (组合总和 III)",
+            short="LC 216 Combination Sum III",
+            slug="lc-0216-combination-sum-3 combination-sum-iii",
+            cn_title="组合总和 III",
+            en_title="Combination Sum III",
+            tags="backtracking recursion dfs combinatorics",
+            lc_num="LC 216",
+            path="daily-practice/lc-0216-combination-sum-3",
+            diff="Medium"
+        )
+        self.assertTrue(entity_bt.matches_keywords(["backtracking"]))
+        self.assertTrue(entity_bt.matches_keywords(["lc-0216"]))
+        self.assertTrue(entity_bt.matches_keywords(["0216"]))
+        self.assertTrue(entity_bt.matches_keywords(["216"]))
+        self.assertTrue(entity_bt.matches_keywords(["combination-sum"]))
+
+        entity_tree = DocumentEntity.create_problem(
+            key="top-100/lc-0104-maximum-depth-of-binary-tree.py",
+            category="Top 100 Liked Track",
+            category_display="Top 100",
+            title="LC 104 · Maximum Depth of Binary Tree (二叉树的最大深度)",
+            short="LC 104 Maximum Depth of Binary Tree",
+            slug="lc-0104-maximum-depth-of-binary-tree maximum-depth-of-binary-tree",
+            cn_title="二叉树的最大深度",
+            en_title="Maximum Depth of Binary Tree",
+            tags="binary-tree tree dfs",
+            lc_num="LC 104",
+            path="top-100/lc-0104-maximum-depth-of-binary-tree",
+            diff="Easy"
+        )
+        self.assertTrue(entity_tree.matches_keywords(["binary-tree"]))
+        self.assertTrue(entity_tree.matches_keywords(["tree"]))
+        self.assertTrue(entity_tree.matches_keywords(["二叉树"]))
+        self.assertTrue(entity_tree.matches_keywords(["lc-0104"]))
+        self.assertTrue(entity_tree.matches_keywords(["0104"]))
+
+        # 2. Substring collisions rejected:
+        # "tree" must NOT match "street"
+        entity_street = DocumentEntity.create_problem(
+            key="daily-practice/lc-9999-easy-street.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 9999 · Easy Street Problem (简单街道)",
+            short="LC 9999 Easy Street Problem",
+            slug="lc-9999-easy-street easy-street",
+            cn_title="简单街道",
+            en_title="Easy Street Problem",
+            tags="array easy",
+            lc_num="LC 9999",
+            path="daily-practice/lc-9999-easy-street",
+            diff="Easy"
+        )
+        self.assertFalse(entity_street.matches_keywords(["tree"]))
+        self.assertTrue(entity_street.matches_keywords(["street"]))
+        self.assertTrue(entity_street.matches_keywords(["easy-street"]))
+
+        # "diff" must NOT match "difficult"
+        entity_diff = DocumentEntity.create_problem(
+            key="daily-practice/lc-9998-difficult-sum.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 9998 · Difficult Sum (困难求和)",
+            short="LC 9998 Difficult Sum",
+            slug="lc-9998-difficult-sum difficult-sum",
+            cn_title="困难求和",
+            en_title="Difficult Sum",
+            tags="dp math",
+            lc_num="LC 9998",
+            path="daily-practice/lc-9998-difficult-sum",
+            diff="Hard"
+        )
+        self.assertFalse(entity_diff.matches_keywords(["diff"]))
+        self.assertTrue(entity_diff.matches_keywords(["difficult"]))
+        self.assertTrue(entity_diff.matches_keywords(["difficult-sum"]))
+
+        # "path" must NOT match "empathy"
+        entity_path = DocumentEntity.create_problem(
+            key="daily-practice/lc-9997-empathy-score.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 9997 · Empathy Score (同理心分数)",
+            short="LC 9997 Empathy Score",
+            slug="lc-9997-empathy-score empathy-score",
+            cn_title="同理心分数",
+            en_title="Empathy Score",
+            tags="greedy",
+            lc_num="LC 9997",
+            path="daily-practice/lc-9997-empathy-score",
+            diff="Medium"
+        )
+        self.assertFalse(entity_path.matches_keywords(["path"]))
+        self.assertTrue(entity_path.matches_keywords(["empathy"]))
 
     def test_backtracking_node_contains_lc_77_and_lc_216(self):
         """Assert backtracking topology node contains LC 77 and LC 216."""

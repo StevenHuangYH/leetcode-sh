@@ -7,20 +7,17 @@ class Solution:
         ans = []
         path = [""] * m 
 
-        def dfs(i, open):
+        def dfs(i, open_count):
             if i == m:
                 ans.append("".join(path))
                 return
 
-            if open < n:
+            if open_count < n:
                 path[i] = "("
-                dfs(i+1, open+1)
-            if i - open < open:
+                dfs(i + 1, open_count + 1)
+            if i - open_count < open_count:
                 path[i] = ")"
-                dfs(i + 1, open)
+                dfs(i + 1, open_count)
 
-        dfs(0,0)
+        dfs(0, 0)
         return ans
-     
-
-        
