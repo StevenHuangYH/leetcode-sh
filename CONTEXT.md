@@ -78,3 +78,6 @@ This file serves as the single source of truth for domain vocabulary, topologica
 7. **Zero-Download In-App Navigation & Notes-First Routing**:
    * Relative `.py` and `.md` links in curriculum catalogs and markdown notes are dynamically intercepted and routed in memory via `InternalNavigationInterceptor` and `EntityReferenceResolver`, completely preventing unwanted browser file downloads. All internal link clicks strictly open the target problem in Notes-Only view (`viewMode = "notes"`) to preserve distraction-free active recall. External URLs are strictly isolated in new browser tabs.
 
+8. **Topology Taxonomy Alignment & Active Recall Mapping**:
+   * Companion notes must declare standardized taxonomy tags and macro topology anchors matching `CANONICAL_TOPOLOGY_NODES` (`scripts/compiler/topology_definitions.py`), bridging micro algorithmic steps to macro curriculum topology while enabling automatic graph search indexing and problem frequency calculation.
+

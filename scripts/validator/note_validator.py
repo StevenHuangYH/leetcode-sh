@@ -42,6 +42,22 @@ class NoteStructureValidator:
         if not (has_title and has_meta):
             missing_sections.append("Component 1: Header & File Links")
             errors.append("Missing required Component 1: Header & File Links metadata.")
+        else:
+            # Verify topology taxonomy keyword alignment
+            topology_keywords = [
+                "array", "linked-list", "linked", "diff", "difference", "matrix", "prefix",
+                "stack", "queue", "hash", "design", "pointer", "sliding-window", "binary-search",
+                "search", "random", "recursion", "recursive", "tree", "level-order", "bfs",
+                "shortest-path", "dijkstra", "dfs", "backtracking", "divide", "conquer",
+                "dp", "dynamic", "math", "greedy", "bst", "heap", "trie", "graph", "bit",
+                "palindrome", "fast-slow", "sentinel", "string", "combinatorics"
+            ]
+            tag_match = re.search(r'(?:Tags|标签)\s*[:：*]+\s*([^\n\r]+)', markdown_content, re.IGNORECASE)
+            if tag_match:
+                tag_text = tag_match.group(1).lower()
+                has_valid_topo_keyword = any(kw in tag_text for kw in topology_keywords)
+                if not has_valid_topo_keyword:
+                    errors.append("Component 1 Tags must include at least one canonical topology taxonomy keyword.")
 
         # 2. Component 2: Problem Statement & Constraints (Bilingual [EN] and [CN])
         has_problem_stmt = bool(re.search(r'##\s*\d*\.?\s*Problem\s*Statement', markdown_content, re.IGNORECASE))

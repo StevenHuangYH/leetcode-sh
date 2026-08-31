@@ -2,7 +2,7 @@
 
 [![Python 3.x](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![LeetCode](https://img.shields.io/badge/LeetCode-Practice-FFA116.svg?logo=leetcode&logoColor=white)](https://leetcode.com/)
-[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-174+-brightgreen.svg)]()
+[![Problems Solved](https://img.shields.io/badge/Problems_Indexed-175+-brightgreen.svg)]()
 [![Interactive Viewer](https://img.shields.io/badge/Web_Viewer-index.html-blueviolet.svg)]()
 
 Welcome to my personal LeetCode question cracking collections. This repository is where I store my solutions, and categorize my various data structures or problem sets.
@@ -36,9 +36,9 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 | Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 31 | ~31% | 31 |
-| **Medium** | 62 | ~62% | 134 |
-| **Hard** | 7 | ~7% | 9 |
+| **Easy** | 8 | ~9% | 8 |
+| **Medium** | 85 | ~90% | 166 |
+| **Hard** | 1 | ~1% | 1 |
 | **Total** | **94 In-Depth Notes** | **100%** | **175 Problem Entities** |
 
 ---
@@ -429,4 +429,10 @@ python3 top-100/lc-0015-3sum.py
 
 # Example: Run Subarray Product Less Than K
 python3 top-100/lc-0713-subarray-product-less-than-k.py
+```
+
+### 4. Enable Local Quality Gate (Pre-Commit Hook)
+Activate the repository's automated pre-commit quality gate to validate note schema compliance and rebuild `index.html` on commit:
+```bash
+git config core.hooksPath .githooks
 ```

@@ -93,6 +93,34 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertIn('e.key === "Enter"', content)
         self.assertIn('notesViewer.focus()', content)
         self.assertIn('boundaryRegex', content)
+        # Assert Enter key targets .problem-item specifically
+        self.assertIn('.problem-item', content)
+        self.assertNotIn('document.querySelector("#treeRoot .nav-item");', content)
+
+    def test_view_mode_isolation_on_notes_fallback(self):
+        """Assert switchItem does not permanently pollute global viewMode when opening code-only items."""
+        app_js_path = REPO_ROOT / "templates" / "src" / "scripts" / "app.js"
+        app_js_content = app_js_path.read_text(encoding="utf-8")
+        # Ensure switchItem does not execute setViewMode("code") on fallback
+        self.assertNotIn(
+            'setViewMode("code")',
+            app_js_content,
+            "switchItem must not mutate global viewMode via setViewMode('code')"
+        )
+
+    def test_search_precision_and_scroll_restoration(self):
+        """Assert search isolates problem ID tokens and clearSearch restores active scroll."""
+        content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn('idBlob', content)
+        self.assertIn('activeItem.scrollIntoView', content)
+        self.assertIn('problem-item', content)
+
+    def test_git_hook_instructions_present_in_docs(self):
+        """Assert both AGENTS.md and README.md document git config core.hooksPath .githooks."""
+        readme_content = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+        agents_content = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("git config core.hooksPath .githooks", readme_content)
+        self.assertIn("git config core.hooksPath .githooks", agents_content)
 
 
 if __name__ == "__main__":

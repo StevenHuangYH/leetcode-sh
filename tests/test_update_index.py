@@ -153,6 +153,17 @@ class TestUpdateIndexParser(unittest.TestCase):
         topic_cfg = TopicConfig("topic-08-backtracking", "8. Backtracking", "8. Backtracking", r"### 8\.")
         self.assertEqual(topic_cfg.key, "topic-08-backtracking")
 
+    def test_sync_readme_dynamic_difficulty_metrics(self):
+        """Assert sync_readme does not contain hardcoded difficulty counts and computes them dynamically."""
+        from pathlib import Path
+        sync_readme_path = Path(__file__).parent.parent / "scripts" / "sync_readme.py"
+        content = sync_readme_path.read_text(encoding="utf-8")
+        # Ensure hardcoded difficulty table constants are removed
+        self.assertNotIn("| **Easy** | 31 | ~31% | 31 |", content)
+        self.assertNotIn("| **Medium** | 62 | ~62% | 134 |", content)
+        self.assertNotIn("| **Hard** | 7 | ~7% | 9 |", content)
+        self.assertNotIn("total_problems = 174", content)
+
 
 if __name__ == "__main__":
     unittest.main()

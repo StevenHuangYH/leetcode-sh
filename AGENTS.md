@@ -38,10 +38,12 @@ This file establishes the operational rules and standards for all AI coding assi
 Every companion `.md` note must adhere to the standard 7-section structure, designed around active recall, mental model mapping, and exam/interview readiness:
 
 1. **Header & File Links**:
-   * Problem number, English & Chinese title, difficulty rating, tags, and clickable markdown link to the corresponding `.py` file.
+   * Problem number, English & Chinese title, difficulty rating, clickable markdown link to the corresponding `.py` file.
+   * **Standardized Topology Taxonomy Keyword Tags**: Note `Tags:` must explicitly include matching keywords from the 38-Node Topology Graph (`CANONICAL_TOPOLOGY_NODES`), such as `sliding-window`, `two-pointers`, `fast-slow-pointers`, `binary-search`, `stack`, `queue`, `prefix-sum`, `difference-array`, `matrix`, `linked-list`, `binary-tree`, `tree-level-order`, `dfs`, `bfs`, `backtracking`, `divide-and-conquer`, `dynamic-programming`, `greedy`, `math`, `bit-manipulation`, `bst`, `heap`, `trie`, `graph`, `hashing`, `design`, etc., ensuring dynamic graph indexing and search highlights.
 2. **Problem Statement & Constraints (Bilingual)**:
    * English (`[EN]`) and Chinese (`[CN]`) problem statements, plus complete input constraints and edge assumptions.
 3. **Core Idea, Mental Model & Pattern Lineage (Visuals & Mathematics)**:
+   * **Topology Node Macro Anchor (宏观拓扑图谱归属)**: Explicitly anchor the problem to its macro Topology DAG location and parent category (e.g., `Topology Node: [Linear Structures] ➔ [Linked Lists] ➔ [Two Pointers / Fast & Slow]`).
    * **ASCII Pattern Lineage Map (算法思维谱系演化图)**: Visually show how the current problem inherits from foundational primitives (e.g. `LC 206 → LC 92 → LC 25`) and what new twist was introduced.
    * Core insights, mathematical proofs, invariants, and multi-stage ASCII diagrams.
 4. **Step-by-Step Code Walkthrough**:
@@ -66,6 +68,7 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 ┌─────────────────────────────────────────────────────────────────────────┐
 │ 1. Note Creation / Verification                                         │
 │    • Generate/update companion .md note (strictly preserve .py).        │
+│    • Ensure topology taxonomy tags & macro anchor are declared.         │
 │    • Ensure standard zero-padded format: lc-{4-digit-id}-{slug}.(py|md) │
 └────────────────────────────────────┬────────────────────────────────────┘
                                      │
@@ -78,9 +81,10 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 3. Mandatory index.html Rebuild (update_index.py)                       │
+│ 3. Mandatory index.html Rebuild & Topology Graph Verification           │
 │    • Execute: python3 update_index.py                                   │
 │    • VERIFY that the new/updated problem is compiled into index.html.   │
+│    • VERIFY that the problem increments target node count in Roadmap.   │
 │    • NEVER commit or push if index.html has not been regenerated.       │
 └────────────────────────────────────┬────────────────────────────────────┘
                                      │

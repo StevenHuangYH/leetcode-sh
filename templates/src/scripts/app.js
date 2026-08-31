@@ -225,8 +225,9 @@ const items = {items_json};
             const numOnly = item.lc_num.replace(/\D/g, "");
             if (parseInt(numOnly, 10) === parseInt(token, 10)) return true;
           }
+          const idBlob = `${item.key} ${item.title || ""} ${item.en_title || ""} ${item.slug || ""}`.toLowerCase();
           const boundaryRegex = new RegExp(`\\b0*${token}\\b`, "i");
-          return boundaryRegex.test(item.search_blob);
+          return boundaryRegex.test(idBlob);
         }
         return item.search_blob.includes(token);
       });
@@ -293,7 +294,10 @@ const items = {items_json};
           let mainTitle = item.title;
           let enSubtitle = "";
 
-          if (item.type === "problem") {
+          const isProblem = item.type === "problem";
+          const problemClass = isProblem ? "problem-item" : "";
+
+          if (isProblem) {
             if (item.lc_num) {
               const numOnly = item.lc_num.replace(/^LC\s*/, '');
               numBadge = `<span class="tree-prob-num">${numOnly}</span>`;
@@ -307,7 +311,7 @@ const items = {items_json};
           }
 
           html += `
-            <div class="nav-item ${isActive ? 'active' : ''}" data-key="${itemKey}" onclick="switchItem('${itemKey}')" title="${item.title}">
+            <div class="nav-item ${problemClass} ${isActive ? 'active' : ''}" data-key="${itemKey}" onclick="switchItem('${itemKey}')" title="${item.title}">
               ${numBadge}
               <div class="tree-title-group">
                 <span class="tree-main-title">${mainTitle}</span>
@@ -361,6 +365,10 @@ const items = {items_json};
       renderTree("");
       if (roadmapGraphInstance) {
         roadmapGraphInstance.highlightNodes("");
+      }
+      const activeItem = document.querySelector("#treeRoot .nav-item.active");
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
       input.focus();
     }
@@ -502,9 +510,7 @@ const items = {items_json};
           console.warn("KaTeX error:", e);
         }
       } else if (item.code) {
-        // Spec 03 Adaptive Code Pane Sizing
-        setViewMode("code");
-        notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">Python solution displayed in code pane.</p>`;
+        notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">Python solution displayed in code pane. Switch to Dual or Code view to inspect implementation.</p>`;
       } else {
         notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">No documentation notes or code found for this problem.</p>`;
       }
@@ -798,12 +804,12 @@ const items = {items_json};
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          const firstVisible = document.querySelector("#treeRoot .nav-item");
-          if (firstVisible) {
-            const key = firstVisible.getAttribute("data-key");
+          const firstProblem = document.querySelector("#treeRoot .problem-item, #treeRoot .nav-item");
+          if (firstProblem) {
+            const key = firstProblem.getAttribute("data-key");
             if (key && items[key]) {
               switchItem(key, false);
-              firstVisible.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              firstProblem.scrollIntoView({ behavior: "smooth", block: "nearest" });
               const notesViewer = document.getElementById("notesViewer");
               if (notesViewer) {
                 notesViewer.focus();

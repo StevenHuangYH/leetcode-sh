@@ -131,20 +131,35 @@ def update_readme():
     
     new_readme = sync_luffy_in_section5(new_readme)
     
+    problem_entities = [v for v in collector_items.values() if v.get("type") == "problem"]
+    total_problems = len(problem_entities)
+
+    easy_problems = len([p for p in problem_entities if p.get("diff") == "Easy"])
+    medium_problems = len([p for p in problem_entities if p.get("diff") == "Medium"])
+    hard_problems = len([p for p in problem_entities if p.get("diff") == "Hard"])
+
+    notes_entities = [p for p in problem_entities if p.get("md_file") or (p.get("notes") and len(p.get("notes").strip()) > 0)]
+    total_notes = len(notes_entities)
+
+    easy_notes = len([p for p in notes_entities if p.get("diff") == "Easy"])
+    medium_notes = len([p for p in notes_entities if p.get("diff") == "Medium"])
+    hard_notes = len([p for p in notes_entities if p.get("diff") == "Hard"])
+
+    easy_pct = round((easy_notes / total_notes * 100)) if total_notes else 0
+    medium_pct = round((medium_notes / total_notes * 100)) if total_notes else 0
+    hard_pct = round((hard_notes / total_notes * 100)) if total_notes else 0
+
     new_readme = re.sub(
         r"Problems_Indexed-\d+\+-brightgreen\.svg",
-        "Problems_Indexed-174+-brightgreen.svg",
+        f"Problems_Indexed-{total_problems}+-brightgreen.svg",
         new_readme
     )
-    
-    total_problems = len([k for k, v in collector_items.items() if v.get("type") == "problem"])
-    total_notes = len(list(REPO_ROOT.glob("top-100/*.md"))) + len(list(REPO_ROOT.glob("daily-practice/*.md"))) + len(list(REPO_ROOT.glob("luffy/*.md")))
-    
+
     sec2_table = f"""| Difficulty | Companion Notes Count | Percentage | Total Tracked Solutions / Stubs |
 | :--- | :---: | :---: | :---: |
-| **Easy** | 31 | ~31% | 31 |
-| **Medium** | 62 | ~62% | 134 |
-| **Hard** | 7 | ~7% | 9 |
+| **Easy** | {easy_notes} | ~{easy_pct}% | {easy_problems} |
+| **Medium** | {medium_notes} | ~{medium_pct}% | {medium_problems} |
+| **Hard** | {hard_notes} | ~{hard_pct}% | {hard_problems} |
 | **Total** | **{total_notes} In-Depth Notes** | **100%** | **{total_problems} Problem Entities** |"""
 
     new_readme = re.sub(
@@ -153,9 +168,9 @@ def update_readme():
         new_readme,
         flags=re.DOTALL
     )
-    
+
     readme_path.write_text(new_readme, encoding="utf-8")
-    print(f"Updated README.md with {total_problems} problem entities.")
+    print(f"Updated README.md with {total_problems} problem entities ({total_notes} companion notes).")
 
 
 if __name__ == "__main__":

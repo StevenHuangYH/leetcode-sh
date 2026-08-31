@@ -4,7 +4,7 @@ from scripts.validator import NoteStructureValidator, validate_note
 
 REPO_ROOT = Path(__file__).parent.parent
 
-VALID_NOTE_SAMPLE = """# LC 0153. Find Minimum in Rotated Sorted Array | 寻找旋转排序数组中的最小值
+VALID_NOTE_SAMPLE = r"""# LC 0153. Find Minimum in Rotated Sorted Array | 寻找旋转排序数组中的最小值
 
 ## 1. Header & File Links
 - Problem Link: [LeetCode 153](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
@@ -62,6 +62,12 @@ class TestNoteStructureValidator(unittest.TestCase):
         result = self.validator.validate(broken_note, "mock-no-en.md")
         self.assertFalse(result.is_valid)
         self.assertTrue(any("bilingual" in err for err in result.errors))
+
+    def test_invalid_topology_tag_fails(self):
+        broken_note = VALID_NOTE_SAMPLE.replace("## 1. Header & File Links", "## 1. Header & File Links\n- Tags: completely_unrelated_nonsense_xyz")
+        result = self.validator.validate(broken_note, "mock-bad-tags.md")
+        self.assertFalse(result.is_valid)
+        self.assertTrue(any("topology taxonomy keyword" in err for err in result.errors))
 
     def test_sample_repository_notes(self):
         sample_paths = [
