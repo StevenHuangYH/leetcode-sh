@@ -92,7 +92,7 @@
       </div>
 
       <div class="toolbar-right">
-        <div class="segmented-control" id="viewSwitcher" style="display: none;">
+        <div class="segmented-control" id="viewSwitcher">
           <button class="seg-btn" id="btnDual" onclick="setViewMode('dual')" title="Split Dual View">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
             <span class="seg-label">Split</span>
@@ -107,7 +107,7 @@
           </button>
         </div>
 
-        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution" style="display: none;">
+        <button class="action-btn" id="copyBtn" onclick="copyActiveCode()" title="Copy Python Solution">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           <span id="copyBtnLabel">Copy Code</span>
         </button>
@@ -148,7 +148,7 @@
     <div id="workspace" class="hidden-view mode-notes tab-notes">
       <!-- Left Pane: Notes & Walkthrough -->
       <section class="pane" id="left-pane">
-        <div class="markdown-body" id="notesViewer">
+        <div class="markdown-body" id="notesViewer" tabindex="-1">
           <!-- Markdown Rendered Here -->
         </div>
       </section>

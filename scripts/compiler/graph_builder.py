@@ -28,12 +28,7 @@ def build_topology_graph(items: Optional[Dict[str, Any]] = None) -> Dict[str, Li
                     if node.id == "data-structure-algorithm":
                         count += 1
                         continue
-                    slug = entity.get("slug", "").lower()
-                    tags = entity.get("tags", "").lower()
-                    title = entity.get("title", "").lower()
-                    cn_title = entity.get("cn_title", "").lower()
-                    key = entity.get("key", "").lower()
-                    search_target = f"{slug} {tags} {title} {cn_title} {key}"
+                    search_target = f"{entity.get('search_blob', '')} {entity.get('key', '')}".lower()
                     if any(kw.lower() in search_target for kw in keywords):
                         count += 1
             node_dict["problem_count"] = count

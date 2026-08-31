@@ -27,6 +27,52 @@ class DocumentEntity:
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def create_problem(
+        cls,
+        key: str,
+        category: str,
+        category_display: str,
+        title: str,
+        short: str,
+        slug: str,
+        cn_title: str,
+        en_title: str,
+        tags: str,
+        lc_num: str,
+        path: str,
+        diff: str = "Medium",
+        notes: str = "",
+        code: str = "",
+        py_file: str = "",
+        md_file: str = ""
+    ) -> "DocumentEntity":
+        """Constructs a problem entity and automatically computes its encapsulated search blob."""
+        search_blob = build_search_blob(
+            [slug, tags, title, en_title, cn_title, lc_num, diff, key, path],
+            f"{notes}\n{code}"
+        )
+        return cls(
+            key=key,
+            category=category,
+            category_display=category_display,
+            title=title,
+            short=short,
+            slug=slug,
+            cn_title=cn_title,
+            en_title=en_title,
+            tags=tags,
+            lc_num=lc_num,
+            search_blob=search_blob,
+            path=path,
+            type="problem",
+            notes=notes,
+            code=code,
+            diff=diff,
+            py_file=py_file,
+            md_file=md_file
+        )
+
 @dataclass
 class RoadmapProblem:
     num: int

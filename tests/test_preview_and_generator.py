@@ -86,5 +86,14 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertIsInstance(res, FormattedTitle)
         self.assertEqual(res.lc_num, "LC 25")
 
+    def test_search_enter_keyboard_and_focus_routing(self):
+        """Assert index.html contains Enter key search handler, notesViewer tabindex, and numeric boundary search."""
+        content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn('id="notesViewer" tabindex="-1"', content)
+        self.assertIn('e.key === "Enter"', content)
+        self.assertIn('notesViewer.focus()', content)
+        self.assertIn('boundaryRegex', content)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -123,6 +123,16 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 
 ---
 
+## 🔧 Git Hooks & Local Quality Gate
+
+To activate the repository's automated pre-commit quality gate (validating note schema compliance and rebuilding `index.html` on commit):
+
+```bash
+git config core.hooksPath .githooks
+```
+
+---
+
 ## 📊 Post-Push Completion Report Standard
 
 Whenever a push is executed, the assistant must provide a structured confirmation report to the user containing:

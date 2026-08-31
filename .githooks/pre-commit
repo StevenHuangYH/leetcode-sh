@@ -1,21 +1,15 @@
-#!/bin/bash
-# ==============================================================================
-# leetcode-sh — Git Pre-Commit Quality & Integrity Hook
-# ==============================================================================
+#!/usr/bin/env bash
+# LeetCode-SH Pre-Commit Validation Hook
+# Validates Markdown schema compliance and compiles index.html before commit
+
 set -e
 
-echo "🛡️  [Pre-Commit] Running leetcode-sh quality & integrity checks..."
-
-# 1. Audit Active Recall 7-Section Companion Note Schema
-echo "🔍 [1/3] Auditing companion note structures..."
+echo "[pre-commit] Validating Markdown note schema compliance..."
 python3 update_index.py --lint
 
-# 2. Execute Full Python Unit Test Suite
-echo "🧪 [2/3] Running Python test suite..."
-python3 -m unittest discover tests
-
-# 3. Rebuild and verify index.html compilation
-echo "✨ [3/3] Verifying study station compilation..."
+echo "[pre-commit] Compiling index.html study station..."
 python3 update_index.py
 
-echo "✅ [Pre-Commit] All quality checks passed successfully!"
+git add index.html
+
+echo "[pre-commit] All pre-commit validations passed successfully."

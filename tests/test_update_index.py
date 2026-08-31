@@ -124,5 +124,35 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertEqual(lc1_luffy["lc_num"], "LC 1")
         self.assertEqual(lc1_top["lc_num"], "LC 1")
 
+    def test_compiler_domain_entities_and_pairing_structures(self):
+        """Assert DocumentEntity, FilePairing, and ProblemCollector domain models."""
+        from scripts.compiler.collector import ProblemCollector, FilePairing
+        from scripts.compiler.entities import DocumentEntity
+        from scripts.compiler.parser import TopicConfig
+
+        pairing = FilePairing(stem="lc-0077-combinations", py_file="lc-0077-combinations.py", md_file="lc-0077-combinations.md")
+        self.assertEqual(pairing.stem, "lc-0077-combinations")
+
+        entity = DocumentEntity.create_problem(
+            key="daily-practice/lc-0077-combinations.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 77 · Combinations (组合)",
+            short="LC 77 Combinations",
+            slug="lc-0077-combinations combinations",
+            cn_title="组合",
+            en_title="Combinations",
+            tags="daily-practice medium",
+            lc_num="LC 77",
+            path="daily-practice/lc-0077-combinations",
+            diff="Medium"
+        )
+        self.assertIn("combinations", entity.search_blob)
+        self.assertIn("77", entity.search_blob)
+
+        topic_cfg = TopicConfig("topic-08-backtracking", "8. Backtracking", "8. Backtracking", r"### 8\.")
+        self.assertEqual(topic_cfg.key, "topic-08-backtracking")
+
+
 if __name__ == "__main__":
     unittest.main()

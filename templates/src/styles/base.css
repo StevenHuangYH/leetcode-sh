@@ -617,6 +617,11 @@
       color: #fff;
       border-color: var(--text-muted);
     }
+    #main-container.is-roadmap-mode #viewSwitcher,
+    #main-container.is-roadmap-mode #copyBtn,
+    #copyBtn.is-hidden {
+      display: none !important;
+    }
 
     /* ========================================================= */
     /* Workspace Dual Split View                                 */
@@ -707,6 +712,10 @@
       margin: 0 auto;
       line-height: 1.8;
       font-size: clamp(15px, 1.02vw, 16.5px);
+    }
+    #notesViewer:focus,
+    #notesViewer:focus-visible {
+      outline: none;
     }
     .markdown-body h1 {
       font-size: 24px;

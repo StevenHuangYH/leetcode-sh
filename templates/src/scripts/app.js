@@ -134,7 +134,7 @@ const items = {items_json};
       const btnWorkspace = document.getElementById("btnModeWorkspace");
       const roadmapView = document.getElementById("roadmap-view");
       const workspaceView = document.getElementById("workspace");
-      const viewSwitcher = document.getElementById("viewSwitcher");
+      const mainContainer = document.getElementById("main-container");
       const copyBtn = document.getElementById("copyBtn");
       const breadcrumb = document.getElementById("itemBreadcrumb");
       const mobileNav = document.getElementById("mobileBottomNav");
@@ -144,8 +144,7 @@ const items = {items_json};
         if (btnWorkspace) btnWorkspace.classList.remove("active");
         if (roadmapView) roadmapView.classList.add("active");
         if (workspaceView) workspaceView.classList.add("hidden-view");
-        if (viewSwitcher) viewSwitcher.style.display = "none";
-        if (copyBtn) copyBtn.style.display = "none";
+        if (mainContainer) mainContainer.classList.add("is-roadmap-mode");
         if (mobileNav) mobileNav.classList.add("hidden");
         if (breadcrumb) {
           breadcrumb.innerHTML = `
@@ -170,8 +169,8 @@ const items = {items_json};
         if (btnWorkspace) btnWorkspace.classList.add("active");
         if (roadmapView) roadmapView.classList.remove("active");
         if (workspaceView) workspaceView.classList.remove("hidden-view");
-        if (viewSwitcher) viewSwitcher.style.display = window.innerWidth <= 768 ? "none" : "inline-flex";
-        if (copyBtn) copyBtn.style.display = items[currentKey]?.code ? "inline-flex" : "none";
+        if (mainContainer) mainContainer.classList.remove("is-roadmap-mode");
+        if (copyBtn) copyBtn.classList.toggle("is-hidden", !items[currentKey]?.code);
         if (mobileNav) mobileNav.classList.remove("hidden");
         syncResponsiveLayout();
         if (triggerSwitch) {
@@ -219,8 +218,18 @@ const items = {items_json};
       if (!query) return true;
       const clean = query.trim().toLowerCase();
       if (!clean) return true;
-      const tokens = clean.split(/\\s+/);
-      return tokens.every(token => item.search_blob.includes(token));
+      const tokens = clean.split(/\s+/);
+      return tokens.every(token => {
+        if (/^\d+$/.test(token)) {
+          if (item.lc_num) {
+            const numOnly = item.lc_num.replace(/\D/g, "");
+            if (parseInt(numOnly, 10) === parseInt(token, 10)) return true;
+          }
+          const boundaryRegex = new RegExp(`\\b0*${token}\\b`, "i");
+          return boundaryRegex.test(item.search_blob);
+        }
+        return item.search_blob.includes(token);
+      });
     }
 
     function renderTree(query = "") {
@@ -356,15 +365,8 @@ const items = {items_json};
       input.focus();
     }
 
-    
-    const renderedMarkdownCache = new Map();
-    const MAX_MD_CACHE_SIZE = 64;
-
     function renderProtectedMarkdown(markdownText) {
       if (!markdownText) return "";
-      if (renderedMarkdownCache.has(markdownText)) {
-        return renderedMarkdownCache.get(markdownText);
-      }
       const mathBlocks = [];
       
       // 1. Protect block math $$...$$
@@ -389,12 +391,6 @@ const items = {items_json};
         const rawMath = display ? `$$${formula}$$` : `$${formula}$`;
         html = html.split(token).join(rawMath);
       });
-
-      if (renderedMarkdownCache.size >= MAX_MD_CACHE_SIZE) {
-        const oldestKey = renderedMarkdownCache.keys().next().value;
-        renderedMarkdownCache.delete(oldestKey);
-      }
-      renderedMarkdownCache.set(markdownText, html);
       
       return html;
     }
@@ -464,7 +460,7 @@ const items = {items_json};
         codeViewer.textContent = "# No python solution source available for this item.";
       }
 
-            const notesViewer = document.getElementById("notesViewer");
+      const notesViewer = document.getElementById("notesViewer");
       if (item.notes && item.notes.trim().length > 0) {
         try {
           if (typeof renderProtectedMarkdown === "function") {
@@ -506,21 +502,17 @@ const items = {items_json};
           console.warn("KaTeX error:", e);
         }
       } else if (item.code) {
-        notesViewer.innerHTML = `
-          <div style="padding: 28px; text-align: center; color: var(--text-muted);">
-            <div style="font-size: 15px; font-weight: 600; color: var(--text-bright); margin-bottom: 8px;">Python Solution Code Available</div>
-            <p style="font-size: 13px; max-width: 460px; margin: 0 auto 16px;">This problem is tracked with verified Python code in the code pane.</p>
-            <button onclick="setViewMode('code')" style="background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-bright); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;">
-              Expand Code Fullscreen
-            </button>
-          </div>
-        `;
+        // Spec 03 Adaptive Code Pane Sizing
+        setViewMode("code");
+        notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">Python solution displayed in code pane.</p>`;
       } else {
         notesViewer.innerHTML = `<p style="color: var(--text-muted); padding: 16px;">No documentation notes or code found for this problem.</p>`;
       }
 
       const copyBtn = document.getElementById("copyBtn");
-      copyBtn.style.display = item.code ? "inline-flex" : "none";
+      if (copyBtn) {
+        copyBtn.classList.toggle("is-hidden", !item.code);
+      }
 
       document.getElementById("left-pane").scrollTop = 0;
       document.getElementById("right-pane").scrollTop = 0;
@@ -801,6 +793,27 @@ const items = {items_json};
     });
 
     // Keyboard Shortcuts
+    const searchEl = document.getElementById("search");
+    if (searchEl) {
+      searchEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const firstVisible = document.querySelector("#treeRoot .nav-item");
+          if (firstVisible) {
+            const key = firstVisible.getAttribute("data-key");
+            if (key && items[key]) {
+              switchItem(key, false);
+              firstVisible.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              const notesViewer = document.getElementById("notesViewer");
+              if (notesViewer) {
+                notesViewer.focus();
+              }
+            }
+          }
+        }
+      });
+    }
+
     window.addEventListener("keydown", (e) => {
       if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
         e.preventDefault();

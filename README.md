@@ -39,7 +39,7 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 | **Easy** | 31 | ~31% | 31 |
 | **Medium** | 62 | ~62% | 134 |
 | **Hard** | 7 | ~7% | 9 |
-| **Total** | **93 In-Depth Notes** | **100%** | **174 Problem Entities** |
+| **Total** | **94 In-Depth Notes** | **100%** | **175 Problem Entities** |
 
 ---
 
@@ -72,6 +72,7 @@ leetcode-sh/
 │   └── lc-0713-subarray-product-less-than-k.py / .md
 ├── daily-practice/               # Daily LeetCode Practices & Weekly Contest Challenges
 │   ├── lc-0025-reverse-nodes-in-k-group.py / .md
+│   ├── lc-0077-combinations.py / .md
 │   ├── lc-0082-remove-duplicates-from-sorted-list.py / .md
 │   ├── lc-0083-remove-duplicates-from-sorted-list.py / .md
 │   ├── lc-0092-reversed-linked-list-2.py / .md
@@ -221,6 +222,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | # | Problem Title | LeetCode Link | Solutions & Notes | Difficulty | Pattern / Core Technique |
 | :-: | :--- | :-: | :--- | :-: | :--- |
 | **25** | Reverse Nodes in k-Group | [LC 25](https://leetcode.com/problems/reverse-nodes-in-k-group/) | [`daily-practice/lc-0025-reverse-nodes-in-k-group.py`](daily-practice/lc-0025-reverse-nodes-in-k-group.py)<br>[`daily-practice/lc-0025-reverse-nodes-in-k-group.md`](daily-practice/lc-0025-reverse-nodes-in-k-group.md) | Hard | Sentinel Dummy + k-Group Reversal (`p0`, `pre`, `cur`) |
+| **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`daily-practice/lc-0077-combinations.py`](daily-practice/lc-0077-combinations.py)<br>[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md) | Medium | Backtracking + Remaining Count Bound Pruning (`j >= d`) |
 | **82** | Remove Duplicates from Sorted List II | [LC 82](https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/) | [`daily-practice/lc-0082-remove-duplicates-from-sorted-list.py`](daily-practice/lc-0082-remove-duplicates-from-sorted-list.py)<br>[`daily-practice/lc-0082-remove-duplicates-from-sorted-list.md`](daily-practice/lc-0082-remove-duplicates-from-sorted-list.md) | Medium | Dummy Sentinel + 2-Step Lookahead Segment Erasure |
 | **83** | Remove Duplicates from Sorted List | [LC 83](https://leetcode.com/problems/remove-duplicates-from-sorted-list/) | [`daily-practice/lc-0083-remove-duplicates-from-sorted-list.py`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.py)<br>[`daily-practice/lc-0083-remove-duplicates-from-sorted-list.md`](daily-practice/lc-0083-remove-duplicates-from-sorted-list.md) | Easy | In-Place Adjacent Deduplication (`cur.next = cur.next.next`) |
 | **92** | Reverse Linked List II | [LC 92](https://leetcode.com/problems/reverse-linked-list-ii/) | [`daily-practice/lc-0092-reversed-linked-list-2.py`](daily-practice/lc-0092-reversed-linked-list-2.py)<br>[`daily-practice/lc-0092-reversed-linked-list-2.md`](daily-practice/lc-0092-reversed-linked-list-2.md) | Medium | Dummy Node + Local Segment Reversal (`p0`, `pre`, `cur`) |
@@ -356,7 +358,7 @@ Tracking daily challenge questions, weekly contest problems, and algorithmic pra
 | **39** | Combination Sum | [LC 39](https://leetcode.com/problems/combination-sum/) | [`luffy/34-lc-0039-combination-sum.py`](luffy/34-lc-0039-combination-sum.py) | Medium | Backtracking (Unbounded Choice) | Pass `start_index` to allow reuse of the current element without duplicate permutations. |
 | **40** | Combination Sum II | [LC 40](https://leetcode.com/problems/combination-sum-ii/) | [`luffy/35-lc-0040-combination-sum-ii.py`](luffy/35-lc-0040-combination-sum-ii.py) | Medium | Backtracking + Deduplication | Sort candidates; skip duplicate elements at the same tree depth (`if i > start and nums[i] == nums[i-1]: continue`). |
 | **46** | Permutations | [LC 46](https://leetcode.com/problems/permutations/) | [`luffy/32-lc-0046-permutations.py`](luffy/32-lc-0046-permutations.py) | Medium | Backtracking (Used Array) | Maintain `used` boolean array or swap elements in-place to explore all orderings. |
-| **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`luffy/31-lc-0077-combinations.py`](luffy/31-lc-0077-combinations.py) | Medium | Backtracking + Pruning | Prune search branch if remaining candidates are insufficient to reach size $k$. |
+| **77** | Combinations | [LC 77](https://leetcode.com/problems/combinations/) | [`daily-practice/lc-0077-combinations.py`](daily-practice/lc-0077-combinations.py)<br>[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)<br>[`luffy/31-lc-0077-combinations.py`](luffy/31-lc-0077-combinations.py) | Medium | Backtracking + Pruning | Prune search branch if remaining candidates are insufficient to reach size $k$ (`range(i, d-1, -1)`). |
 | **78** | Subsets | [LC 78](https://leetcode.com/problems/subsets/) | [`top-100/lc-0078-subsets.py`](top-100/lc-0078-subsets.py)<br>[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)<br>[`luffy/33-lc-0078-subsets.py`](luffy/33-lc-0078-subsets.py) | Medium | Backtracking (0-1 Pick vs Multi-way Loop) | 0-1 choose/skip binary tree or multi-way start index loop; record `path.copy()` to generate all $2^n$ subsets in $O(2^n \cdot n)$ time. |
 | **79** | Word Search | [LC 79](https://leetcode.com/problems/word-search/) | [`luffy/37-lc-0079-word-search.py`](luffy/37-lc-0079-word-search.py) | Medium | 2D Grid DFS + Backtracking | Mark visited cells in-place (e.g. `'#'`); restore character on backtracking. |
 | **131** | Palindrome Partitioning | [LC 131](https://leetcode.com/problems/palindrome-partitioning/) | [`daily-practice/lc-0131-palindrome-partitioning.py`](daily-practice/lc-0131-palindrome-partitioning.py)<br>[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)<br>[`luffy/36-lc-0131-palindrome-partitioning.py`](luffy/36-lc-0131-palindrome-partitioning.py) | Medium | Backtracking + Substring Palindrome Check | Partition string into palindromic segments; validate $s[i:j+1] == (s[i:j+1])[::-1]$ and backtrack in $O(n \cdot 2^n)$ time. |
