@@ -26,8 +26,8 @@
 │ 1. 括号有效性前缀平衡不变量 (Prefix Balance Invariant):                     │
 │    • 任意合法括号序列的长度为 2n，且在任意前缀位置 i 中：                   │
 │      左括号数量 >= 右括号数量 (count('(') >= count(')'))                     │
-│    • 当填入的左括号总数达到 n 时，不可再填左括号 (open < n)。                │
-│    • 当已填右括号数小于已填左括号数时，方可填入右括号 (close < open)。      │
+│    • 当填入的左括号总数达到 n 时，不可再填左括号 (open_count < n)。          │
+│    • 当已填右括号数小于已填左括号数时，方可填入右括号 (close < open_count)。│
 │ 2. 状态空间树剪枝 (State-Space Tree Pruning):                               │
 │    • 总序列长度为 2n，暴力穷举共有 2^(2n) 种二进制序列。                    │
 │    • 利用前缀合法性守卫，仅在合法分支递归，将搜索树压缩至卡特兰数 Cn 个有效叶子。│
@@ -112,23 +112,23 @@ Topology Node: [Exhaustive Search] ➔ [Traverse View] ➔ [Backtracking]
 ### 🎨 ASCII 决策剪枝搜索树 (`n = 2, m = 4`)
 
 ```
-                                  dfs(i=0, open=0) ["", "", "", ""]
+                                  dfs(i=0, open_count=0) ["", "", "", ""]
                                                 |
                                         path[0] = '('
                                                 |
-                                  dfs(i=1, open=1) ["(", "", "", ""]
+                                  dfs(i=1, open_count=1) ["(", "", "", ""]
                                      /                          \
                           path[1] = '('                     path[1] = ')'
                                  /                                  \
-             dfs(i=2, open=2) ["((", "", ""]             dfs(i=2, open=1) ["()", "", ""]
+             dfs(i=2, open_count=2) ["((", "", ""]             dfs(i=2, open_count=1) ["()", "", ""]
                    |                                           /               \
              path[2] = ')'                              path[2] = '('      [path[2]=')' 剪枝]
-                   |                                         /            (close=2 > open=1 ❌)
-             dfs(i=3, open=2) ["(()", ""]         dfs(i=3, open=2) ["()(", ""]
+                   |                                         /            (close=2 > open_count=1 ❌)
+             dfs(i=3, open_count=2) ["(()", ""]         dfs(i=3, open_count=2) ["()(", ""]
                    |                                         |
              path[3] = ')'                             path[3] = ')'
                    |                                         |
-             dfs(i=4, open=2)                          dfs(i=4, open=2)
+             dfs(i=4, open_count=2)                          dfs(i=4, open_count=2)
                 "(())" (✓)                                "()()" (✓)
 ```
 
@@ -151,24 +151,24 @@ class Solution:
 
         # 3. 定义回溯递归函数:
         #    i: 当前正在填充 path 的下标 (0 <= i <= m)
-        #    open: 当前路径中已填入的左括号 '(' 数量
-        def dfs(i, open):
+        #    open_count: 当前路径中已填入的左括号 '(' 数量
+        def dfs(i, open_count):
             # 递归基 (Base Case): 当填满 m 个位置时，当前 path 构成一个完整合法的括号组合
             if i == m:
                 ans.append("".join(path))
                 return
 
             # 分支 1: 只要已填左括号数量未达到 n，就可以在当前位置填入 '('
-            if open < n:
+            if open_count < n:
                 path[i] = "("
-                dfs(i + 1, open + 1)
+                dfs(i + 1, open_count + 1)
             
-            # 分支 2: 当已填右括号数量 (i - open) 小于已填左括号数量 (open) 时，方可填入 ')'
-            # 注: 当前已填入的总字符数为 i，其中 open 个是左括号，因此已填右括号数 close = i - open
-            # 合法放右括号的约束为: close < open 即 i - open < open (等价于 i < 2 * open)
-            if i - open < open:
+            # 分支 2: 当已填右括号数量 (i - open_count) 小于已填左括号数量 (open_count) 时，方可填入 ')'
+            # 注: 当前已填入的总字符数为 i，其中 open_count 个是左括号，因此已填右括号数 close = i - open_count
+            # 合法放右括号的约束为: close < open_count 即 i - open_count < open_count (等价于 i < 2 * open_count)
+            if i - open_count < open_count:
                 path[i] = ")"
-                dfs(i + 1, open)
+                dfs(i + 1, open_count)
 
         # 4. 从下标 0、已用左括号 0 开始搜索
         dfs(0, 0)
@@ -181,7 +181,7 @@ class Solution:
 
 ### 追问 1: 剩余计数法（Remaining Count）与字符串参数传递写法
 
-* **面试官**：除了使用 `open` 已填计数与定长数组原位覆盖，面试中很多候选人喜欢用 `left_rem` 与 `right_rem`（剩余可用左/右括号数），这种模式该如何书写？
+* **面试官**：除了使用 `open_count` 已填计数与定长数组原位覆盖，面试中很多候选人喜欢用 `left_rem` 与 `right_rem`（剩余可用左/右括号数），这种模式该如何书写？
 * **候选人解析**：
   * 维护 `left`（剩余可用左括号数）和 `right`（剩余可用右括号数）。
   * 初始状态 `left = n, right = n`。
@@ -247,23 +247,23 @@ class SolutionDP:
 
 | 典型错误模式 (Buggy Pattern) | 触发场景 & 异常表现 (Symptom) | 根因分析 (Root Cause) | 防御性修复与不变量 (Defensive Fix) |
 | :--- | :--- | :--- | :--- |
-| **右括号剪枝变量误写 (`open < open`)** | 输出全为空或仅有左括号报错 | 条件误将 `close < open`（即 `i - open < open`）误敲为 `open < open`，导致右括号分支永远为 `False` 无法进入 | 明确定义变量：`close = i - open`，守卫条件严格为 `if close < open:` |
-| **前缀失衡提前闭合 (`close > open`)** | 输出无效括号序列如 `")("`, `"())("` | 允许在右括号数超过左括号数时生成分支，破坏前缀平衡不变量 | 严格限制放右括号的前提是未闭合左括号数 $>0$，即 `close < open` |
+| **右括号剪枝变量误写 (`open_count < open_count`)** | 输出全为空或仅有左括号报错 | 条件误将 `close < open_count`（即 `i - open_count < open_count`）误敲为 `open_count < open_count`，导致右括号分支永远为 `False` 无法进入 | 明确定义变量：`close = i - open_count`，守卫条件严格为 `if close < open_count:` |
+| **前缀失衡提前闭合 (`close > open_count`)** | 输出无效括号序列如 `")("`, `"())("` | 允许在右括号数超过左括号数时生成分支，破坏前缀平衡不变量 | 严格限制放右括号的前提是未闭合左括号数 $>0$，即 `close < open_count` |
 | **递归触底未加 `return`** | 抛出 `IndexError: list assignment index out of range` | 命中 `i == m` 收集答案后未中断，继续执行后续赋值 `path[i]` | 触底 `ans.append` 后必须立即执行 `return` |
-| **递归参数累加副作用 (`open += 1`)** | 兄弟分支状态污染，生成错乱组合 | 在调用前执行 `open += 1` 而回溯时未复原 `open -= 1` | 保持纯函数传参 `dfs(i + 1, open + 1)`，或在修改后显式回溯撤销 |
+| **递归参数累加副作用 (`open_count += 1`)** | 兄弟分支状态污染，生成错乱组合 | 在调用前执行 `open_count += 1` 而回溯时未复原 `open_count -= 1` | 保持纯函数传参 `dfs(i + 1, open_count + 1)`，或在修改后显式回溯撤销 |
 
 ---
 
 ### 🔍 全流程推演表 (Dry-Run Matrix for $n = 2$)
 
-| 递归调用栈 (Call Stack) | 当前下标 $i$ | 已放左括号 `open` | 已放右括号 `close` ($i - open$) | 当前 `path` 状态 | 决策分支与动作 (Decision) |
+| 递归调用栈 (Call Stack) | 当前下标 $i$ | 已放左括号 `open_count` | 已放右括号 `close` ($i - open\_count$) | 当前 `path` 状态 | 决策分支与动作 (Decision) |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| `dfs(0, 0)` | 0 | 0 | 0 | `["", "", "", ""]` | `open < 2` $\implies$ `path[0]='('`, 递归 `dfs(1, 1)` |
-| ├── `dfs(1, 1)` | 1 | 1 | 0 | `["(", "", "", ""]` | `open < 2` $\implies$ `path[1]='('`, 递归 `dfs(2, 2)`<br>`close < 1` $\implies$ `path[1]=')'`, 递归 `dfs(2, 1)` |
-| │   ├── `dfs(2, 2)` | 2 | 2 | 0 | `["(", "(", "", ""]` | `open == 2` (不可放左); `close(0) < 2` $\implies$ `path[2]=')'`, 递归 `dfs(3, 2)` |
+| `dfs(0, 0)` | 0 | 0 | 0 | `["", "", "", ""]` | `open_count < 2` $\implies$ `path[0]='('`, 递归 `dfs(1, 1)` |
+| ├── `dfs(1, 1)` | 1 | 1 | 0 | `["(", "", "", ""]` | `open_count < 2` $\implies$ `path[1]='('`, 递归 `dfs(2, 2)`<br>`close < 1` $\implies$ `path[1]=')'`, 递归 `dfs(2, 1)` |
+| │   ├── `dfs(2, 2)` | 2 | 2 | 0 | `["(", "(", "", ""]` | `open_count == 2` (不可放左); `close(0) < 2` $\implies$ `path[2]=')'`, 递归 `dfs(3, 2)` |
 | │   │   └── `dfs(3, 2)` | 3 | 2 | 1 | `["(", "(", ")", ""]` | `close(1) < 2` $\implies$ `path[3]=')'`, 递归 `dfs(4, 2)` |
 | │   │       └── `dfs(4, 2)` | 4 | 2 | 2 | `["(", "(", ")", ")"]` | $i == 4 \implies$ 收集 **`"(())"`**，`return` |
-| │   └── `dfs(2, 1)` | 2 | 1 | 1 | `["(", ")", "", ""]` | `open(1) < 2` $\implies$ `path[2]='('`, 递归 `dfs(3, 2)`<br>`close(1) == open(1)` (不可放右) |
+| │   └── `dfs(2, 1)` | 2 | 1 | 1 | `["(", ")", "", ""]` | `open_count(1) < 2` $\implies$ `path[2]='('`, 递归 `dfs(3, 2)`<br>`close(1) == open_count(1)` (不可放右) |
 | │       └── `dfs(3, 2)` | 3 | 2 | 1 | `["(", ")", "(", ""]` | `close(1) < 2` $\implies$ `path[3]=')'`, 递归 `dfs(4, 2)` |
 | │           └── `dfs(4, 2)` | 4 | 2 | 2 | `["(", ")", "(", ")"]` | $i == 4 \implies$ 收集 **`"()()"`**，`return` |
 

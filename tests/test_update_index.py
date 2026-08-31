@@ -156,6 +156,18 @@ class TestUpdateIndexParser(unittest.TestCase):
         topic_cfg = TopicConfig("topic-08-backtracking", "8. Backtracking", "8. Backtracking", r"### 8\.")
         self.assertEqual(topic_cfg.key, "topic-08-backtracking")
 
+    def test_format_markdown_link_helper(self):
+        """Assert format_markdown_link helper produces consistent, properly formatted markdown links."""
+        from scripts.sync_readme import format_markdown_link
+        self.assertEqual(
+            format_markdown_link("top-100/lc-0022-generate-parentheses.py"),
+            "[`top-100/lc-0022-generate-parentheses.py`](top-100/lc-0022-generate-parentheses.py)"
+        )
+        self.assertEqual(
+            format_markdown_link("daily-practice/lc-0077-combinations.md"),
+            "[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)"
+        )
+
     def test_sync_readme_dynamic_difficulty_metrics(self):
         """Assert sync_readme does not contain hardcoded difficulty counts and computes them dynamically."""
         from pathlib import Path
@@ -168,6 +180,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertNotIn("total_problems = 174", content)
         self.assertNotIn("LUFFY_TRACK_REPLACEMENTS", content)
         self.assertNotIn("EXTRA_PROBLEM_MAPPINGS", content)
+        self.assertIn("format_markdown_link", content)
         self.assertIn("sync_multi_track_solutions", content)
         self.assertIn("build_problem_files_index(collector_items)", content)
 

@@ -24,15 +24,119 @@ class DocumentEntity:
     py_file: str = ""
     md_file: str = ""
 
+    def __post_init__(self) -> None:
+        self._token_set: Optional[set] = None
+        self._word_sequence: Optional[List[str]] = None
+        self._cleaned_cjk: Optional[str] = None
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+    def _ensure_token_cache(self) -> None:
+        """Lazily extracts and caches normalized tokens, word sequences, and CJK text for keyword matching."""
+        if getattr(self, "_token_set", None) is not None:
+            return
+
+        # Gather metadata fields for token extraction and phrase matching
+        raw_parts = [
+            self.slug or "",
+            self.tags or "",
+            self.title or "",
+            self.category or "",
+            self.category_display or "",
+            self.short or "",
+            self.lc_num or "",
+            self.en_title or "",
+            self.cn_title or "",
+            self.key or "",
+            self.path or ""
+        ]
+        self._cleaned_cjk = " ".join(raw_parts).lower()
+
+        # Clean punctuation except hyphens, underscores, word characters and CJK
+        cleaned_text = re.sub(r"[^\w\-\u4e00-\u9fff]+", " ", self._cleaned_cjk)
+        self._word_sequence = [w for w in re.split(r"[-_\s]+", cleaned_text) if w]
+
+        # Build token set with individual words and preserved hyphenated/underscore chunks
+        token_set = set(self._word_sequence)
+        for chunk in cleaned_text.split():
+            clean_chunk = chunk.strip("-_")
+            if clean_chunk:
+                token_set.add(clean_chunk)
+                if "_" in clean_chunk:
+                    token_set.add(clean_chunk.replace("_", "-"))
+
+        # Extract LC problem number variations
+        lc_sources = [self.lc_num, self.key, self.slug, self.path]
+        for src in lc_sources:
+            if not src:
+                continue
+            for m in re.finditer(r'(?:lc-?|\b)(\d{1,4})\b', str(src).lower()):
+                try:
+                    num_int = int(m.group(1))
+                    if num_int > 0:
+                        raw_num = str(num_int)
+                        padded = f"{num_int:04d}"
+                        token_set.update({
+                            raw_num,
+                            padded,
+                            f"lc-{raw_num}",
+                            f"lc-{padded}",
+                            f"lc{raw_num}",
+                            f"lc{padded}"
+                        })
+                except ValueError:
+                    pass
+
+        self._token_set = token_set
+
     def matches_keywords(self, keywords: List[str]) -> bool:
-        """Determines whether this entity matches any of the canonical topology keywords."""
+        """Determines whether this entity matches any of the canonical topology keywords using tokenized word-boundary matching."""
         if not keywords:
             return False
-        search_target = f"{self.search_blob} {self.key} {self.slug} {self.title}".lower()
-        return any(kw.lower() in search_target for kw in keywords)
+
+        if getattr(self, "_token_set", None) is None:
+            self._ensure_token_cache()
+
+        token_set = self._token_set or set()
+        word_sequence = self._word_sequence or []
+        word_seq_len = len(word_sequence)
+        cleaned_cjk = self._cleaned_cjk or ""
+
+        # Evaluate candidate keywords
+        for kw in keywords:
+            if not kw:
+                continue
+            kw_clean = kw.strip().lower()
+            if not kw_clean:
+                continue
+
+            # CJK characters matching
+            if re.search(r'[\u4e00-\u9fff]', kw_clean):
+                if kw_clean in cleaned_cjk:
+                    return True
+                continue
+
+            # Split keyword on hyphens, underscores, and whitespace
+            kw_words = [w for w in re.split(r"[-_\s]+", kw_clean) if w]
+            if not kw_words:
+                continue
+
+            if len(kw_words) == 1:
+                # Single word token: exact membership check in token_set
+                if kw_words[0] in token_set or kw_clean in token_set:
+                    return True
+            else:
+                # Multi-word phrase or hyphenated token
+                hyphenated_kw = "-".join(kw_words)
+                if hyphenated_kw in token_set or kw_clean in token_set:
+                    return True
+                k_len = len(kw_words)
+                for i in range(word_seq_len - k_len + 1):
+                    if word_sequence[i:i + k_len] == kw_words:
+                        return True
+
+        return False
 
     def to_topology_summary(self) -> Dict[str, Any]:
         """Returns a normalized problem projection dictionary for the topology graph."""
