@@ -40,27 +40,24 @@ def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
             continue
         num = int(m.group(0))
         
-        track_dir = key.split("/")[0] if "/" in key else "top-100"
         py_file = item.get("py_file")
         md_file = item.get("md_file")
         
         links = file_map.setdefault(num, [])
         
+        def add_file_link(file_rel: Optional[str]):
+            if file_rel and (REPO_ROOT / file_rel).exists():
+                link = f"[`{file_rel}`]({file_rel})"
+                if link not in links:
+                    links.append(link)
+        
+        py_file = item.get("py_file")
         if py_file:
-            py_rel = f"{track_dir}/{py_file}"
-            py_link = f"[`{py_rel}`]({py_rel})"
-            if py_link not in links and (REPO_ROOT / py_rel).exists():
-                links.append(py_link)
-        elif key.endswith(".py") and (REPO_ROOT / key).exists():
-            key_link = f"[`{key}`]({key})"
-            if key_link not in links:
-                links.append(key_link)
-                
-        if md_file:
-            md_rel = f"{track_dir}/{md_file}"
-            md_link = f"[`{md_rel}`]({md_rel})"
-            if md_link not in links and (REPO_ROOT / md_rel).exists():
-                links.append(md_link)
+            add_file_link(py_file)
+        elif key.endswith(".py"):
+            add_file_link(key)
+            
+        add_file_link(item.get("md_file"))
                 
     return file_map
 

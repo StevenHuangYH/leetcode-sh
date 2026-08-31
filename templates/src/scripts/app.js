@@ -244,11 +244,6 @@ const items = {items_json};
       return (item) => matchers.every(m => m(item));
     }
 
-    function matchesSearchQuery(item, query) {
-      const matcher = buildSearchMatcher(query);
-      return matcher(item);
-    }
-
     function renderTree(query = "") {
       const root = document.getElementById("treeRoot");
       if (!root) return;

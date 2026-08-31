@@ -116,6 +116,7 @@ class TestPreviewAndGenerator(unittest.TestCase):
         self.assertIn('firstMatchElement', content)
         self.assertIn('cleanSlug', content)
         self.assertIn('idBlob', content)
+        self.assertNotIn('function matchesSearchQuery', content)
         self.assertIn('activeItem.scrollIntoView', content)
         self.assertIn('problem-item', content)
 
