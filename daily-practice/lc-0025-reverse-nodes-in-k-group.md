@@ -335,7 +335,7 @@ class SolutionRecursion:
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| 常见陷阱 / 易错反模式 (Buggy Pattern / Traps) | 错误现象与测试用例 (Symptom & Fail Case) | 根本原因分析 (Root Cause) | 防御性修复与循环不变量 (Defensive Fix & Invariant) |
 | :--- | :--- | :--- | :--- |
 | **未提前缓存 `p0.next` 即改写** | 链表成环死循环，或仅返回前 2 个节点 | 改写 `p0.next` 破坏了对本组尾部的引用 | 必须在任何指针改写前用 `nxt = p0.next` 暂存尾节点 |
 | **反转内部循环计数用 `while cur:`** | 末尾不足 $k$ 个的节点也被强行翻转 | 题目明确要求剩余节点保序 | 严格使用 `while n >= k:` 或探路 probe 控制翻转次数 |

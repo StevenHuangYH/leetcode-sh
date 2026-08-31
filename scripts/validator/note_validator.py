@@ -79,7 +79,7 @@ class NoteStructureValidator:
             errors.append("Missing required Component 6: The Error Log & Complete Dry-Run.")
         else:
             has_error_table = bool(re.search(
-                r'\|\s*(?:Buggy Pattern|Anti-Patterns|Traps|典型错误|常见陷阱).*?\|\s*(?:Symptom|Fail Case|触发场景|典型报错).*?\|\s*(?:Root Cause|根因|根本原因).*?\|\s*(?:Defensive Fix|Invariant|防御性修复)',
+                r'\|[^|\n]*(?:Buggy Pattern|Anti-Patterns?|Traps|典型错误|常见陷阱)[^|\n]*\|[^|\n]*(?:Symptom|Fail Case|触发场景|典型报错|错误现象)[^|\n]*\|[^|\n]*(?:Root Cause|根因|根本原因)[^|\n]*\|[^|\n]*(?:Defensive Fix|Invariant|防御性修复)[^|\n]*',
                 markdown_content,
                 re.IGNORECASE
             ))

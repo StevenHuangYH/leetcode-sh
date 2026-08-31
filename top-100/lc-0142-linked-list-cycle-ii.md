@@ -252,7 +252,7 @@ class Solution:
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| 常见陷阱 / 易错反模式 (Buggy Pattern / Traps) | 错误现象与测试用例 (Symptom & Fail Case) | 根本原因分析 (Root Cause) | 防御性修复与循环不变量 (Defensive Fix & Invariant) |
 | :--- | :--- | :--- | :--- |
 | **`while slow.val != head.val:`** | 重复值链表在入环前提前误返回 | 混淆了数值相等与节点同一性 | 严格使用对象同一性判断 `while slow is not head:` |
 | **阶段 2 快指针仍以 2 步速度走** | 两指针不断在环内错开，无法在入环点相遇 | 违背了 $a = c$ 的单步同速数学前提 | 阶段 2 两指针速度必须**严格均为 1 步** |

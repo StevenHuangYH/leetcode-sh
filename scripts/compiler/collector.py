@@ -15,7 +15,7 @@ from .entities import (
 from .parser import parse_curriculum_topics
 
 
-MANIFEST_VERSION = "2.1"
+MANIFEST_VERSION = "2.2"
 
 
 def _get_file_stat(file_path: Optional[Path]) -> Tuple[float, int]:
@@ -136,7 +136,7 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 category_display = cat_title.replace(" Track", "").split("(")[0].strip()
 
                 clean_slug = normalize_slug(f"{stem} {en_title} {cn_title}")
-                search_blob = build_search_blob([stem, title, en_title, cn_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
+                search_blob = build_search_blob([stem, title, en_title, cn_title, lc_num, diff], f"{md_content}\n{py_content}")
 
                 entity_dict = asdict(DocumentEntity(
                     key=primary_key, category=cat_title, category_display=category_display, title=title, short=short_display or (py_file if py_file else md_file),

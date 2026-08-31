@@ -254,7 +254,7 @@ class Solution:
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| 常见陷阱 / 易错反模式 (Buggy Pattern / Traps) | 错误现象与测试用例 (Symptom & Fail Case) | 根本原因分析 (Root Cause) | 防御性修复与循环不变量 (Defensive Fix & Invariant) |
 | :--- | :--- | :--- | :--- |
 | **`if fast.val == slow.val:`** | 重复值无环链表报出错误的 `True` | 误将“节点值相等”当作“拓扑节点重合” | 必须使用对象同一性判断 `if fast is slow:` |
 | **`while fast.next and fast:`** | `AttributeError: 'NoneType' object has no attribute 'next'` | 短路求值顺序错误，对 `None` 访问了 `.next` | 严格保持先判自身后判子节点的顺序 `while fast and fast.next:` |

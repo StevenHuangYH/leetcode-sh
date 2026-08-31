@@ -268,7 +268,7 @@ class Solution:
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| 常见陷阱 / 易错反模式 (Buggy Pattern / Traps) | 错误现象与测试用例 (Symptom & Fail Case) | 根本原因分析 (Root Cause) | 防御性修复与循环不变量 (Defensive Fix & Invariant) |
 | :--- | :--- | :--- | :--- |
 | **合并时未双暂存 `nxt` 和 `nxt2`** | 链表在第 2 个节点死循环或截断 | 覆盖 `head.next` 导致丢失后续节点引用 | 必须在连线前同时缓存 `nxt = head.next, nxt2 = head2.next` |
 | **合并循环条件误写为 `while head2:`** | 末尾形成自环导致死循环 | 偶数长度下最后一步 `3.next = 3` 造成闭环 | 严格使用 `while head2.next:` 作为守卫 |

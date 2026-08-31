@@ -271,7 +271,7 @@ class SolutionTwoPass:
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| 常见易错反模式 (Buggy Anti-Pattern) | 翻车现象与症状 (Symptom) | 深层翻车机理 (Root Cause) | 防御性修复策略 (Defensive Invariant) |
+| 常见陷阱 / 易错反模式 (Buggy Pattern / Traps) | 错误现象与测试用例 (Symptom & Fail Case) | 根本原因分析 (Root Cause) | 防御性修复与循环不变量 (Defensive Fix & Invariant) |
 | :--- | :--- | :--- | :--- |
 | **`while fast.next and fast:`** | `AttributeError: 'NoneType' object has no attribute 'next'` | 短路求值失效，对 `None` 访问了 `.next` | 严格保持先判自身后判子节点的顺序 `while fast and fast.next:` |
 | **混淆左中点与右中点** | 链表折半断开时导致前半段多出一个节点或死循环 | `while fast and fast.next` 会落在第 2 个中点 | 若需断开前截，需用 `while fast.next and fast.next.next:` 定位左中点 |
