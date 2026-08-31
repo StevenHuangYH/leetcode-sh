@@ -11,8 +11,6 @@ Welcome to my personal LeetCode question cracking collections. This repository i
 
 ## Table of Contents
 
-> **[Algorithm Master Roadmap (ROADMAP.md)](ROADMAP.md)**: A structured full-landscape curriculum covering 5 progressive phases, 12 core algorithmic topics, and mental model pattern templates.
-
 1. [Core Algorithmic Competencies & Domain Mastery](#core-algorithmic-competencies--domain-mastery)
 2. [Practice Statistics & Summary](#practice-statistics--summary)
 3. [Repository Structure](#repository-structure)

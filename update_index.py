@@ -45,7 +45,6 @@ def watch_mode():
     ]
     watch_files = [
         BASE_DIR / "README.md",
-        BASE_DIR / "ROADMAP.md",
     ]
 
     def get_snapshot() -> dict:
