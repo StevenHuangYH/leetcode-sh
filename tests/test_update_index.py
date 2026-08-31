@@ -85,6 +85,9 @@ class TestUpdateIndexParser(unittest.TestCase):
         from scripts.compiler.bundler import TemplateBundler
         bundler = TemplateBundler()
         bundled_html = bundler.bundle(minify=False)
+        self.assertIn("function initRoadmapGraph", bundled_html)
+        self.assertIn("function openWorkspaceForNode", bundled_html)
+        self.assertIn("function showNodePopover", bundled_html)
         self.assertIn("function enforceNotesView", bundled_html)
         self.assertIn("const DOM_RENDER_DELAY_MS = 60;", bundled_html)
         self.assertIn("function resolveEntityReference", bundled_html)
