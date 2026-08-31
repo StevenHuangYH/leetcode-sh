@@ -516,6 +516,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
+      max-width: 100%;
     }
     .breadcrumb-folder {
       color: var(--text-muted);

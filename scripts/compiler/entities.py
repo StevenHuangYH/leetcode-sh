@@ -84,13 +84,6 @@ def read_file(path: Path) -> str:
     except Exception as e:
         return f"Error reading file: {e}"
 
-def read_file(path: Path) -> str:
-    """Safely reads a text file."""
-    try:
-        return path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
-    except Exception as e:
-        return f"Error reading file: {e}"
-
 @dataclass
 class FormattedTitle:
     """Structured representation of normalized problem title metadata."""

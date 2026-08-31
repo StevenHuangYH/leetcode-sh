@@ -67,5 +67,18 @@ class TestPreviewAndGenerator(unittest.TestCase):
         file_size_mb = self.index_html_path.stat().st_size / (1024 * 1024)
         self.assertLess(file_size_mb, 1.8, f"index.html size should be compact (< 1.8MB), got {file_size_mb:.2f}MB")
 
+    def test_semantic_breadcrumb_and_title_formatter_contract(self):
+        """Assert compiled index.html includes semantic breadcrumb title attributes and ProblemTitleFormatter exports."""
+        content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn('breadcrumb-file', content)
+        self.assertIn('title="${item.title}"', content)
+        self.assertIn('Interactive Topology Graph', content)
+        
+        # Verify public compiler export
+        from scripts.compiler import ProblemTitleFormatter, FormattedTitle
+        res = ProblemTitleFormatter.format("lc-0025-reverse-nodes-in-k-group")
+        self.assertIsInstance(res, FormattedTitle)
+        self.assertEqual(res.lc_num, "LC 25")
+
 if __name__ == "__main__":
     unittest.main()
