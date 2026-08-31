@@ -822,8 +822,7 @@
         setMobileTab(mobileTab);
       }
       const breadcrumb = document.getElementById("itemBreadcrumb");
-      let folderLabel = item.category || "Workspace";
-      folderLabel = folderLabel.replace(/\s+Track$/, '').replace(/\s*\(\d{2}-\d{2}\)$/, '');
+      let folderLabel = item.category_display || item.category || "Workspace";
       let diffHtml = item.diff && item.diff !== "All" ? `<span class="diff-badge ${item.diff}">${item.diff}</span>` : "";
       breadcrumb.innerHTML = `
         <span class="breadcrumb-folder">${folderLabel}</span>

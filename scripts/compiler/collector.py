@@ -66,7 +66,7 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
         topic_docs = parse_curriculum_topics(readme_text)
         overview_docs = {
             "README.md": asdict(DocumentEntity(
-                key="README.md", category="Overview", title="LeetCode Self-Practices Overview",
+                key="README.md", category="Overview", category_display="Overview", title="LeetCode Self-Practices Overview",
                 short="README.md", slug="readme overview", cn_title="项目总览", tags="readme overview index",
                 lc_num="", search_blob=build_search_blob(["README.md", "overview", "项目总览", "leetcode self practices overview"], readme_text),
                 path="README.md", type="doc", notes=readme_text, diff="All"
@@ -133,12 +133,13 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 diff = diff_match.group(1).capitalize() if diff_match else "Medium"
 
                 short_display = f"{lc_num} {en_title or cn_title}".strip()
+                category_display = cat_title.replace(" Track", "").split("(")[0].strip()
 
                 clean_slug = normalize_slug(f"{stem} {en_title} {cn_title}")
                 search_blob = build_search_blob([stem, title, en_title, cn_title, lc_num, diff, dir_name], f"{md_content}\n{py_content}")
 
                 entity_dict = asdict(DocumentEntity(
-                    key=primary_key, category=cat_title, title=title, short=short_display or (py_file if py_file else md_file),
+                    key=primary_key, category=cat_title, category_display=category_display, title=title, short=short_display or (py_file if py_file else md_file),
                     slug=clean_slug, cn_title=cn_title, en_title=en_title, tags=f"{dir_name} {diff.lower()}", lc_num=lc_num,
                     search_blob=search_blob, path=f"{dir_name}/{stem}", type="problem", notes=md_content,
                     code=py_content, diff=diff, py_file=f"{dir_name}/{py_file}" if py_file else "",

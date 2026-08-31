@@ -17,6 +17,7 @@ class DocumentEntity:
     path: str
     type: str = "problem"
     en_title: str = ""
+    category_display: str = ""
     notes: str = ""
     code: str = ""
     diff: str = "All"
@@ -109,8 +110,8 @@ class ProblemTitleFormatter:
         Extracts and normalizes (lc_num, en_title, cn_title, full_title) from a filename stem and markdown content.
         Handles standard problems, curriculum prefixed problems, and non-LC tutorials.
         """
-        # 1. Match LeetCode 4-digit problem number in stem
-        match_lc = re.search(r'(?:^|\D)(?:lc-)?(\d{4})(?:-|$)', stem)
+        # 1. Match LeetCode 4-digit problem number in stem symmetrically anchored at start
+        match_lc = re.search(r'^(?:\d{2}-)?(?:lc-)?(\d{4})(?:-|$)', stem)
         if match_lc:
             num_int = int(match_lc.group(1))
             lc_num = f"LC {num_int}"
