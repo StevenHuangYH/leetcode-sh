@@ -18,18 +18,37 @@ This file serves as the single source of truth for domain vocabulary, topologica
 * **NoteStructureValidator**: The quality enforcement module that audits companion `.md` notes against the standard 7-Section Active Recall template mandated by `AGENTS.md`.
 * **ValidationResult**: The structured result object returned by `NoteStructureValidator`, providing granular diagnostics on missing sections, bilingual tags, error log schemas, and complexity proofs.
 
-### 3. Dual-Subtree Algorithmic Mastery Hierarchy
-* **Array Subtree (数组子树)**:
-  * *Operations Pipeline*: Contiguous memory, prefix sums, difference arrays, and 2D matrix transformations.
-  * *Two Pointers Pipeline*: Fast/slow pointers, collision pointers, sliding window dynamic bounds, binary search variants, and randomized algorithms.
-  * *Data Structures Pipeline*: Basic structures (circular arrays, stacks, queues, hash tables, design) transitioning to advanced structures (BSTs, heaps, tries, graph adjacency).
-* **Linked List & Tree Subtree (链表与树子树)**:
-  * *Bridge to Trees*: Discrete pointers, in-place re-linking, recursion foundations, and binary tree hierarchies.
-  * *Level-order Pipeline*: Queue-driven level traversal, breadth-first search (BFS), and shortest path algorithms.
-  * *Recursive Traversal Multi-Branching*:
-    * *Traversal Perspective (遍历视角)*: Decision tree exploration $\rightarrow$ Backtracking $\rightarrow$ Depth-First Search (DFS).
-    * *Subproblem Perspective (子问题视角)*: Disjoint subproblems $\rightarrow$ Divide & Conquer $\rightarrow$ Dynamic Programming (DP).
-    * *Miscellaneous (其他算法)*: Mathematical logic, bit manipulation $\rightarrow$ Greedy Algorithms.
+### 3. 38-Node Compound Algorithmic Topology Hierarchy (38 节点复合算法知识图谱)
+* **Root**: `data-structure-algorithm` (Programs = Data Structures + Algorithms).
+* **Array Subtree (数组子树体系)**:
+  * *`array` Root*: Contiguous buffer with O(1) random access.
+  * *`array-operation-group` (Operations 复合容器)*:
+    * `diff-array`: O(1) interval boundary increments for frequent range modifications.
+    * `2d-array-ops`: 2D matrix transformations, diagonal reflections, and spiral indexing.
+    * `prefix-sum`: O(N) preprocessing for O(1) static range sum queries.
+  * *`two-pointer-group` (Array Two Pointer 复合容器)*:
+    * `two-pointer-array`: Monotonic opposite collision pointers and Two Sum / 3Sum.
+    * `sliding-window`: Monotonic [left, right] closed-interval dynamic window bounds.
+    * `binary-search`: Halving search spaces by monotonicity (left/right bounds & search by answer).
+    * `random`: Reservoir sampling for data streams and Fisher-Yates array shuffling.
+  * *`basic-ds-group` (Basic Data Structure 复合容器)*:
+    * `cycle-array`: Modulo arithmetic for circular buffers without reallocation.
+    * `stack-queue`: Monotonic stacks for Next Greater Element and monotonic queues.
+    * `hashing`: O(1) frequency tables, deduplication sets, and in-place sign hashes.
+    * `design`: Composite data structure design (LRU / LFU cache with Doubly Linked Lists).
+* **Linked List & Tree Subtree (链表与树子树体系)**:
+  * *`linked` Root*: Discrete pointer-linked dynamic nodes.
+  * *Bridge to Trees*: `two-pointer-linked` (Floyd's Tortoise & Hare) $\rightarrow$ `recursion-ops` (Mathematical Induction Contract) $\rightarrow$ `binary-tree` (Foundational Hierarchy).
+  * *`level-order-traverse` Pipeline*: Layer size snapshots (`sz = q.size()`) $\rightarrow$ `bfs` (Wavefront expansion) $\rightarrow$ `shortest-path` (Dijkstra state relaxation).
+  * *`advanced-ds-group` (Advanced Data Structure 复合容器)*:
+    * `bst`: Invariant Left < Root < Right with logarithmic search and sorted inorder.
+    * `heap`: Complete binary tree priority queues with swim/sink operations.
+    * `trie`: Multi-way string prefix trees for fast prefix matching and wildcards.
+    * `graph`: Adjacency lists, Kahn's topological sort, and Union-Find disjoint sets.
+  * *Recursive Traversal Multi-Branching (`recursive-traverse`)*:
+    * *`traverse-view-group` (Traverse View 复合容器)*: `dfs` (Connected components & cycle checks) + `backtracking` (Choose $\rightarrow$ Explore $\rightarrow$ Unchoose decision trees).
+    * *`subproblem-view-group` (Subproblem View 复合容器)*: `divide-conquer` (Disjoint subproblem merging) + `dp` (Overlapping subproblems & state transitions).
+    * *`other-group` (Other 复合容器)*: `math` (Bitwise manipulation & number theory) + `greedy` (Local optimal choices with no aftermath).
 
 ---
 

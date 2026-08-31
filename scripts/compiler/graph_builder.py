@@ -1,9 +1,15 @@
 """
 Graph Builder: Generates the structured Cytoscape.js directed acyclic graph (DAG)
-for the algorithm curriculum topology, automatically enriched with problem counts from workspace items.
+for the algorithm curriculum topology aligned 1:1 with Labuladong's 38-node compound hierarchy,
+automatically enriched with problem counts from workspace items and preset geometric coordinates.
 """
 from dataclasses import dataclass, asdict, field
 from typing import Dict, List, Any, Optional
+
+@dataclass
+class TopologyNodePosition:
+    x: float
+    y: float
 
 @dataclass
 class TopologyNodeData:
@@ -11,10 +17,14 @@ class TopologyNodeData:
     topic_id: str
     label: str
     category: str
+    node_type: str = "normal"  # "normal" | "group"
+    parent: Optional[str] = None
     status: str = "mastered"
     summary: str = ""
     keywords: List[str] = field(default_factory=list)
     problem_count: int = 0
+    color: Optional[Dict[str, str]] = None
+    position: Optional[Dict[str, float]] = None
 
 @dataclass
 class TopologyEdgeData:
@@ -22,263 +32,496 @@ class TopologyEdgeData:
     source: str
     target: str
     label: str = ""
+    source_handle: str = "bottom"
+    target_handle: str = "top"
 
 def build_topology_graph(items: Optional[Dict[str, Any]] = None) -> Dict[str, List[Dict[str, Any]]]:
-    """Constructs the canonical directed algorithm roadmap graph in English, enriched with workspace problem counts."""
+    """Constructs the canonical 38-node compound algorithm roadmap graph enriched with workspace problem counts."""
     raw_nodes = [
         # Root Node
         TopologyNodeData(
-            id="root",
+            id="data-structure-algorithm",
             topic_id="topic-all",
-            label="Data Structures & Algorithms\nDSA Mastery",
+            label="Data Structure & Algorithm\n数据结构与算法",
             category="Root Paradigm",
+            node_type="normal",
+            position={"x": 400, "y": 50},
+            color={"lightMode": "#52c41a", "darkMode": "#389e0d"},
             status="mastered",
-            summary="Programs = Data Structures + Algorithms. Comprehensive mastery across linear buffers, tree/graph topologies, and advanced optimization paradigms.",
+            summary="Programs = Data Structures + Algorithms. Comprehensive mastery across linear buffers, tree/graph topologies, and optimization paradigms.",
             keywords=["overview", "all"]
         ),
-        # First-Level Split
+
+        # First-Level Split (Linear Roots)
         TopologyNodeData(
-            id="array_root",
+            id="array",
             topic_id="topic-01-arrays-sliding-window",
-            label="Array",
+            label="Array\n数组",
             category="Linear Structures",
+            node_type="normal",
+            position={"x": 150, "y": 200},
+            color={"lightMode": "#13c2c2", "darkMode": "#08979c"},
             status="mastered",
-            summary="Contiguous memory with O(1) random access. Focus on in-place mutations, range operations, and pointer movements.",
-            keywords=["array", "数组"]
+            summary="Contiguous memory buffer with O(1) random indexing. Focus on in-place mutations, range operations, and pointer movements.",
+            keywords=["array", "数组", "nums"]
         ),
         TopologyNodeData(
-            id="linked_list_root",
+            id="linked",
             topic_id="topic-05-linked-lists",
-            label="Linked List",
+            label="Linked List\n链表",
             category="Linear Structures",
+            node_type="normal",
+            position={"x": 650, "y": 200},
+            color={"lightMode": "#1890ff", "darkMode": "#096dd9"},
             status="mastered",
-            summary="Pointer-linked dynamic nodes. Core techniques: Dummy Head, Fast & Slow Pointers, and In-Place Reversal.",
-            keywords=["linked-list", "链表", "linked_list"]
+            summary="Discrete pointer-linked dynamic nodes. Core techniques: Dummy Head, Multi-Pointer Steps, and In-Place Linkage Reversals.",
+            keywords=["linked-list", "链表", "linked_list", "listnode"]
         ),
-        # Array Subtree - Operations Pipeline
+
+        # -------------------------------------------------------------
+        # Group 1: Array Operations Group & Children
+        # -------------------------------------------------------------
         TopologyNodeData(
-            id="arr_ops",
+            id="array-operation-group",
             topic_id="topic-01-arrays-sliding-window",
-            label="Array Operations",
+            label="Operations\n数组核心操作",
             category="Array Basics",
+            node_type="group",
+            position={"x": 40, "y": 350},
             status="mastered",
-            summary="In-place element removal, moving zeroes, cyclic rotation, and matrix indexing.",
-            keywords=["remove-element", "move-zeroes", "rotate-array"]
+            summary="Foundational array transformation techniques: difference arrays, 2D matrix geometry, and prefix sum range query invariants."
         ),
         TopologyNodeData(
-            id="prefix_sum",
+            id="diff-array",
+            parent="array-operation-group",
             topic_id="topic-03-prefix-sum",
-            label="Prefix Sum",
+            label="Diff Array\n差分数组",
             category="Array Techniques",
+            node_type="normal",
+            position={"x": 100, "y": 380},
+            status="learning",
+            summary="Optimize frequent range updates [i, j] += val from O(N) down to O(1) boundary increments diff[i]+=val, diff[j+1]-=val.",
+            keywords=["difference-array", "差分", "corporate-flight", "car-pooling", "flight", "booking"]
+        ),
+        TopologyNodeData(
+            id="2d-array-ops",
+            parent="array-operation-group",
+            topic_id="topic-04-intervals",
+            label="2D Array\n二维矩阵",
+            category="Array Techniques",
+            node_type="normal",
+            position={"x": 100, "y": 450},
+            status="learning",
+            summary="2D prefix sums, in-place clockwise matrix rotation via diagonal reflection + horizontal row reversal, and spiral scanning.",
+            keywords=["matrix", "rotate-image", "spiral-matrix", "set-matrix-zeroes", "game-of-life", "矩阵", "二维"]
+        ),
+        TopologyNodeData(
+            id="prefix-sum",
+            parent="array-operation-group",
+            topic_id="topic-03-prefix-sum",
+            label="Prefix Sum\n前缀和",
+            category="Array Techniques",
+            node_type="normal",
+            position={"x": 100, "y": 520},
             status="mastered",
             summary="O(N) precomputation enables O(1) static range sum queries; combine with hash maps for Subarray Sum = K.",
-            keywords=["prefix-sum", "prefix_sum", "前缀和", "subarray-sum", "range-sum"]
+            keywords=["prefix-sum", "prefix_sum", "前缀和", "subarray-sum", "range-sum", "running-sum"]
         ),
+
+        # -------------------------------------------------------------
+        # Group 2: Basic Data Structure Group & Children
+        # -------------------------------------------------------------
         TopologyNodeData(
-            id="diff_array",
-            topic_id="topic-03-prefix-sum",
-            label="Difference Array",
-            category="Array Techniques",
-            status="learning",
-            summary="Optimize frequent range updates [i, j] += val from O(N) down to O(1) boundary increments.",
-            keywords=["difference-array", "差分", "corporate-flight", "car-pooling"]
-        ),
-        TopologyNodeData(
-            id="matrix_2d",
-            topic_id="topic-04-intervals",
-            label="2D Matrix",
-            category="Array Techniques",
-            status="learning",
-            summary="2D prefix sums, in-place clockwise matrix rotation, spiral traversal, and diagonal reflections.",
-            keywords=["matrix", "rotate-image", "spiral-matrix", "set-matrix-zeroes"]
-        ),
-        # Array Subtree - Two Pointers Pipeline
-        TopologyNodeData(
-            id="two_pointers_tech",
-            topic_id="topic-01-arrays-sliding-window",
-            label="Two Pointers Technique",
-            category="Two Pointers",
-            status="mastered",
-            summary="Fast/slow pointers, collision pointers, and sliding bounds to reduce brute-force complexity by monotonicity.",
-            keywords=["two-pointers", "双指针"]
-        ),
-        TopologyNodeData(
-            id="arr_two_pointers",
-            topic_id="topic-01-arrays-sliding-window",
-            label="Array Two Pointers",
-            category="Two Pointers",
-            status="mastered",
-            summary="Opposite collision pointers, Two Sum on sorted arrays, and Trapping Rain Water volumetric computation.",
-            keywords=["container-with-most-water", "3sum", "two-sum-ii", "trapping-rain-water"]
-        ),
-        TopologyNodeData(
-            id="sliding_window",
-            topic_id="topic-01-arrays-sliding-window",
-            label="Sliding Window",
-            category="Two Pointers",
-            status="mastered",
-            summary="Maintain dynamic closed bounds [left, right] with monotonic expansion and shrink conditions.",
-            keywords=["sliding-window", "滑动窗口", "longest-substring", "min-window"]
-        ),
-        TopologyNodeData(
-            id="binary_search",
-            topic_id="topic-02-binary-search",
-            label="Binary Search",
-            category="Searching",
-            status="mastered",
-            summary="Halve search spaces by monotonicity. Covers standard closed intervals, left/right bounds, and search by answer.",
-            keywords=["binary-search", "二分", "search-in-rotated", "find-first-and-last"]
-        ),
-        TopologyNodeData(
-            id="random_algo",
-            topic_id="topic-02-binary-search",
-            label="Randomized Algorithms",
-            category="Searching",
-            status="unvisited",
-            summary="Reservoir Sampling for stream processing and Fisher-Yates in-place array shuffling.",
-            keywords=["random", "shuffle", "reservoir"]
-        ),
-        # Array Subtree - Data Structures Pipeline
-        TopologyNodeData(
-            id="basic_ds",
+            id="basic-ds-group",
             topic_id="topic-06-stacks-queues",
-            label="Basic Data Structures\n(Circular Array / Stack / Queue / Hash / LRU)",
+            label="Basic Data Structure\n基础数据结构",
             category="Data Structures",
+            node_type="group",
+            position={"x": 350, "y": 350},
             status="mastered",
-            summary="Circular queues, monotonic stacks, monotonic queues, hash collisions, and LRU/LFU cache eviction design.",
-            keywords=["stack", "queue", "lru", "lfu", "min-stack", "daily-temperatures"]
+            summary="Core linear abstract data types: circular queues, monotonic stacks, collision-resistant hash maps, and composite LRU cache designs."
         ),
         TopologyNodeData(
-            id="adv_ds",
-            topic_id="topic-07-trees-bst",
-            label="Advanced Data Structures\n(BST / Heap / Trie / Graph)",
+            id="cycle-array",
+            parent="basic-ds-group",
+            topic_id="topic-06-stacks-queues",
+            label="Cycle Array\n环形数组",
             category="Data Structures",
-            status="learning",
-            summary="BST properties and balanced trees, priority queues/heaps, prefix tries, and adjacency graph representations.",
-            keywords=["bst", "heap", "trie", "priority-queue", "kth-largest"]
+            node_type="normal",
+            position={"x": 365, "y": 385},
+            status="mastered",
+            summary="Modulo arithmetic (index = (i + offset) % cap) avoids memory re-allocation in circular queues and buffer wheels.",
+            keywords=["cycle-array", "circular", "rotate-array", "ring-buffer", "环形"]
         ),
-        # Linked List & Tree Subtree - Bridge
         TopologyNodeData(
-            id="ll_two_pointers",
+            id="stack-queue",
+            parent="basic-ds-group",
+            topic_id="topic-06-stacks-queues",
+            label="Stack & Queue\n栈与队列",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 500, "y": 385},
+            color={"lightMode": "#faad14", "darkMode": "#d48806"},
+            status="mastered",
+            summary="LIFO stack parentheses matching, monotonic stacks for Next Greater Element, and monotonic queues for Sliding Window Maximum.",
+            keywords=["stack", "queue", "min-stack", "daily-temperatures", "valid-parentheses", "sliding-window-maximum", "单调栈", "队列"]
+        ),
+        TopologyNodeData(
+            id="hashing",
+            parent="basic-ds-group",
+            topic_id="topic-04-intervals",
+            label="Hashing\n哈希技术",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 365, "y": 455},
+            status="mastered",
+            summary="O(1) average lookup and insertion; hash sets for deduplication, frequency counting, and in-place sign marking.",
+            keywords=["hash", "hashing", "two-sum", "group-anagrams", "longest-consecutive", "哈希"]
+        ),
+        TopologyNodeData(
+            id="design",
+            parent="basic-ds-group",
+            topic_id="topic-06-stacks-queues",
+            label="Design\n结构设计",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 500, "y": 455},
+            status="mastered",
+            summary="Composite data structure engineering: LRU cache (Hash Map + Doubly Linked List) and LFU frequency ranking.",
+            keywords=["design", "lru", "lfu", "lru-cache", "trie", "设计"]
+        ),
+
+        # -------------------------------------------------------------
+        # Group 3: Array Two Pointer Group & Children
+        # -------------------------------------------------------------
+        TopologyNodeData(
+            id="two-pointer-group",
+            topic_id="topic-01-arrays-sliding-window",
+            label="Array Two Pointer\n数组双指针",
+            category="Two Pointers",
+            node_type="group",
+            position={"x": 40, "y": 650},
+            status="mastered",
+            summary="Techniques leveraging mathematical monotonicity to prune quadratic search spaces down to linear or logarithmic time."
+        ),
+        TopologyNodeData(
+            id="two-pointer-array",
+            parent="two-pointer-group",
+            topic_id="topic-01-arrays-sliding-window",
+            label="Two Pointer\n对撞与快慢指针",
+            category="Two Pointers",
+            node_type="normal",
+            position={"x": 100, "y": 630},
+            status="mastered",
+            summary="Opposite collision pointers for sorted Two Sum / 3Sum and volumetric Trapping Rain Water computations.",
+            keywords=["two-pointer", "two-pointers", "3sum", "container-with-most-water", "trapping-rain-water", "双指针", "对撞"]
+        ),
+        TopologyNodeData(
+            id="sliding-window",
+            parent="two-pointer-group",
+            topic_id="topic-01-arrays-sliding-window",
+            label="Sliding Window\n滑动窗口",
+            category="Two Pointers",
+            node_type="normal",
+            position={"x": 100, "y": 700},
+            color={"lightMode": "#13c2c2", "darkMode": "#08979c"},
+            status="mastered",
+            summary="Maintain dynamic closed bounds [left, right] with monotonic right++ expansion and left++ shrink conditions.",
+            keywords=["sliding-window", "滑动窗口", "longest-substring", "min-window", "minimum-window", "find-all-anagrams", "substring"]
+        ),
+        TopologyNodeData(
+            id="binary-search",
+            parent="two-pointer-group",
+            topic_id="topic-02-binary-search",
+            label="Binary Search\n二分搜索",
+            category="Searching",
+            node_type="normal",
+            position={"x": 100, "y": 770},
+            status="mastered",
+            summary="Halve search spaces by monotonicity: standard closed intervals, left/right bound searches, and search-by-answer ranges.",
+            keywords=["binary-search", "二分", "search-in-rotated", "find-first-and-last", "search-a-2d-matrix", "find-minimum-in-rotated"]
+        ),
+        TopologyNodeData(
+            id="random",
+            parent="two-pointer-group",
+            topic_id="topic-02-binary-search",
+            label="Randomize\n随机算法",
+            category="Searching",
+            node_type="normal",
+            position={"x": 100, "y": 840},
+            status="unvisited",
+            summary="Reservoir Sampling for dynamic data streams (1/k probability) and Fisher-Yates uniform in-place array shuffling.",
+            keywords=["random", "shuffle", "reservoir", "sampling", "随机"]
+        ),
+
+        # -------------------------------------------------------------
+        # Linked List & Tree Subtree - Pipeline Bridge
+        # -------------------------------------------------------------
+        TopologyNodeData(
+            id="two-pointer-linked",
             topic_id="topic-05-linked-lists",
-            label="Linked List Two Pointers",
+            label="Two Pointer\n链表双指针",
             category="Linked List",
+            node_type="normal",
+            position={"x": 720, "y": 350},
             status="mastered",
-            summary="Find middle nodes, detect cycles using Floyd's Tortoise and Hare, and merge K sorted lists.",
-            keywords=["linked-list-cycle", "reverse-linked-list", "middle-of-the-linked-list", "merge-two-sorted-lists"]
+            summary="Floyd's Tortoise and Hare cycle detection (2k - k = n*cycle), finding midpoint, and K-group recursive reversals.",
+            keywords=["linked-list-cycle", "middle-of-the-linked-list", "reorder-list", "reverse-nodes-in-k-group", "快慢指针", "环形链表"]
         ),
         TopologyNodeData(
-            id="recursion_tree",
+            id="recursion-ops",
             topic_id="topic-07-trees-bst",
-            label="Recursion Foundations",
+            label="Recursion\n递归思维",
             category="Recursive Mindset",
+            node_type="normal",
+            position={"x": 720, "y": 450},
             status="mastered",
-            summary="Mathematical induction and call stack fundamentals: base cases, single-level contracts, and return values.",
-            keywords=["recursion", "递归"]
+            summary="Mathematical induction and call stack contracts: establish base cases, execute current layer logic, and trust return values.",
+            keywords=["recursion", "recursive", "invert-binary-tree", "递归"]
         ),
         TopologyNodeData(
-            id="binary_tree_root",
+            id="binary-tree",
             topic_id="topic-07-trees-bst",
-            label="Binary Tree",
+            label="Binary Tree\n二叉树",
             category="Tree Hierarchies",
+            node_type="normal",
+            position={"x": 720, "y": 550},
+            color={"lightMode": "#1890ff", "darkMode": "#096dd9"},
             status="mastered",
-            summary="Foundational hierarchy for advanced search and dynamic programming. Branches into level-order and recursive traversals.",
-            keywords=["binary-tree", "二叉树", "tree"]
+            summary="Foundational hierarchy bridging linear lists to tree/graph topologies and dynamic programming state transitions.",
+            keywords=["binary-tree", "二叉树", "tree", "treenode", "depth", "max-depth"]
         ),
-        # Tree Subtree - Level Order Pipeline
+
+        # -------------------------------------------------------------
+        # Level-Order Pipeline
+        # -------------------------------------------------------------
         TopologyNodeData(
-            id="level_order",
+            id="level-order-traverse",
             topic_id="topic-07-trees-bst",
-            label="Level-Order Traversal",
+            label="Level Traverse\n层序遍历",
             category="Tree Traversal",
+            node_type="normal",
+            position={"x": 850, "y": 670},
             status="mastered",
-            summary="Queue-driven top-to-bottom breadth scanning and layered tree exploration.",
-            keywords=["level-order", "层序", "binary-tree-level-order"]
+            summary="Queue-driven top-to-bottom breadth scanning; layer size snapshots (sz = q.size()) isolate tree levels cleanly.",
+            keywords=["level-order", "层序", "binary-tree-level-order", "zigzag", "right-side-view", "bottom-left"]
         ),
         TopologyNodeData(
-            id="bfs_search",
+            id="bfs",
             topic_id="topic-09-graphs",
-            label="Breadth-First Search (BFS)",
+            label="BFS\n广度优先搜索",
             category="Search Algorithms",
+            node_type="normal",
+            position={"x": 850, "y": 785},
+            color={"lightMode": "#1890ff", "darkMode": "#096dd9"},
             status="mastered",
             summary="Wavefront expansion model for finding global shortest paths and minimum transitions in unweighted state graphs.",
-            keywords=["bfs", "word-ladder", "open-the-lock"]
+            keywords=["bfs", "breadth-first", "word-ladder", "open-the-lock", "广度优先"]
         ),
         TopologyNodeData(
-            id="shortest_path",
+            id="shortest-path",
             topic_id="topic-09-graphs",
-            label="Shortest Path",
+            label="Shortest Path\n最短路径",
             category="Search Algorithms",
+            node_type="normal",
+            position={"x": 850, "y": 900},
             status="learning",
-            summary="Dijkstra's weighted shortest paths, bidirectional BFS branch pruning, and 0-1 BFS with deques.",
-            keywords=["dijkstra", "shortest-path", "network-delay-time"]
+            summary="Dijkstra priority queue state relaxation, 0-1 BFS with double-ended queues, and bidirectional search branch pruning.",
+            keywords=["dijkstra", "shortest-path", "network-delay-time", "cheapest-flights", "最短路径"]
         ),
-        # Tree Subtree - Recursive Traversal Multi-Branching
+
+        # -------------------------------------------------------------
+        # Recursive Traversal Pipeline
+        # -------------------------------------------------------------
         TopologyNodeData(
-            id="recursive_traversal",
+            id="recursive-traverse",
             topic_id="topic-07-trees-bst",
-            label="Recursive Traversal",
+            label="Recursive Traverse\n递归遍历",
             category="Tree Paradigms",
+            node_type="normal",
+            position={"x": 620, "y": 670},
             status="mastered",
             summary="Preorder, Inorder, and Postorder traversals — the theoretical origin of Backtracking and Divide & Conquer.",
-            keywords=["inorder", "preorder", "postorder", "max-depth", "invert-binary-tree"]
+            keywords=["inorder", "preorder", "postorder", "construct-binary-tree", "diameter", "flatten"]
         ),
-        # Traversal Perspective: Backtracking -> DFS
+
+        # -------------------------------------------------------------
+        # Group 4: Traverse View Group & Children
+        # -------------------------------------------------------------
+        TopologyNodeData(
+            id="traverse-view-group",
+            topic_id="topic-08-backtracking",
+            label="Traverse View\n遍历视角",
+            category="Exhaustive Search",
+            node_type="group",
+            position={"x": 450, "y": 780},
+            status="mastered",
+            summary="Exhaustive decision tree exploration: maintain state path, explore child branches, and unchoose upon backtracking."
+        ),
+        TopologyNodeData(
+            id="dfs",
+            parent="traverse-view-group",
+            topic_id="topic-09-graphs",
+            label="DFS\n深度优先搜索",
+            category="Exhaustive Search",
+            node_type="normal",
+            position={"x": 390, "y": 930},
+            color={"lightMode": "#f5222d", "darkMode": "#cf1322"},
+            status="mastered",
+            summary="Connected components, flood fill algorithms, cycle detection via onPath arrays, and topological sorting.",
+            keywords=["dfs", "depth-first", "number-of-islands", "surrounded-regions", "pacific-atlantic", "深度优先"]
+        ),
         TopologyNodeData(
             id="backtracking",
+            parent="traverse-view-group",
             topic_id="topic-08-backtracking",
-            label="Backtracking",
+            label="Backtracking\n回溯算法",
             category="Exhaustive Search",
+            node_type="normal",
+            position={"x": 390, "y": 1000},
+            color={"lightMode": "#f5222d", "darkMode": "#cf1322"},
             status="mastered",
-            summary="State-space decision trees: Choose -> Explore -> Unchoose pattern for permutations, subsets, and N-Queens.",
-            keywords=["backtracking", "回溯", "subsets", "permutations", "combination-sum", "n-queens"]
+            summary="State-space decision trees: Choose -> Explore -> Unchoose pattern for subsets, permutations, combinations, and N-Queens.",
+            keywords=["backtracking", "回溯", "subsets", "permutations", "combination-sum", "n-queens", "palindrome-partitioning", "word-search"]
+        ),
+
+        # -------------------------------------------------------------
+        # Group 5: Subproblem View Group & Children
+        # -------------------------------------------------------------
+        TopologyNodeData(
+            id="subproblem-view-group",
+            topic_id="topic-10-dp-math",
+            label="Subproblem View\n子问题视角",
+            category="Optimization",
+            node_type="group",
+            position={"x": 650, "y": 780},
+            status="mastered",
+            summary="Deconstruct problems into smaller instances: independent subproblems (Divide & Conquer) vs overlapping states (DP)."
         ),
         TopologyNodeData(
-            id="dfs_search",
-            topic_id="topic-09-graphs",
-            label="Depth-First Search (DFS)",
-            category="Exhaustive Search",
-            status="mastered",
-            summary="Connected components, island flooding algorithms, topological sorting, and deep recursion exploration.",
-            keywords=["dfs", "number-of-islands", "surrounded-regions", "pacific-atlantic"]
-        ),
-        # Subproblem Perspective: Divide & Conquer -> DP
-        TopologyNodeData(
-            id="divide_and_conquer",
+            id="divide-conquer",
+            parent="subproblem-view-group",
             topic_id="topic-07-trees-bst",
-            label="Divide & Conquer",
+            label="Divide & Conquer\n分治算法",
             category="Subproblems",
+            node_type="normal",
+            position={"x": 640, "y": 930},
             status="mastered",
-            summary="Deconstruct problems into disjoint subproblems, solve independently, and merge results (e.g. Merge Sort).",
-            keywords=["divide-and-conquer", "分治", "merge-sort", "quick-sort"]
+            summary="Deconstruct into disjoint subproblems, solve independently, and merge results (e.g. Merge Sort, Quick Select).",
+            keywords=["divide-and-conquer", "分治", "merge-sort", "quick-sort", "kth-largest", "sort-list"]
         ),
         TopologyNodeData(
-            id="dynamic_programming",
+            id="dp",
+            parent="subproblem-view-group",
             topic_id="topic-10-dp-math",
-            label="Dynamic Programming (DP)",
+            label="DP\n动态规划",
             category="Optimization",
+            node_type="normal",
+            position={"x": 640, "y": 1000},
+            color={"lightMode": "#722ed1", "darkMode": "#531dab"},
             status="learning",
-            summary="Overlapping subproblems, optimal substructure, and state transition tables (memoization vs tabulation).",
-            keywords=["dynamic-programming", "dp", "coin-change", "climbing-stairs", "longest-increasing-subsequence"]
+            summary="Overlapping subproblems, optimal substructure, and state transition equations (memoization vs bottom-up tabulation).",
+            keywords=["dynamic-programming", "dp", "coin-change", "climbing-stairs", "longest-increasing-subsequence", "longest-common", "动态规划"]
         ),
-        # Miscellaneous: Math -> Greedy
+
+        # -------------------------------------------------------------
+        # Group 6: Other Group & Children (Math & Greedy)
+        # -------------------------------------------------------------
         TopologyNodeData(
-            id="math_algo",
+            id="other-group",
             topic_id="topic-10-dp-math",
-            label="Math & Bit Manipulation",
+            label="Other\n其他算法",
+            category="Discrete & Optimization",
+            node_type="group",
+            position={"x": 250, "y": 780},
+            status="mastered",
+            summary="Specialized algorithmic paradigms: mathematical logic, bitwise arithmetic, and greedy choice heuristics."
+        ),
+        TopologyNodeData(
+            id="math",
+            parent="other-group",
+            topic_id="topic-10-dp-math",
+            label="Math\n数学与位运算",
             category="Discrete Math",
+            node_type="normal",
+            position={"x": 200, "y": 930},
             status="mastered",
-            summary="Bit manipulation tricks, binary exponentiation, Euclidean GCD algorithm, and prime number sieves.",
-            keywords=["math", "bit-manipulation", "power-of-two", "single-number", "gcd"]
+            summary="Bitwise manipulations (n & n-1), XOR properties, binary exponentiation, and Euclidean GCD algorithms.",
+            keywords=["math", "bit-manipulation", "single-number", "power-of-two", "counting-bits", "stone-game", "位运算", "数学"]
         ),
         TopologyNodeData(
-            id="greedy_algo",
+            id="greedy",
+            parent="other-group",
             topic_id="topic-10-dp-math",
-            label="Greedy Algorithms",
+            label="Greedy\n贪心算法",
             category="Optimization",
+            node_type="normal",
+            position={"x": 200, "y": 1000},
             status="learning",
-            summary="Prove local optimal choices yield global optimum with no aftermath (e.g. Interval Scheduling, Jump Game).",
-            keywords=["greedy", "贪心", "jump-game", "gas-station"]
+            summary="Prove local optimal choices yield global optimum with no aftermath (e.g. Interval Scheduling, Jump Game, Gas Station).",
+            keywords=["greedy", "贪心", "jump-game", "gas-station", "interval", "non-overlapping"]
+        ),
+
+        # -------------------------------------------------------------
+        # Group 7: Advanced Data Structure Group & Children
+        # -------------------------------------------------------------
+        TopologyNodeData(
+            id="advanced-ds-group",
+            topic_id="topic-07-trees-bst",
+            label="Advanced Data Structure\n高阶数据结构",
+            category="Data Structures",
+            node_type="group",
+            position={"x": 270, "y": 550},
+            status="learning",
+            summary="Advanced tree and graph structures: BST invariants, binary heap priority queues, prefix tries, and graph adjacency topologies."
+        ),
+        TopologyNodeData(
+            id="bst",
+            parent="advanced-ds-group",
+            topic_id="topic-07-trees-bst",
+            label="BST\n二叉搜索树",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 285, "y": 585},
+            status="mastered",
+            summary="BST invariant (Left < Root < Right) enables logarithmic search, insertion, deletion, and sorted inorder streaming.",
+            keywords=["bst", "binary-search-tree", "validate-binary-search-tree", "lowest-common-ancestor", "kth-smallest"]
+        ),
+        TopologyNodeData(
+            id="heap",
+            parent="advanced-ds-group",
+            topic_id="topic-07-trees-bst",
+            label="Heap\n堆与优先队列",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 420, "y": 585},
+            status="mastered",
+            summary="Complete binary tree maintaining min/max invariant; swim/sink operations achieve O(log N) priority queue operations.",
+            keywords=["heap", "priority-queue", "find-median-from-data-stream", "top-k-frequent", "kth-largest-element", "堆"]
+        ),
+        TopologyNodeData(
+            id="trie",
+            parent="advanced-ds-group",
+            topic_id="topic-07-trees-bst",
+            label="Trie\n前缀字典树",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 285, "y": 655},
+            status="mastered",
+            summary="Multi-way tree for high-efficiency prefix matching, string dictionary search, and autocomplete wildcards.",
+            keywords=["trie", "prefix-tree", "implement-trie", "word-search-ii", "前缀树", "字典树"]
+        ),
+        TopologyNodeData(
+            id="graph",
+            parent="advanced-ds-group",
+            topic_id="topic-09-graphs",
+            label="Graph\n图论进阶",
+            category="Data Structures",
+            node_type="normal",
+            position={"x": 420, "y": 655},
+            status="learning",
+            summary="Adjacency list representations, Kahn's topological sort algorithm, bipartite checks, and Union-Find disjoint sets.",
+            keywords=["graph", "course-schedule", "is-graph-bipartite", "union-find", "disjoint-set", "图论", "拓扑排序"]
         ),
     ]
 
@@ -290,7 +533,7 @@ def build_topology_graph(items: Optional[Dict[str, Any]] = None) -> Dict[str, Li
             count = 0
             for k, entity in items.items():
                 if entity.get("type") == "problem":
-                    if node.id == "root":
+                    if node.id == "data-structure-algorithm":
                         count += 1
                         continue
                     slug = entity.get("slug", "").lower()
@@ -302,51 +545,41 @@ def build_topology_graph(items: Optional[Dict[str, Any]] = None) -> Dict[str, Li
                     if any(kw.lower() in search_target for kw in keywords):
                         count += 1
             node_dict["problem_count"] = count
-        nodes.append({"data": node_dict})
+
+        # Construct Cytoscape element payload
+        element_payload = {"data": node_dict}
+        if node.position:
+            element_payload["position"] = node.position
+        nodes.append(element_payload)
 
     raw_edges = [
         # Root Branching
-        TopologyEdgeData(id="e-root-arr", source="root", target="array_root", label="Array Branch"),
-        TopologyEdgeData(id="e-root-ll", source="root", target="linked_list_root", label="Linked List Branch"),
+        TopologyEdgeData(id="e-data-structure-algorithm-array", source="data-structure-algorithm", target="array", label="Array Branch"),
+        TopologyEdgeData(id="e-data-structure-algorithm-linked", source="data-structure-algorithm", target="linked", label="Linked List Branch"),
 
-        # Array Subtree - Operations Pipeline
-        TopologyEdgeData(id="e-arr-ops", source="array_root", target="arr_ops"),
-        TopologyEdgeData(id="e-ops-prefix", source="arr_ops", target="prefix_sum"),
-        TopologyEdgeData(id="e-prefix-diff", source="prefix_sum", target="diff_array"),
-        TopologyEdgeData(id="e-diff-2d", source="diff_array", target="matrix_2d"),
+        # Array Subtree - Operations & Basic DS
+        TopologyEdgeData(id="e-array-array-operation-group", source="array", target="array-operation-group"),
+        TopologyEdgeData(id="e-array-operation-group-two-pointer-group", source="array-operation-group", target="two-pointer-group"),
+        TopologyEdgeData(id="e-array-operation-group-basic-ds-group", source="array-operation-group", target="basic-ds-group"),
 
-        # Array Subtree - Two Pointers Pipeline
-        TopologyEdgeData(id="e-arr-tp", source="array_root", target="two_pointers_tech"),
-        TopologyEdgeData(id="e-tp-arrtp", source="two_pointers_tech", target="arr_two_pointers"),
-        TopologyEdgeData(id="e-arrtp-sw", source="arr_two_pointers", target="sliding_window"),
-        TopologyEdgeData(id="e-sw-bs", source="sliding_window", target="binary_search"),
-        TopologyEdgeData(id="e-bs-rand", source="binary_search", target="random_algo"),
+        # Linked List & Basic DS / Tree Bridge
+        TopologyEdgeData(id="e-linked-basic-ds-group", source="linked", target="basic-ds-group"),
+        TopologyEdgeData(id="e-linked-two-pointer-linked", source="linked", target="two-pointer-linked"),
+        TopologyEdgeData(id="e-two-pointer-linked-recursion-ops", source="two-pointer-linked", target="recursion-ops"),
+        TopologyEdgeData(id="e-recursion-ops-binary-tree", source="recursion-ops", target="binary-tree"),
 
-        # Array Subtree - Data Structures Pipeline
-        TopologyEdgeData(id="e-arr-bds", source="array_root", target="basic_ds"),
-        TopologyEdgeData(id="e-bds-ads", source="basic_ds", target="adv_ds"),
+        # Tree Subtree - Level Order & BFS
+        TopologyEdgeData(id="e-binary-tree-level-order-traverse", source="binary-tree", target="level-order-traverse", label="Level-Order"),
+        TopologyEdgeData(id="e-level-order-traverse-bfs", source="level-order-traverse", target="bfs"),
+        TopologyEdgeData(id="e-bfs-shortest-path", source="bfs", target="shortest-path"),
 
-        # Linked List & Tree Subtree - Bridge
-        TopologyEdgeData(id="e-ll-tp", source="linked_list_root", target="ll_two_pointers"),
-        TopologyEdgeData(id="e-tp-rec", source="ll_two_pointers", target="recursion_tree"),
-        TopologyEdgeData(id="e-rec-bt", source="recursion_tree", target="binary_tree_root"),
-
-        # Tree Subtree - Level Order Pipeline
-        TopologyEdgeData(id="e-bt-lo", source="binary_tree_root", target="level_order", label="Level-Order"),
-        TopologyEdgeData(id="e-lo-bfs", source="level_order", target="bfs_search"),
-        TopologyEdgeData(id="e-bfs-sp", source="bfs_search", target="shortest_path"),
+        # Tree Subtree - Advanced DS Branch
+        TopologyEdgeData(id="e-binary-tree-advanced-ds-group", source="binary-tree", target="advanced-ds-group", label="Advanced DS"),
 
         # Tree Subtree - Recursive Traversal Multi-Branching
-        TopologyEdgeData(id="e-bt-rec", source="binary_tree_root", target="recursive_traversal", label="Recursive"),
-        # Traversal Perspective
-        TopologyEdgeData(id="e-rec-btk", source="recursive_traversal", target="backtracking", label="Traversal"),
-        TopologyEdgeData(id="e-btk-dfs", source="backtracking", target="dfs_search"),
-        # Subproblem Perspective
-        TopologyEdgeData(id="e-rec-dc", source="recursive_traversal", target="divide_and_conquer", label="Subproblems"),
-        TopologyEdgeData(id="e-dc-dp", source="divide_and_conquer", target="dynamic_programming"),
-        # Miscellaneous
-        TopologyEdgeData(id="e-rec-math", source="recursive_traversal", target="math_algo", label="Other Paradigms"),
-        TopologyEdgeData(id="e-math-greedy", source="math_algo", target="greedy_algo"),
+        TopologyEdgeData(id="e-binary-tree-recursive-traverse", source="binary-tree", target="recursive-traverse", label="Recursive"),
+        TopologyEdgeData(id="e-recursive-traverse-traverse-view-group", source="recursive-traverse", target="traverse-view-group", label="Traversal View"),
+        TopologyEdgeData(id="e-recursive-traverse-subproblem-view-group", source="recursive-traverse", target="subproblem-view-group", label="Subproblem View"),
     ]
 
     edges = [{"data": asdict(edge)} for edge in raw_edges]
