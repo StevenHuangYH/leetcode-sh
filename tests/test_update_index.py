@@ -90,5 +90,32 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIn("function initLinkInterceptor", bundled_html)
         self.assertIn("initLinkInterceptor();", bundled_html)
 
+    def test_entity_resolution_contracts(self):
+        documents = collect_workspace_documents()
+        
+        # 1. Exact path resolution
+        self.assertIn("luffy/02-lc-0001-two-sum.py", documents)
+        self.assertIn("top-100/lc-0015-3sum.py", documents)
+        self.assertIn("daily-practice/lc-0025-reverse-nodes-in-k-group.py", documents)
+
+        # 2. Extension swap contract (md file companion lookup)
+        top15 = documents.get("top-100/lc-0015-3sum.py")
+        self.assertIsNotNone(top15)
+        self.assertTrue(top15.get("md_file", "").endswith("lc-0015-3sum.md"))
+
+        # 3. Topic and problem-index keys
+        self.assertIn("topic-01-arrays-sliding-window", documents)
+        self.assertIn("topic-all", documents)
+
+        # 4. LC number mapping integrity
+        lc15_entity = next((v for v in documents.values() if v.get("lc_num") == "LC 15"), None)
+        self.assertIsNotNone(lc15_entity)
+        self.assertEqual(lc15_entity["key"], "top-100/lc-0015-3sum.py")
+
+        self.assertIn("luffy/02-lc-0001-two-sum.py", documents)
+        self.assertIn("top-100/lc-0001-two-sum.py", documents)
+        self.assertEqual(documents["luffy/02-lc-0001-two-sum.py"]["lc_num"], "LC 1")
+        self.assertEqual(documents["top-100/lc-0001-two-sum.py"]["lc_num"], "LC 1")
+
 if __name__ == "__main__":
     unittest.main()

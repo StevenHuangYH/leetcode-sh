@@ -869,6 +869,8 @@ const items = {items_json};
       document.getElementById("right-pane").scrollTop = 0;
     }
 
+    const DOM_RENDER_DELAY_MS = 60;
+
     /**
      * EntityReferenceResolver: Resolves relative file paths, stems, LC numbers, or slugs
      * to a registered DocumentEntity key in the in-memory items manifest.
@@ -894,33 +896,26 @@ const items = {items_json};
       }
       if (!cleanPath) return null;
 
-      const isCodeTarget = cleanPath.endsWith(".py");
-      const isNoteTarget = cleanPath.endsWith(".md");
-
       // 1. Exact Match in items
       if (items[cleanPath]) {
-        return { key: cleanPath, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+        return { key: cleanPath, anchor };
       }
 
       // 2. Extension swap match (.md <-> .py)
-      if (isNoteTarget) {
+      if (cleanPath.endsWith(".md")) {
         const pyKey = cleanPath.replace(/\.md$/, ".py");
-        if (items[pyKey]) {
-          return { key: pyKey, isCode: false, isNote: true, anchor };
-        }
-      } else if (isCodeTarget) {
+        if (items[pyKey]) return { key: pyKey, anchor };
+      } else if (cleanPath.endsWith(".py")) {
         const mdKey = cleanPath.replace(/\.py$/, ".md");
-        if (items[mdKey]) {
-          return { key: mdKey, isCode: true, isNote: false, anchor };
-        }
+        if (items[mdKey]) return { key: mdKey, anchor };
       }
 
       // 3. Problem index / topic docs match
       if (items[`problem-index/${cleanPath}`]) {
-        return { key: `problem-index/${cleanPath}`, isCode: false, isNote: true, anchor };
+        return { key: `problem-index/${cleanPath}`, anchor };
       }
       if (cleanPath.startsWith("topic-") && items[cleanPath]) {
-        return { key: cleanPath, isCode: false, isNote: true, anchor };
+        return { key: cleanPath, anchor };
       }
 
       // 4. Track prefix fallback & Stem matching
@@ -929,11 +924,11 @@ const items = {items_json};
       for (const track of tracks) {
         const tryPy = `${track}/${stem}.py`;
         const tryMd = `${track}/${stem}.md`;
-        if (items[tryPy]) return { key: tryPy, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
-        if (items[tryMd]) return { key: tryMd, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+        if (items[tryPy]) return { key: tryPy, anchor };
+        if (items[tryMd]) return { key: tryMd, anchor };
       }
 
-      // 5. LC Number / Slug scanning
+      // 5. LC Number & exact slug matching
       const lcNumMatch = stem.match(/(?:^|\b)(?:lc-?)(\d+)/i) || stem.match(/(?:^|\b)(\d+)\b/);
       const targetLcNum = lcNumMatch ? parseInt(lcNumMatch[1], 10) : null;
 
@@ -943,14 +938,14 @@ const items = {items_json};
           if (targetLcNum !== null && item.lc_num) {
             const itemNum = parseInt(item.lc_num.replace(/\D/g, ""), 10);
             if (itemNum === targetLcNum) {
-              return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+              return { key: k, anchor };
             }
           }
-          if (item.slug && (item.slug === stem || item.slug.includes(stem) || stem.includes(item.slug))) {
-            return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+          if (item.slug && item.slug === stem) {
+            return { key: k, anchor };
           }
-          if (item.key && item.key.toLowerCase().includes(stem)) {
-            return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+          if (item.path && item.path.toLowerCase().endsWith(`/${stem}`)) {
+            return { key: k, anchor };
           }
         }
       }
@@ -959,13 +954,12 @@ const items = {items_json};
     }
 
     /**
-     * Finds a heading DOM element within a container matching an anchor id or slug.
+     * Finds a heading DOM element strictly within a container matching an anchor id or slug.
      */
     function findHeadingElement(container, anchorId) {
       if (!container || !anchorId) return null;
       const cleanAnchor = anchorId.toLowerCase();
-      const direct = document.getElementById(anchorId) ||
-                     container.querySelector(`[id="${anchorId}"], [name="${anchorId}"], h1[id="${anchorId}"], h2[id="${anchorId}"], h3[id="${anchorId}"], h4[id="${anchorId}"], h5[id="${anchorId}"], h6[id="${anchorId}"]`);
+      const direct = container.querySelector(`[id="${anchorId}"], [name="${anchorId}"], h1[id="${anchorId}"], h2[id="${anchorId}"], h3[id="${anchorId}"], h4[id="${anchorId}"], h5[id="${anchorId}"], h6[id="${anchorId}"]`);
       if (direct) return direct;
       return Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
         const cleanHeading = h.textContent.trim().toLowerCase();
@@ -976,8 +970,8 @@ const items = {items_json};
     }
 
     /**
-     * InternalNavigationInterceptor: Intercepts link clicks to route internal files,
-     * in-page anchors, and external links without triggering page downloads or reloads.
+     * InternalNavigationInterceptor: Intercepts link clicks within workspace & notes
+     * to route internal files, in-page anchors, and external links without triggering page downloads.
      */
     function initLinkInterceptor() {
       document.addEventListener("click", (e) => {
@@ -999,6 +993,11 @@ const items = {items_json};
           e.preventDefault();
           const anchorId = rawHref.substring(1);
           if (items[anchorId]) {
+            if (window.innerWidth <= 768) {
+              setMobileTab("notes");
+            } else {
+              setViewMode("notes");
+            }
             switchItem(anchorId);
             return;
           }
@@ -1032,7 +1031,7 @@ const items = {items_json};
               if (!notesViewer) return;
               const targetEl = findHeadingElement(notesViewer, resolved.anchor);
               if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 60);
+            }, DOM_RENDER_DELAY_MS);
           }
           return;
         } else if (isRelativeDocLink) {
