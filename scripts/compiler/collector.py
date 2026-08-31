@@ -51,12 +51,15 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
     # 1. Overview & Curriculum Docs
     readme_path = base_dir / "README.md"
     readme_stat = _get_file_stat(readme_path)
+    roadmap_path = base_dir / "ROADMAP.md"
+    roadmap_stat = _get_file_stat(roadmap_path)
     readme_cache_key = "__readme__"
 
     if (
         use_cache
         and readme_cache_key in cached_manifest
         and cached_manifest[readme_cache_key].get("stat") == list(readme_stat)
+        and cached_manifest[readme_cache_key].get("roadmap_stat") == list(roadmap_stat)
     ):
         overview_docs = cached_manifest[readme_cache_key].get("overview_docs", {})
         topic_docs = cached_manifest[readme_cache_key].get("topic_docs", {})
@@ -72,8 +75,17 @@ def collect_workspace_documents(base_dir: Optional[Path] = None, use_cache: bool
                 path="README.md", type="doc", notes=readme_text, diff="All"
             ))
         }
+        if roadmap_path.exists():
+            roadmap_text = read_file(roadmap_path)
+            overview_docs["ROADMAP.md"] = asdict(DocumentEntity(
+                key="ROADMAP.md", category="Overview", category_display="Overview", title="Algorithm Master Roadmap",
+                short="ROADMAP.md", slug="roadmap algorithm master curriculum 5 phases", cn_title="算法全景路线图", tags="roadmap algorithm curriculum phases",
+                lc_num="", search_blob=build_search_blob(["ROADMAP.md", "roadmap", "算法路线图", "algorithm master roadmap"], roadmap_text),
+                path="ROADMAP.md", type="doc", notes=roadmap_text, diff="All"
+            ))
         new_manifest[readme_cache_key] = {
             "stat": list(readme_stat),
+            "roadmap_stat": list(roadmap_stat),
             "overview_docs": overview_docs,
             "topic_docs": topic_docs
         }

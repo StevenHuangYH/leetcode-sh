@@ -31,6 +31,13 @@ const items = {items_json};
         filter: k => k === "README.md"
       },
       {
+        id: "roadmap-doc",
+        name: "ROADMAP.md",
+        label: "Algorithm Roadmap",
+        isLeaf: true,
+        filter: k => k === "ROADMAP.md"
+      },
+      {
         id: "problem-index",
         name: "problem-index/",
         label: "Curriculum Index",

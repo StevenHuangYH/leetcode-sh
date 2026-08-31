@@ -24,6 +24,7 @@ class TestIncrementalCache(unittest.TestCase):
 
         self.assertEqual(len(res1), len(res2), "Cached entity count must match full scan count")
         self.assertIn("README.md", res2)
+        self.assertIn("ROADMAP.md", res2)
         self.assertIn("topic-all", res2)
 
     def test_clean_rebuild_bypasses_cache(self):
@@ -31,3 +32,4 @@ class TestIncrementalCache(unittest.TestCase):
         res = collect_workspace_documents(REPO_ROOT, use_cache=False)
         self.assertGreater(len(res), 150)
         self.assertIn("README.md", res)
+        self.assertIn("ROADMAP.md", res)
