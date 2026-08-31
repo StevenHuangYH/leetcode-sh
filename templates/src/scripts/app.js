@@ -1014,13 +1014,9 @@ const items = {items_json};
           const isMd = resolved.isNote || rawHref.endsWith(".md");
 
           if (window.innerWidth <= 768) {
-            setMobileTab(isPy ? "code" : "notes");
+            setMobileTab("notes");
           } else {
-            if (isPy) {
-              setViewMode("dual");
-            } else if (isMd) {
-              setViewMode("notes");
-            }
+            setViewMode("notes");
           }
 
           switchItem(targetKey);
