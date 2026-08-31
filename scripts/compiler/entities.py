@@ -168,13 +168,18 @@ class ProblemTitleFormatter:
                 lc_num = match_range.group(1)
                 raw_slug = match_range.group(2)
             else:
-                lc_num = ""
+                match_meta_lc = re.search(r'(?:\*\*LeetCode ID\*\*:\s*|#\s*)LC\s*(\d+)', md_content, re.IGNORECASE) if md_content else None
+                if match_meta_lc and int(match_meta_lc.group(1)) > 0:
+                    num_int = int(match_meta_lc.group(1))
+                    lc_num = f"LC {num_int}"
+                else:
+                    lc_num = ""
                 raw_slug = re.sub(r'^\d{2}-', '', stem)
 
         # 2. Extract Chinese Title from Markdown H1 header (# LC ... | 中文标题)
         cn_title = ""
         if md_content:
-            match_cn = re.search(r'# .*?\|\s*([\u4e00-\u9fa5A-Za-z0-9\s\(\)·\-—]+)', md_content)
+            match_cn = re.search(r'# .*?\|\s*([^\r\n]+)', md_content)
             if match_cn:
                 cn_title = match_cn.group(1).strip()
 

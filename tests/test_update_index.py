@@ -1,6 +1,9 @@
 import unittest
+from pathlib import Path
 from update_index import collect_workspace_documents
 from scripts.compiler.entities import format_problem_title
+
+REPO_ROOT = Path(__file__).parent.parent
 
 class TestUpdateIndexParser(unittest.TestCase):
     def test_all_11_topics_curriculum_are_parsed_without_empty_content(self):
@@ -167,6 +170,39 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertNotIn("EXTRA_PROBLEM_MAPPINGS", content)
         self.assertIn("sync_multi_track_solutions", content)
         self.assertIn("build_problem_files_index(collector_items)", content)
+
+    def test_multi_track_solution_and_note_indexing(self):
+        """Assert build_problem_files_index aggregates both .py and .md files for multi-track problems."""
+        from scripts.sync_readme import build_problem_files_index
+        from scripts.compiler.collector import ProblemCollector
+        
+        collector_items = ProblemCollector.collect(REPO_ROOT, use_cache=False)
+        file_map = build_problem_files_index(collector_items)
+        
+        # Verify LC 77 contains both daily-practice py/md and luffy py
+        self.assertIn(77, file_map)
+        lc_77_links = file_map[77]
+        self.assertTrue(any("daily-practice/lc-0077-combinations.py" in l for l in lc_77_links))
+        self.assertTrue(any("daily-practice/lc-0077-combinations.md" in l for l in lc_77_links))
+        self.assertTrue(any("luffy/31-lc-0077-combinations.py" in l for l in lc_77_links))
+
+        # Verify LC 131 contains both daily-practice py/md and luffy py
+        self.assertIn(131, file_map)
+        lc_131_links = file_map[131]
+        self.assertTrue(any("daily-practice/lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
+        self.assertTrue(any("daily-practice/lc-0131-palindrome-partitioning.md" in l for l in lc_131_links))
+        self.assertTrue(any("luffy/36-lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
+
+    def test_section_5_multi_track_readme_preservation(self):
+        """Assert Section 5 in README.md retains both .py and .md companion links for multi-track problems."""
+        from scripts.sync_readme import update_readme
+        update_readme()
+        
+        readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+        
+        # Verify LC 77 row in Section 5 includes companion notes
+        self.assertIn("[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)", readme_text)
+        self.assertIn("[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)", readme_text)
 
 
 if __name__ == "__main__":
