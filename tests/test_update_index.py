@@ -86,6 +86,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         bundler = TemplateBundler()
         bundled_html = bundler.bundle(minify=False)
         self.assertIn("function resolveEntityReference", bundled_html)
+        self.assertIn("function findHeadingElement", bundled_html)
         self.assertIn("function initLinkInterceptor", bundled_html)
         self.assertIn("initLinkInterceptor();", bundled_html)
 

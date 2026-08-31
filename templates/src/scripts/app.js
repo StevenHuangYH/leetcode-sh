@@ -959,6 +959,23 @@ const items = {items_json};
     }
 
     /**
+     * Finds a heading DOM element within a container matching an anchor id or slug.
+     */
+    function findHeadingElement(container, anchorId) {
+      if (!container || !anchorId) return null;
+      const cleanAnchor = anchorId.toLowerCase();
+      const direct = document.getElementById(anchorId) ||
+                     container.querySelector(`[id="${anchorId}"], [name="${anchorId}"], h1[id="${anchorId}"], h2[id="${anchorId}"], h3[id="${anchorId}"], h4[id="${anchorId}"], h5[id="${anchorId}"], h6[id="${anchorId}"]`);
+      if (direct) return direct;
+      return Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
+        const cleanHeading = h.textContent.trim().toLowerCase();
+        const slug1 = cleanHeading.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+        const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
+        return slug1 === cleanAnchor || slug2 === cleanAnchor || cleanHeading === cleanAnchor;
+      }) || null;
+    }
+
+    /**
      * InternalNavigationInterceptor: Intercepts link clicks to route internal files,
      * in-page anchors, and external links without triggering page downloads or reloads.
      */
@@ -985,20 +1002,9 @@ const items = {items_json};
             switchItem(anchorId);
             return;
           }
-          const leftPane = document.getElementById("left-pane");
           const notesViewer = document.getElementById("notesViewer");
-          if (!notesViewer || !leftPane) return;
-
-          const targetEl = document.getElementById(anchorId) ||
-                           notesViewer.querySelector(`[name="${anchorId}"]`) ||
-                           notesViewer.querySelector(`h1[id="${anchorId}"], h2[id="${anchorId}"], h3[id="${anchorId}"], h4[id="${anchorId}"], h5[id="${anchorId}"], h6[id="${anchorId}"]`) ||
-                           Array.from(notesViewer.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
-                             const cleanHeading = h.textContent.trim().toLowerCase();
-                             const slug1 = cleanHeading.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
-                             const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
-                             return slug1 === anchorId.toLowerCase() || slug2 === anchorId.toLowerCase() || cleanHeading === anchorId.toLowerCase();
-                           });
-
+          if (!notesViewer) return;
+          const targetEl = findHeadingElement(notesViewer, anchorId);
           if (targetEl) {
             targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
           }
@@ -1006,12 +1012,11 @@ const items = {items_json};
         }
 
         // 3. Relative File / Entity Reference
+        const isRelativeDocLink = rawHref.endsWith(".py") || rawHref.endsWith(".md") || rawHref.startsWith("./") || rawHref.startsWith("../") || rawHref.startsWith("problem-index/") || rawHref.startsWith("topic-");
         const resolved = resolveEntityReference(rawHref);
         if (resolved && resolved.key && items[resolved.key]) {
           e.preventDefault();
           const targetKey = resolved.key;
-          const isPy = resolved.isCode || rawHref.endsWith(".py");
-          const isMd = resolved.isNote || rawHref.endsWith(".md");
 
           if (window.innerWidth <= 768) {
             setMobileTab("notes");
@@ -1025,17 +1030,15 @@ const items = {items_json};
             setTimeout(() => {
               const notesViewer = document.getElementById("notesViewer");
               if (!notesViewer) return;
-              const targetEl = document.getElementById(resolved.anchor) ||
-                               notesViewer.querySelector(`[name="${resolved.anchor}"]`) ||
-                               Array.from(notesViewer.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
-                                 const cleanHeading = h.textContent.trim().toLowerCase();
-                                 const slug1 = cleanHeading.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
-                                 const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
-                                 return slug1 === resolved.anchor.toLowerCase() || slug2 === resolved.anchor.toLowerCase();
-                               });
+              const targetEl = findHeadingElement(notesViewer, resolved.anchor);
               if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
             }, 60);
           }
+          return;
+        } else if (isRelativeDocLink) {
+          // Prevent browser from triggering a 404 or file download for unindexed relative references
+          e.preventDefault();
+          console.warn("[InternalNavigationInterceptor] Unindexed relative link reference:", rawHref);
         }
       });
     }
