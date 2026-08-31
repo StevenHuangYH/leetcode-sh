@@ -85,6 +85,8 @@ class TestUpdateIndexParser(unittest.TestCase):
         from scripts.compiler.bundler import TemplateBundler
         bundler = TemplateBundler()
         bundled_html = bundler.bundle(minify=False)
+        self.assertIn("function enforceNotesView", bundled_html)
+        self.assertIn("const DOM_RENDER_DELAY_MS = 60;", bundled_html)
         self.assertIn("function resolveEntityReference", bundled_html)
         self.assertIn("function findHeadingElement", bundled_html)
         self.assertIn("function initLinkInterceptor", bundled_html)
@@ -112,10 +114,12 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIsNotNone(lc15_entity)
         self.assertEqual(lc15_entity["key"], "top-100/lc-0015-3sum.py")
 
-        self.assertIn("luffy/02-lc-0001-two-sum.py", documents)
-        self.assertIn("top-100/lc-0001-two-sum.py", documents)
-        self.assertEqual(documents["luffy/02-lc-0001-two-sum.py"]["lc_num"], "LC 1")
-        self.assertEqual(documents["top-100/lc-0001-two-sum.py"]["lc_num"], "LC 1")
+        lc1_luffy = documents.get("luffy/02-lc-0001-two-sum.py")
+        lc1_top = documents.get("top-100/lc-0001-two-sum.py")
+        self.assertIsNotNone(lc1_luffy)
+        self.assertIsNotNone(lc1_top)
+        self.assertEqual(lc1_luffy["lc_num"], "LC 1")
+        self.assertEqual(lc1_top["lc_num"], "LC 1")
 
 if __name__ == "__main__":
     unittest.main()

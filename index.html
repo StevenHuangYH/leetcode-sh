@@ -1034,6 +1034,13 @@
         return slug1 === cleanAnchor || slug2 === cleanAnchor || cleanHeading === cleanAnchor;
       }) || null;
     }
+    function enforceNotesView() {
+      if (window.innerWidth <= 768) {
+        setMobileTab("notes");
+      } else {
+        setViewMode("notes");
+      }
+    }
     function initLinkInterceptor() {
       document.addEventListener("click", (e) => {
         const link = e.target.closest("a");
@@ -1049,11 +1056,7 @@
           e.preventDefault();
           const anchorId = rawHref.substring(1);
           if (items[anchorId]) {
-            if (window.innerWidth <= 768) {
-              setMobileTab("notes");
-            } else {
-              setViewMode("notes");
-            }
+            enforceNotesView();
             switchItem(anchorId);
             return;
           }
@@ -1070,11 +1073,7 @@
         if (resolved && resolved.key && items[resolved.key]) {
           e.preventDefault();
           const targetKey = resolved.key;
-          if (window.innerWidth <= 768) {
-            setMobileTab("notes");
-          } else {
-            setViewMode("notes");
-          }
+          enforceNotesView();
           switchItem(targetKey);
           if (resolved.anchor) {
             setTimeout(() => {

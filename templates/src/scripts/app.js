@@ -970,6 +970,17 @@ const items = {items_json};
     }
 
     /**
+     * Enforces Notes-First view mode across desktop and mobile breakpoints.
+     */
+    function enforceNotesView() {
+      if (window.innerWidth <= 768) {
+        setMobileTab("notes");
+      } else {
+        setViewMode("notes");
+      }
+    }
+
+    /**
      * InternalNavigationInterceptor: Intercepts link clicks within workspace & notes
      * to route internal files, in-page anchors, and external links without triggering page downloads.
      */
@@ -993,11 +1004,7 @@ const items = {items_json};
           e.preventDefault();
           const anchorId = rawHref.substring(1);
           if (items[anchorId]) {
-            if (window.innerWidth <= 768) {
-              setMobileTab("notes");
-            } else {
-              setViewMode("notes");
-            }
+            enforceNotesView();
             switchItem(anchorId);
             return;
           }
@@ -1017,12 +1024,7 @@ const items = {items_json};
           e.preventDefault();
           const targetKey = resolved.key;
 
-          if (window.innerWidth <= 768) {
-            setMobileTab("notes");
-          } else {
-            setViewMode("notes");
-          }
-
+          enforceNotesView();
           switchItem(targetKey);
 
           if (resolved.anchor) {
