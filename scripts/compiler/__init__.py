@@ -4,9 +4,6 @@ scripts.compiler — Deep modular compiler pipeline for leetcode-sh SPA.
 
 from .entities import (
     DocumentEntity,
-    RoadmapPhase,
-    RoadmapTopic,
-    RoadmapProblem,
     BuildResult,
     FormattedTitle,
     ProblemTitleFormatter,
@@ -24,15 +21,12 @@ from .topology_definitions import (
 )
 from .graph_builder import build_topology_graph
 from .collector import collect_workspace_documents
-from .parser import parse_curriculum_topics, parse_roadmap_data
+from .parser import parse_curriculum_topics
 from .bundler import TemplateBundler
 from .engine import StudyStationCompiler, compile_study_station
 
 __all__ = [
     "DocumentEntity",
-    "RoadmapPhase",
-    "RoadmapTopic",
-    "RoadmapProblem",
     "BuildResult",
     "FormattedTitle",
     "ProblemTitleFormatter",
@@ -48,8 +42,8 @@ __all__ = [
     "build_topology_graph",
     "collect_workspace_documents",
     "parse_curriculum_topics",
-    "parse_roadmap_data",
     "TemplateBundler",
     "StudyStationCompiler",
     "compile_study_station",
 ]
+

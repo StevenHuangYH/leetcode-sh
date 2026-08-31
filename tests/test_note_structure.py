@@ -69,10 +69,19 @@ class TestNoteStructureValidator(unittest.TestCase):
         self.assertFalse(result.is_valid)
         self.assertTrue(any("topology taxonomy keyword" in err for err in result.errors))
 
+    def test_missing_topology_lineage_diagram_fails(self):
+        broken_note = VALID_NOTE_SAMPLE.replace("```\n[LC 0033] -> [LC 0153] -> [LC 0154]\n```", "Just plain text without diagram or model.")
+        result = self.validator.validate(broken_note, "mock-no-lineage.md")
+        self.assertFalse(result.is_valid)
+        self.assertTrue(any("Topology Anchor" in err or "Pattern Lineage" in err for err in result.errors))
+
     def test_sample_repository_notes(self):
+
         sample_paths = [
             REPO_ROOT / "top-100" / "lc-0015-3sum.md",
             REPO_ROOT / "daily-practice" / "lc-0153-find-minimum-in-rotated-sorted-array.md",
+            REPO_ROOT / "daily-practice" / "lc-0216-combination-sum-3.md",
+            REPO_ROOT / "luffy" / "31-lc-0077-combinations.md",
         ]
         for note_path in sample_paths:
             if note_path.exists():
@@ -80,5 +89,24 @@ class TestNoteStructureValidator(unittest.TestCase):
                 res = self.validator.validate(content, note_path.name)
                 self.assertTrue(res.is_valid, f"Repo note {note_path.name} failed validation: {res.errors}")
 
+    def test_universal_notes_directory_auditing_covers_all_luffy_notes(self):
+        """Assert audit_notes_directory discovers and validates all numbered notes in luffy/."""
+        from scripts.validator.note_validator import audit_notes_directory
+        luffy_results = audit_notes_directory(REPO_ROOT / "luffy")
+        self.assertEqual(len(luffy_results), 49, "Should audit exactly 49 LC companion notes in luffy/")
+        for name, res in luffy_results.items():
+
+            self.assertTrue(res.is_valid, f"Luffy note {name} failed validation: {res.errors}")
+
+    def test_daily_practice_notes_auditing(self):
+        """Assert all companion notes in daily-practice/ pass 7-section validation."""
+        from scripts.validator.note_validator import audit_notes_directory
+        daily_results = audit_notes_directory(REPO_ROOT / "daily-practice")
+        self.assertGreaterEqual(len(daily_results), 20, "Should audit all daily practice companion notes")
+        for name, res in daily_results.items():
+            self.assertTrue(res.is_valid, f"Daily practice note {name} failed validation: {res.errors}")
+
+
 if __name__ == "__main__":
     unittest.main()
+

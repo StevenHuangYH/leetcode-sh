@@ -282,3 +282,97 @@
   background: #2ea043;
   box-shadow: 0 0 10px rgba(46, 160, 67, 0.4);
 }
+
+.popover-problem-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.popover-problem-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.popover-problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 125px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.popover-problem-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.popover-problem-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.popover-prob-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-main);
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.popover-prob-item:hover {
+  background: var(--bg-hover);
+  color: #2dd4bf;
+}
+
+.popover-prob-num {
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: var(--border-subtle);
+  color: var(--text-bright);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.popover-prob-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popover-prob-diff {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.popover-prob-diff.diff-easy {
+  background: #34d399;
+}
+
+.popover-prob-diff.diff-medium {
+  background: #fbbf24;
+}
+
+.popover-prob-diff.diff-hard {
+  background: #f87171;
+}

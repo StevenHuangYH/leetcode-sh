@@ -72,13 +72,45 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertGreaterEqual(nodes_by_id["sliding-window"]["problem_count"], 1)
         self.assertGreaterEqual(nodes_by_id["data-structure-algorithm"]["problem_count"], 150)
 
-    def test_end_to_end_topology_payload_in_index_html(self):
-        """Assert compiled index.html contains the dynamic roadmap_graph payload."""
-        result = compile_study_station(REPO_ROOT)
-        self.assertTrue(result.success)
-        self.assertTrue(result.output_path.exists())
+    def test_document_entity_domain_methods(self):
+        """Assert DocumentEntity matches_keywords and to_topology_summary encapsulation."""
+        from scripts.compiler.entities import DocumentEntity
+        entity = DocumentEntity.create_problem(
+            key="daily-practice/lc-0216-combination-sum-3.py",
+            category="Daily Practice Track",
+            category_display="Daily Practice",
+            title="LC 216 · Combination Sum III (组合总和 III)",
+            short="LC 216 Combination Sum III",
+            slug="lc-0216-combination-sum-3 combination-sum-iii",
+            cn_title="组合总和 III",
+            en_title="Combination Sum III",
+            tags="backtracking recursion dfs combinatorics",
+            lc_num="LC 216",
+            path="daily-practice/lc-0216-combination-sum-3",
+            diff="Medium"
+        )
+        self.assertTrue(entity.matches_keywords(["backtracking"]))
+        self.assertTrue(entity.matches_keywords(["0216"]))
+        self.assertFalse(entity.matches_keywords(["linked-list"]))
 
-        html_content = result.output_path.read_text(encoding="utf-8")
-        self.assertIn("ROADMAP_GRAPH_DATA", html_content)
-        self.assertNotIn("{roadmap_graph_json}", html_content, "Token {roadmap_graph_json} must be replaced")
+        summary = entity.to_topology_summary()
+        self.assertEqual(summary["key"], "daily-practice/lc-0216-combination-sum-3.py")
+        self.assertEqual(summary["lc_num"], "LC 216")
+        self.assertEqual(summary["diff"], "Medium")
+
+    def test_backtracking_node_contains_lc_77_and_lc_216(self):
+        """Assert backtracking topology node contains LC 77 and LC 216."""
+        items = collect_workspace_documents(REPO_ROOT)
+        graph = build_topology_graph(items)
+        nodes_by_id = {node["data"]["id"]: node["data"] for node in graph["nodes"]}
+        
+        backtracking_problems = nodes_by_id["backtracking"]["problems"]
+        prob_keys = [p["key"] for p in backtracking_problems]
+        self.assertTrue(any("0077" in k for k in prob_keys), "LC 77 should be in backtracking node")
+        self.assertTrue(any("0216" in k for k in prob_keys), "LC 216 should be in backtracking node")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
 

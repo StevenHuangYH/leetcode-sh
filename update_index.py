@@ -16,9 +16,9 @@ from scripts.compiler import (
     BuildResult,
     collect_workspace_documents,
     parse_curriculum_topics,
-    parse_roadmap_data,
     compile_study_station,
 )
+
 from scripts.validator import audit_notes_directory
 
 BASE_DIR = Path(__file__).parent.resolve()

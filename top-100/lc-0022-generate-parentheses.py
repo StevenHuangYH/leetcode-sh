@@ -1,4 +1,5 @@
 from typing import List, Optional
 
 class Solution:
-    pass
+    def generateParenthesis(self, n: int) -> List[str]:
+        
