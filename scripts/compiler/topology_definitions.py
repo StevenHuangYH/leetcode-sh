@@ -379,8 +379,9 @@ CANONICAL_TOPOLOGY_NODES: List[TopologyNodeData] = [
         color={"lightMode": "#f5222d", "darkMode": "#cf1322"},
         status="mastered",
         summary="State-space decision trees: Choose -> Explore -> Unchoose pattern for subsets, permutations, combinations, and N-Queens.",
-        keywords=["backtracking", "回溯", "subsets", "permutations", "combination-sum", "n-queens", "palindrome-partitioning", "word-search"]
+        keywords=["backtracking", "回溯", "subsets", "permutations", "combination-sum", "combinations", "combination", "0077", "lc-0077", "0216", "lc-0216", "combination-sum-3", "combination-sum-iii", "n-queens", "palindrome-partitioning", "word-search", "组合"]
     ),
+
 
     # -------------------------------------------------------------
     # Group 5: Subproblem View Group & Children

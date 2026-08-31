@@ -35,7 +35,7 @@ This file establishes the operational rules and standards for all AI coding assi
 
 ## 📝 Core Rule 2: Standard 7-Section Structure for Companion `.md` Notes (Active & Exam-Oriented Standard)
 
-Every companion `.md` note must adhere to the standard 7-section structure, designed around active recall, mental model mapping, and exam/interview readiness:
+Every companion `.md` note must adhere to the standard 7-section structure, designed around active recall, mental model mapping, and exam/interview readiness. Whenever a new LeetCode problem source (`.py`) is added, its companion `.md` note **MUST establish and update its relation chain in the 38-Node Topology Graph**:
 
 1. **Header & File Links**:
    * Problem number, English & Chinese title, difficulty rating, clickable markdown link to the corresponding `.py` file.
@@ -44,7 +44,7 @@ Every companion `.md` note must adhere to the standard 7-section structure, desi
    * English (`[EN]`) and Chinese (`[CN]`) problem statements, plus complete input constraints and edge assumptions.
 3. **Core Idea, Mental Model & Pattern Lineage (Visuals & Mathematics)**:
    * **Topology Node Macro Anchor (宏观拓扑图谱归属)**: Explicitly anchor the problem to its macro Topology DAG location and parent category (e.g., `Topology Node: [Linear Structures] ➔ [Linked Lists] ➔ [Two Pointers / Fast & Slow]`).
-   * **ASCII Pattern Lineage Map (算法思维谱系演化图)**: Visually show how the current problem inherits from foundational primitives (e.g. `LC 206 → LC 92 → LC 25`) and what new twist was introduced.
+   * **ASCII Pattern Lineage Map (算法思维谱系演化图)**: Visually show the problem's relational evolution chain in the topology graph—how the current problem inherits from foundational primitives (e.g. `LC 206 → LC 92 → LC 25`) and what invariant or paradigm twist was introduced.
    * Core insights, mathematical proofs, invariants, and multi-stage ASCII diagrams.
 4. **Step-by-Step Code Walkthrough**:
    * Line-by-line breakdown based **strictly on the user's original `.py` implementation**, explaining the rationale, variable roles, and loop invariants.
@@ -60,15 +60,31 @@ Every companion `.md` note must adhere to the standard 7-section structure, desi
 
 ---
 
-## 🚀 Core Rule 3: Mandatory 4-Step Push & Walkthrough Protocol
+## 🌐 Core Rule 3: Topology Graph Relation Chain & Registry Synchronization
+
+Whenever writing or updating a LeetCode problem source (`.py`), the assistant MUST synchronize its relation chain with the 38-Node Topology Graph across three tiers:
+
+1. **Note Micro & Macro Anchoring**:
+   * Declare standardized tags matching canonical node keywords in Section 1.
+   * Declare the macro DAG path and draw the ASCII pattern lineage chain in Section 3, connecting prerequisite algorithm primitives to the new problem.
+2. **Compiler Topology Registry Alignment (`scripts/compiler/topology_definitions.py`)**:
+   * If the new problem introduces a distinct pattern slug or keyword, ensure the target node in `CANONICAL_TOPOLOGY_NODES` includes matching keywords so `ProblemCollector` and `GraphBuilder` accurately aggregate and highlight the problem.
+3. **Interactive Graph Verification**:
+   * Rebuild via `python3 update_index.py` and verify that the target node's problem count increments and the problem appears in the node's detail list.
+
+---
+
+## 🚀 Core Rule 4: Mandatory 4-Step Push & Walkthrough Protocol
 
 Whenever creating a note, implementing a solution, or preparing to push to GitHub, AI assistants **MUST execute the following 4-step protocol in exact sequence**:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 1. Note Creation / Verification                                         │
+│ 1. Note Creation & Topology Relation Chain Synchronization              │
 │    • Generate/update companion .md note (strictly preserve .py).        │
-│    • Ensure topology taxonomy tags & macro anchor are declared.         │
+│    • Declare topology taxonomy tags & macro anchor in note.             │
+│    • Map ASCII pattern lineage evolution chain in Section 3.            │
+│    • Verify/update keywords in scripts/compiler/topology_definitions.py.│
 │    • Ensure standard zero-padded format: lc-{4-digit-id}-{slug}.(py|md) │
 └────────────────────────────────────┬────────────────────────────────────┘
                                      │
@@ -99,7 +115,7 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 
 ---
 
-## 🎨 Core Rule 4: Visual & Iconography Standards
+## 🎨 Core Rule 5: Visual & Iconography Standards
 
 1. **Strict Prohibition of Distracting Emojis in README & Documentation**:
    * **Zero Distracting Emojis**: NEVER use decorative, random, or distracting emojis in `README.md` (e.g., no emojis in section titles, headings, table headers, table cells, or bullet points such as `🔥`, `🚀`, `✨`, `📁`, `📊`, `📑`, `🟢`, `🟡`, `🔴`).
@@ -111,7 +127,7 @@ Whenever creating a note, implementing a solution, or preparing to push to GitHu
 
 ---
 
-## 🖥️ Core Rule 5: SPA Viewer Layout & Declarative Architecture Standards
+## 🖥️ Core Rule 6: SPA Viewer Layout & Declarative Architecture Standards
 
 1. **Default View Mode**:
    * The workspace viewer (`index.html`) defaults strictly to **Notes-Only mode** (`viewMode = "notes"`).

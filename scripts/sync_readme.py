@@ -2,7 +2,7 @@ import sys
 import re
 from pathlib import Path
 from collections import Counter
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 REPO_ROOT = Path(__file__).parent.parent
 if str(REPO_ROOT) not in sys.path:
@@ -27,8 +27,16 @@ def build_difficulty_map(collector_items: dict) -> Dict[int, str]:
 
 def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
     """Dynamically maps problem number to repository-relative solution links across all tracks directly from collector entities."""
-    file_map: Dict[int, List[str]] = {}
+    py_map: Dict[int, List[str]] = {}
+    md_map: Dict[int, List[str]] = {}
     
+    def _add_link(target_dict: Dict[int, List[str]], num: int, file_rel: Optional[str]):
+        if file_rel and (REPO_ROOT / file_rel).exists():
+            link = f"[`{file_rel}`]({file_rel})"
+            links = target_dict.setdefault(num, [])
+            if link not in links:
+                links.append(link)
+
     for key in sorted(collector_items.keys()):
         item = collector_items[key]
         if item.get("type") != "problem":
@@ -41,25 +49,24 @@ def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
         num = int(m.group(0))
         
         py_file = item.get("py_file")
-        md_file = item.get("md_file")
-        
-        links = file_map.setdefault(num, [])
-        
-        def add_file_link(file_rel: Optional[str]):
-            if file_rel and (REPO_ROOT / file_rel).exists():
-                link = f"[`{file_rel}`]({file_rel})"
-                if link not in links:
-                    links.append(link)
-        
-        py_file = item.get("py_file")
         if py_file:
-            add_file_link(py_file)
+            _add_link(py_map, num, py_file)
         elif key.endswith(".py"):
-            add_file_link(key)
+            _add_link(py_map, num, key)
             
-        add_file_link(item.get("md_file"))
-                
+        md_file = item.get("md_file")
+        if md_file:
+            _add_link(md_map, num, md_file)
+        elif key.endswith(".md"):
+            _add_link(md_map, num, key)
+            
+    file_map: Dict[int, List[str]] = {}
+    all_nums = set(py_map.keys()) | set(md_map.keys())
+    for num in sorted(all_nums):
+        file_map[num] = py_map.get(num, []) + md_map.get(num, [])
+        
     return file_map
+
 
 
 def parse_existing_descriptions(readme_text: str) -> Dict[int, Tuple[str, str, str]]:

@@ -133,7 +133,8 @@ def audit_notes_directory(dir_path: Path) -> Dict[str, ValidationResult]:
     validator = NoteStructureValidator()
     results: Dict[str, ValidationResult] = {}
     for md_file in sorted(dir_path.glob("*.md")):
-        if md_file.name.startswith("lc-"):
+        if re.search(r'(?:^\d{2}-)?lc-', md_file.name):
             content = md_file.read_text(encoding="utf-8", errors="ignore")
             results[md_file.name] = validator.validate(content, str(md_file))
     return results
+

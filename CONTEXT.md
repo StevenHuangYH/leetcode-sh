@@ -81,3 +81,6 @@ This file serves as the single source of truth for domain vocabulary, topologica
 8. **Topology Taxonomy Alignment & Active Recall Mapping**:
    * Companion notes must declare standardized taxonomy tags and macro topology anchors matching `CANONICAL_TOPOLOGY_NODES` (`scripts/compiler/topology_definitions.py`), bridging micro algorithmic steps to macro curriculum topology while enabling automatic graph search indexing and problem frequency calculation.
 
+9. **Dynamic Topology Graph Relation Chain Synchronization**:
+   * Whenever a new LeetCode problem source (`.py`) is implemented, the companion note and compiler registry must explicitly establish and update its relational lineage within the 38-Node Topology Graph. This requires anchoring the macro topology path, illustrating the ASCII pattern lineage progression against prerequisite algorithm primitives in Section 3, and registering the problem's slug/keywords in `CANONICAL_TOPOLOGY_NODES` (`scripts/compiler/topology_definitions.py`) for dynamic roadmap aggregation.
+

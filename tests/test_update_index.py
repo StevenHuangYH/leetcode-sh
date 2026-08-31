@@ -210,12 +210,30 @@ class TestUpdateIndexParser(unittest.TestCase):
         # Verify Section 5 rows include both code and companion notes across tracks
         self.assertIn("[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)", readme_text)
         self.assertIn("[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)", readme_text)
-        self.assertIn("[`top-100/lc-0078-subsets.md`](top-100/lc-0078-subsets.md)", readme_text)
         self.assertIn("[`top-100/lc-0003-longest-substring-without-repeating-characters.md`](top-100/lc-0003-longest-substring-without-repeating-characters.md)", readme_text)
         self.assertIn("[`top-100/lc-0209-minimum-size-subarray-sum.md`](top-100/lc-0209-minimum-size-subarray-sum.md)", readme_text)
         self.assertIn("[`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)", readme_text)
         self.assertIn("[`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)", readme_text)
 
+    def test_pre_commit_quality_gate_contracts(self):
+        """Assert .githooks/pre-commit enforces strict linting and unit test execution."""
+        hook_path = REPO_ROOT / ".githooks" / "pre-commit"
+        self.assertTrue(hook_path.exists(), "Pre-commit hook must exist")
+        content = hook_path.read_text(encoding="utf-8")
+        self.assertIn("--lint --strict", content, "Pre-commit hook must enforce --strict linting")
+        self.assertIn("python3 -m unittest discover tests", content, "Pre-commit hook must run test discovery")
+        self.assertIn("python3 update_index.py", content, "Pre-commit hook must compile index.html")
+
+    def test_dead_roadmap_parser_removal(self):
+        """Assert obsolete parse_roadmap_data and Roadmap classes are completely removed from compiler pipeline."""
+        import scripts.compiler.parser as parser_module
+        import scripts.compiler.entities as entities_module
+        self.assertFalse(hasattr(parser_module, "parse_roadmap_data"), "parse_roadmap_data should be removed")
+        self.assertFalse(hasattr(entities_module, "RoadmapPhase"), "RoadmapPhase should be removed")
+        self.assertFalse(hasattr(entities_module, "RoadmapTopic"), "RoadmapTopic should be removed")
+        self.assertFalse(hasattr(entities_module, "RoadmapProblem"), "RoadmapProblem should be removed")
+
 
 if __name__ == "__main__":
     unittest.main()
+

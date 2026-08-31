@@ -27,6 +27,25 @@ class DocumentEntity:
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+    def matches_keywords(self, keywords: List[str]) -> bool:
+        """Determines whether this entity matches any of the canonical topology keywords."""
+        if not keywords:
+            return False
+        search_target = f"{self.search_blob} {self.key} {self.slug} {self.title}".lower()
+        return any(kw.lower() in search_target for kw in keywords)
+
+    def to_topology_summary(self) -> Dict[str, Any]:
+        """Returns a normalized problem projection dictionary for the topology graph."""
+        return {
+            "key": self.key,
+            "lc_num": self.lc_num,
+            "title": self.title,
+            "short": self.short,
+            "diff": self.diff or "Medium",
+            "category": self.category_display
+        }
+
+
     @classmethod
     def create_problem(
         cls,
@@ -74,37 +93,13 @@ class DocumentEntity:
         )
 
 @dataclass
-class RoadmapProblem:
-    num: int
-    name: str
-    cn: str
-    diff: str
-    key: str
-
-@dataclass
-class RoadmapTopic:
-    id: str
-    title: str
-    subtitle: str
-    icon: str
-    formula: str
-    problems: List[Dict[str, Any]] = field(default_factory=list)
-
-@dataclass
-class RoadmapPhase:
-    phase: int
-    phase_name: str
-    phase_badge: str
-    phase_desc: str
-    topics: List[Dict[str, Any]] = field(default_factory=list)
-
-@dataclass
 class BuildResult:
     output_path: Path
     total_entities: int
-    total_phases: int
+    total_phases: int = 0
     success: bool = True
     error_message: Optional[str] = None
+
 
 def normalize_slug(text: str) -> str:
     """Normalizes problem title to a clean slug for searching."""

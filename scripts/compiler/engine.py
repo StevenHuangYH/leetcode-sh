@@ -4,7 +4,6 @@ from typing import Optional, Dict, Any
 
 from .entities import BuildResult, read_file
 from .collector import collect_workspace_documents
-from .parser import parse_roadmap_data
 from .graph_builder import build_topology_graph
 from .bundler import TemplateBundler
 
@@ -28,8 +27,7 @@ class StudyStationCompiler:
             # 1. Collect all documents (with incremental caching)
             all_items = collect_workspace_documents(self.repo_root, use_cache=use_cache)
 
-            # 2. Parse roadmap topology / graph
-            roadmap_data = parse_roadmap_data(base_dir=self.repo_root)
+            # 2. Build 38-node topology graph
             graph_data = build_topology_graph(all_items)
 
             # 3. Bundle template assets in-memory
@@ -40,23 +38,23 @@ class StudyStationCompiler:
                 return BuildResult(
                     output_path=output_path,
                     total_entities=len(all_items),
-                    total_phases=len(roadmap_data),
+                    total_phases=0,
                     success=False,
                     error_message="Template content was empty."
                 )
 
             # 4. Inject payload into template
             compact_items_json = json.dumps(all_items, separators=(',', ':'), ensure_ascii=False)
-            compact_roadmap_json = json.dumps(roadmap_data, separators=(',', ':'), ensure_ascii=False)
             compact_graph_json = json.dumps(graph_data, separators=(',', ':'), ensure_ascii=False)
 
             html_content = template.replace(
                 "{items_json}", compact_items_json
             ).replace(
-                "{roadmap_json}", compact_roadmap_json
+                "{roadmap_json}", "[]"
             ).replace(
                 "{roadmap_graph_json}", compact_graph_json
             )
+
 
             # 5. Write index.html artifact
             output_path.write_text(html_content, encoding="utf-8")
@@ -64,9 +62,10 @@ class StudyStationCompiler:
             return BuildResult(
                 output_path=output_path,
                 total_entities=len(all_items),
-                total_phases=len(roadmap_data),
+                total_phases=len(graph_data.get("nodes", [])),
                 success=True
             )
+
         except Exception as e:
             return BuildResult(
                 output_path=output_path or self.repo_root / "index.html",

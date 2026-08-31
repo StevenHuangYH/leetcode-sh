@@ -59,13 +59,16 @@ const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
       const container = document.getElementById("roadmap-view");
       const containerRect = container.getBoundingClientRect();
 
+      const problems = nodeData.problems || [];
+      const hasProblems = problems.length > 0;
+
       let posX = renderedPos.x + 15;
       let posY = renderedPos.y + 15;
-      if (posX + 320 > containerRect.width) {
-        posX = Math.max(10, renderedPos.x - 325);
+      if (posX + 350 > containerRect.width) {
+        posX = Math.max(10, renderedPos.x - 345);
       }
-      if (posY + 280 > containerRect.height) {
-        posY = Math.max(10, renderedPos.y - 270);
+      if (posY + (hasProblems ? 360 : 270) > containerRect.height) {
+        posY = Math.max(10, renderedPos.y - (hasProblems ? 350 : 260));
       }
 
       const currentStatus = nodeData.status || "unvisited";
@@ -76,6 +79,34 @@ const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
       const displayTitle = titleCn ? `${titleEn} · ${titleCn}` : titleEn;
       const count = nodeData.problem_count || 0;
       const countBadge = count > 0 ? `<span class="popover-count-badge">${count} Problems</span>` : '<span class="popover-count-badge" style="opacity:0.65;">Topic Concept</span>';
+
+      let problemsHtml = "";
+      if (hasProblems) {
+        const problemItems = problems.map(p => {
+          const numOnly = (p.lc_num || "").replace(/\D/g, "");
+          const numBadge = numOnly ? `<span class="popover-prob-num">${numOnly}</span>` : "";
+          const diffClass = `diff-${(p.diff || "medium").toLowerCase()}`;
+          const cleanTitle = p.short || p.title || p.key;
+          return `
+            <div class="popover-prob-item" onclick="switchItem('${p.key}')" title="${p.title || cleanTitle}">
+              ${numBadge}
+              <span class="popover-prob-title">${cleanTitle}</span>
+              <span class="popover-prob-diff ${diffClass}"></span>
+            </div>
+          `;
+        }).join("");
+
+        problemsHtml = `
+          <div class="popover-problem-section">
+            <div class="popover-problem-header">
+              <span>Linked Problems (${problems.length})</span>
+            </div>
+            <div class="popover-problem-list">
+              ${problemItems}
+            </div>
+          </div>
+        `;
+      }
 
       popover.innerHTML = `
         <div class="popover-header">
@@ -91,6 +122,7 @@ const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
         <div class="popover-summary">
           ${nodeData.summary || "Core data structure & algorithm paradigms with time/space complexity invariants and recursion contracts."}
         </div>
+        ${problemsHtml}
         <div class="popover-status-row">
           <span class="popover-status-label">Mastery Status:</span>
           <div class="status-pill-group">
@@ -101,7 +133,7 @@ const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
         </div>
         <button class="popover-action-btn" onclick="openWorkspaceForNode('${nodeData.id}', '${nodeData.topic_id || ''}', '${titleEn.replace(/'/g, "\\'")}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          <span>${count > 0 ? `View ${count} Problems in Workspace` : 'Open Curriculum Topic'}</span>
+          <span>${count > 0 ? `Filter All in Workspace` : 'Open Curriculum Topic'}</span>
         </button>
       `;
 
@@ -322,11 +354,28 @@ const ROADMAP_GRAPH_DATA = {roadmap_graph_json};
               return;
             }
             let firstMatch = null;
+            const isNumeric = /^\d+$/.test(q);
+            const targetNum = isNumeric ? parseInt(q, 10) : null;
+
             cy.nodes().forEach(n => {
               const label = (n.data('label') || "").toLowerCase();
               const cat = (n.data('category') || "").toLowerCase();
               const tid = (n.data('topic_id') || "").toLowerCase();
-              if (label.includes(q) || cat.includes(q) || tid.includes(q)) {
+              const summary = (n.data('summary') || "").toLowerCase();
+              const keywords = (n.data('keywords') || []).map(k => String(k).toLowerCase());
+              const problems = n.data('problems') || [];
+
+              const matchesMeta = label.includes(q) || cat.includes(q) || tid.includes(q) || summary.includes(q) || keywords.some(k => k.includes(q));
+              const matchesProblem = problems.some(p => {
+                if (isNumeric && p.lc_num) {
+                  const pNum = parseInt(String(p.lc_num).replace(/\D/g, ""), 10);
+                  if (pNum === targetNum) return true;
+                }
+                const pText = `${p.key || ''} ${p.title || ''} ${p.short || ''}`.toLowerCase();
+                return pText.includes(q);
+              });
+
+              if (matchesMeta || matchesProblem) {
                 n.removeClass('dimmed').addClass('highlighted');
                 if (!firstMatch) firstMatch = n;
               } else {

@@ -1,19 +1,14 @@
 from typing import List
-# 假设path 长为m
-# 那么还需要选 d = k = m
-# 设当前需要从[1, i] 这i个数中选数
-# 如果 i < d
-# 最后必然无法选出k个数
-# 不需要继续递归
-# 这是一种剪枝
 
 class Solution:
-    def combine(self, n: int, k: int) -> List[List[int]]:
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
         ans = []
         path = []
-        def dfs(i):
+        def dfs(i, t):
 
             d = k - len(path) # m
+            if t < 0 or t > (i * 2 - d + 1) * d // 2:
+                return
             
             if len(path) == k:
                 ans.append(path.copy())
@@ -22,8 +17,8 @@ class Solution:
             
             for j in range(i, d-1, -1):
                 path.append(j)
-                dfs(j-1)
+                dfs(j-1, t-1)
                 path.pop()
 
-        dfs(n)
+        dfs(9, n)
         return ans
