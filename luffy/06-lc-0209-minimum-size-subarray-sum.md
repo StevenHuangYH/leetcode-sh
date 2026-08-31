@@ -23,6 +23,8 @@ Given an array of positive integers `nums` and a positive integer `target`, retu
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Sliding Window]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 滑动窗口: 右移累加，和 >= target 时持续收缩左边界      │

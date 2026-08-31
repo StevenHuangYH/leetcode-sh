@@ -23,6 +23,8 @@ Given two integers `n` and `k`, return all possible combinations of `k` numbers 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 回溯树剪枝: 当剩余候选数不足以填满 k 时立即剪枝        │

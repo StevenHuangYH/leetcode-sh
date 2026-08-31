@@ -23,6 +23,8 @@ Given an array `nums` of distinct integers, return all the possible permutations
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 回溯全排列: used 标记数组 或 原地 swap 交换            │

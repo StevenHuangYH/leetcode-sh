@@ -23,6 +23,8 @@ Given an unsorted integer array `nums`. Return the smallest positive integer tha
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Cycle Array]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 原地哈希 / 归位法 (Cyclic Sort)                         │

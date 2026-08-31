@@ -23,6 +23,8 @@ Prefix sum implementation using n+1 length array constructor.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [Prefix Sum]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 前缀和 n+1 构造法                                      │

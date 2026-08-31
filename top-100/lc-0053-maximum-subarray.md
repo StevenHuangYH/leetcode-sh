@@ -24,6 +24,8 @@ Given an integer array `nums`, find the subarray with the largest sum, and retur
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Subproblem View] ➔ [DP]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

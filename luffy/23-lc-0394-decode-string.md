@@ -23,6 +23,8 @@ Given an encoded string, return its decoded string. The encoding rule is: `k[enc
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Stack & Queue]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 双栈法 (倍数栈 count_stack + 字符串栈 str_stack)       │

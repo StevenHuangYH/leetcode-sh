@@ -23,6 +23,8 @@ Given an array of `intervals` where `intervals[i] = [start, end]`, merge all ove
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Other] ➔ [Greedy]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 排序 + 贪心合并                                        │

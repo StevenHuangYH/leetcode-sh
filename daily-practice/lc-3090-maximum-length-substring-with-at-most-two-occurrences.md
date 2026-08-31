@@ -23,6 +23,8 @@ Given a string `s`, return the maximum length of a substring such that it contai
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Sliding Window]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

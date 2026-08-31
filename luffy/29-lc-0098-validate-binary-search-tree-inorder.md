@@ -23,6 +23,8 @@ Validate BST by verifying that its in-order traversal yields a strictly monotoni
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 中序单调递增特性: pre_val < cur_node.val               │

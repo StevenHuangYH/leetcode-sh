@@ -23,6 +23,8 @@ Given a string `s`, find the length of the longest substring without duplicate c
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Two Pointers] ➔ [Sliding Window]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 滑动窗口: 右进左出维持窗口内字符无重复                 │

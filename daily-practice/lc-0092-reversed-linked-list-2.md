@@ -25,6 +25,8 @@ Given the `head` of a singly linked list and two integers `left` and `right` whe
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Linked List] ➔ [Two Pointer]`
+
 ### 算法思维谱系演化图 (ASCII Pattern Lineage Map)
 
 ```

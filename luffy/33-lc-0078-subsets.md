@@ -23,6 +23,8 @@ Given an integer array `nums` of unique elements, return all possible subsets (t
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 子集生成两大流派:                                      │

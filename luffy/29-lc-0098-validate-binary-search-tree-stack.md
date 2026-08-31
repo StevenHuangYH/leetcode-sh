@@ -23,6 +23,8 @@ Validate BST using an explicit stack for in-order traversal to eliminate recursi
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 显式中序栈: while stack or root -> push all left nodes │

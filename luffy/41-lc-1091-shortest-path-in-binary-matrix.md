@@ -23,6 +23,8 @@ n == grid.length == grid[i].length, 1 <= n <= 100, grid[i][j] 为 0 或 1
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Search Algorithms] ➔ [BFS]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 8 方向 BFS 逐层扩散                                    │

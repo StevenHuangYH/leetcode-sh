@@ -23,6 +23,8 @@ Design a stack that supports push, pop, top, and retrieving the minimum element 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Stack & Queue]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 双栈法 / 辅助最小栈 (Min Stack Pair)                   │

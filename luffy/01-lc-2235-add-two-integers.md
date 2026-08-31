@@ -23,6 +23,8 @@ Given two integers `num1` and `num2`, return the sum of the two integers.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Other] ➔ [Math]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 直接代数求和: sum = num1 + num2                         │

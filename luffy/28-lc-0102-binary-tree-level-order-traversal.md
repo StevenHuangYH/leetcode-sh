@@ -23,6 +23,8 @@ Given the `root` of a binary tree, return the level order traversal of its nodes
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Tree Traversal] ➔ [Level Traverse]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 队列 BFS / 双缓冲区层序遍历                            │

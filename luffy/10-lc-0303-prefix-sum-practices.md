@@ -23,6 +23,8 @@ OOP 基础规范
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [Prefix Sum]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 面向对象类封装与状态维护                               │

@@ -43,6 +43,8 @@
 
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ### 🧠 回溯组合思维谱系演化树 (Pattern Lineage)
 
 ```

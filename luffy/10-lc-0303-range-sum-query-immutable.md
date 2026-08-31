@@ -23,6 +23,8 @@ Given an integer array `nums`, handle multiple queries of the sum of the element
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [Prefix Sum]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 前缀和数组: preSum[i] = nums[0] + ... + nums[i-1]      │

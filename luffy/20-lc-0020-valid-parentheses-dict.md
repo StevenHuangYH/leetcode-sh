@@ -23,6 +23,8 @@ Given an array of integers `temperatures` represents the daily temperatures, ret
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Stack & Queue]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 单调递减栈 (Monotonic Decreasing Stack)                │

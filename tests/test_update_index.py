@@ -246,7 +246,13 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertFalse(hasattr(entities_module, "RoadmapTopic"), "RoadmapTopic should be removed")
         self.assertFalse(hasattr(entities_module, "RoadmapProblem"), "RoadmapProblem should be removed")
 
+    def test_strict_lint_across_entire_repository(self):
+        """Assert python3 update_index.py --lint --strict succeeds across the entire repository with 0 errors."""
+        from update_index import run_lint_check
+        self.assertTrue(run_lint_check(strict=True))
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

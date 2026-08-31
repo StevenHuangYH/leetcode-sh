@@ -50,6 +50,8 @@
 
 ## 3. Core Idea, Mental Model & Pattern Lineage / 核心思路与思维谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Data Structures] ➔ [BST]`
+
 ### 🧠 最近公共祖先 (LCA) 算法思维谱系演化树 (Pattern Lineage)
 
 ```

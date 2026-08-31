@@ -23,6 +23,8 @@ Given two integer arrays `preorder` and `inorder`, construct and return the bina
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Tree Hierarchies] ➔ [Tree Paradigms] ➔ [Recursive Traverse]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 递归分治定位:                                          │

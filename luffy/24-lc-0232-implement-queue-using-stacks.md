@@ -23,6 +23,8 @@ Implement a first in first out (FIFO) queue using only two stacks.
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Data Structures] ➔ [Stack & Queue]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 双栈模拟 (In-Stack & Out-Stack)                        │

@@ -23,6 +23,8 @@ Given an array of distinct integers `candidates` and a target integer `target`, 
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures / Recursive Traverse] ➔ [Traverse View] ➔ [Backtracking]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 可重复选择的组合回溯                                   │

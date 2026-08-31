@@ -23,6 +23,8 @@ Given an array of integers `nums` and an integer `k`, return the total number of
 
 ## 2. Core Idea, Mental Model & Pattern Lineage / 核心思维模型与算法谱系
 
+`Topology Node: [Linear Structures] ➔ [Array Basics] ➔ [Prefix Sum]`
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 前缀和 + 哈希频次表                                    │
