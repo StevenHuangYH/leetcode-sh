@@ -41,9 +41,9 @@ class ProblemCollector:
     """Encapsulates document collection, pairing, and metadata extraction across repository tracks."""
 
     TRACKS = [
-        ("top-100", "Top 100 Liked Track"),
-        ("daily-practice", "Daily Practice Track"),
-        ("luffy", "Luffy Curriculum (01-42)")
+        ("problems/top-100", "Top 100 Liked Track"),
+        ("problems/daily-practice", "Daily Practice Track"),
+        ("problems/luffy", "Luffy Curriculum (01-42)")
     ]
 
     @classmethod

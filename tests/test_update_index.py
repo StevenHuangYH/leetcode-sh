@@ -102,12 +102,12 @@ class TestUpdateIndexParser(unittest.TestCase):
         documents = collect_workspace_documents()
         
         # 1. Exact path resolution
-        self.assertIn("luffy/02-lc-0001-two-sum.py", documents)
-        self.assertIn("top-100/lc-0015-3sum.py", documents)
-        self.assertIn("daily-practice/lc-0025-reverse-nodes-in-k-group.py", documents)
+        self.assertIn("problems/luffy/02-lc-0001-two-sum.py", documents)
+        self.assertIn("problems/top-100/lc-0015-3sum.py", documents)
+        self.assertIn("problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py", documents)
 
         # 2. Extension swap contract (md file companion lookup)
-        top15 = documents.get("top-100/lc-0015-3sum.py")
+        top15 = documents.get("problems/top-100/lc-0015-3sum.py")
         self.assertIsNotNone(top15)
         self.assertTrue(top15.get("md_file", "").endswith("lc-0015-3sum.md"))
 
@@ -118,10 +118,10 @@ class TestUpdateIndexParser(unittest.TestCase):
         # 4. LC number mapping integrity
         lc15_entity = next((v for v in documents.values() if v.get("lc_num") == "LC 15"), None)
         self.assertIsNotNone(lc15_entity)
-        self.assertEqual(lc15_entity["key"], "top-100/lc-0015-3sum.py")
+        self.assertEqual(lc15_entity["key"], "problems/top-100/lc-0015-3sum.py")
 
-        lc1_luffy = documents.get("luffy/02-lc-0001-two-sum.py")
-        lc1_top = documents.get("top-100/lc-0001-two-sum.py")
+        lc1_luffy = documents.get("problems/luffy/02-lc-0001-two-sum.py")
+        lc1_top = documents.get("problems/top-100/lc-0001-two-sum.py")
         self.assertIsNotNone(lc1_luffy)
         self.assertIsNotNone(lc1_top)
         self.assertEqual(lc1_luffy["lc_num"], "LC 1")
@@ -137,7 +137,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertEqual(pairing.stem, "lc-0077-combinations")
 
         entity = DocumentEntity.create_problem(
-            key="daily-practice/lc-0077-combinations.py",
+            key="problems/daily-practice/lc-0077-combinations.py",
             category="Daily Practice Track",
             category_display="Daily Practice",
             title="LC 77 · Combinations (组合)",
@@ -145,9 +145,9 @@ class TestUpdateIndexParser(unittest.TestCase):
             slug="lc-0077-combinations combinations",
             cn_title="组合",
             en_title="Combinations",
-            tags="daily-practice medium",
+            tags="problems/daily-practice medium",
             lc_num="LC 77",
-            path="daily-practice/lc-0077-combinations",
+            path="problems/daily-practice/lc-0077-combinations",
             diff="Medium"
         )
         self.assertIn("combinations", entity.search_blob)
@@ -160,12 +160,12 @@ class TestUpdateIndexParser(unittest.TestCase):
         """Assert format_markdown_link helper produces consistent, properly formatted markdown links."""
         from scripts.sync_readme import format_markdown_link
         self.assertEqual(
-            format_markdown_link("top-100/lc-0022-generate-parentheses.py"),
-            "[`top-100/lc-0022-generate-parentheses.py`](top-100/lc-0022-generate-parentheses.py)"
+            format_markdown_link("problems/top-100/lc-0022-generate-parentheses.py"),
+            "[`problems/top-100/lc-0022-generate-parentheses.py`](problems/top-100/lc-0022-generate-parentheses.py)"
         )
         self.assertEqual(
-            format_markdown_link("daily-practice/lc-0077-combinations.md"),
-            "[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)"
+            format_markdown_link("problems/daily-practice/lc-0077-combinations.md"),
+            "[`problems/daily-practice/lc-0077-combinations.md`](problems/daily-practice/lc-0077-combinations.md)"
         )
 
     def test_sync_readme_dynamic_difficulty_metrics(self):
@@ -195,16 +195,16 @@ class TestUpdateIndexParser(unittest.TestCase):
         # Verify LC 77 contains both daily-practice py/md and luffy py
         self.assertIn(77, file_map)
         lc_77_links = file_map[77]
-        self.assertTrue(any("daily-practice/lc-0077-combinations.py" in l for l in lc_77_links))
-        self.assertTrue(any("daily-practice/lc-0077-combinations.md" in l for l in lc_77_links))
-        self.assertTrue(any("luffy/31-lc-0077-combinations.py" in l for l in lc_77_links))
+        self.assertTrue(any("problems/daily-practice/lc-0077-combinations.py" in l for l in lc_77_links))
+        self.assertTrue(any("problems/daily-practice/lc-0077-combinations.md" in l for l in lc_77_links))
+        self.assertTrue(any("problems/luffy/31-lc-0077-combinations.py" in l for l in lc_77_links))
 
         # Verify LC 131 contains both daily-practice py/md and luffy py
         self.assertIn(131, file_map)
         lc_131_links = file_map[131]
-        self.assertTrue(any("daily-practice/lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
-        self.assertTrue(any("daily-practice/lc-0131-palindrome-partitioning.md" in l for l in lc_131_links))
-        self.assertTrue(any("luffy/36-lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
+        self.assertTrue(any("problems/daily-practice/lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
+        self.assertTrue(any("problems/daily-practice/lc-0131-palindrome-partitioning.md" in l for l in lc_131_links))
+        self.assertTrue(any("problems/luffy/36-lc-0131-palindrome-partitioning.py" in l for l in lc_131_links))
 
         # Verify all 10 core multi-track problems exist in file_map with >1 link
         multi_track_ids = [77, 78, 131, 167, 3, 209, 59, 303, 20, 98]
@@ -221,12 +221,12 @@ class TestUpdateIndexParser(unittest.TestCase):
         readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         
         # Verify Section 5 rows include both code and companion notes across tracks
-        self.assertIn("[`daily-practice/lc-0077-combinations.md`](daily-practice/lc-0077-combinations.md)", readme_text)
-        self.assertIn("[`daily-practice/lc-0131-palindrome-partitioning.md`](daily-practice/lc-0131-palindrome-partitioning.md)", readme_text)
-        self.assertIn("[`top-100/lc-0003-longest-substring-without-repeating-characters.md`](top-100/lc-0003-longest-substring-without-repeating-characters.md)", readme_text)
-        self.assertIn("[`top-100/lc-0209-minimum-size-subarray-sum.md`](top-100/lc-0209-minimum-size-subarray-sum.md)", readme_text)
-        self.assertIn("[`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)", readme_text)
-        self.assertIn("[`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)", readme_text)
+        self.assertIn("[`problems/daily-practice/lc-0077-combinations.md`](problems/daily-practice/lc-0077-combinations.md)", readme_text)
+        self.assertIn("[`problems/daily-practice/lc-0131-palindrome-partitioning.md`](problems/daily-practice/lc-0131-palindrome-partitioning.md)", readme_text)
+        self.assertIn("[`problems/top-100/lc-0003-longest-substring-without-repeating-characters.md`](problems/top-100/lc-0003-longest-substring-without-repeating-characters.md)", readme_text)
+        self.assertIn("[`problems/top-100/lc-0209-minimum-size-subarray-sum.md`](problems/top-100/lc-0209-minimum-size-subarray-sum.md)", readme_text)
+        self.assertIn("[`problems/luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](problems/luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py)", readme_text)
+        self.assertIn("[`problems/luffy/19-lc-0020-valid-parentheses.py`](problems/luffy/19-lc-0020-valid-parentheses.py)", readme_text)
 
     def test_pre_commit_quality_gate_contracts(self):
         """Assert .githooks/pre-commit enforces strict linting and unit test execution."""

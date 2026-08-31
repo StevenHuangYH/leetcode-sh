@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
 REPO_ROOT = Path(__file__).parent.parent
-TRACKS = ["top-100", "daily-practice", "luffy"]
+TRACKS = ["problems/top-100", "problems/daily-practice", "problems/luffy"]
 
 def get_disk_problems(repo_root: Path = REPO_ROOT) -> Dict[str, Set[str]]:
     disk_manifest: Dict[str, Set[str]] = {}
@@ -29,13 +29,13 @@ def get_readme_tracked_problems(repo_root: Path = REPO_ROOT) -> Tuple[Dict[str, 
     readme_text = readme_path.read_text(encoding="utf-8")
     
     tracked_manifest: Dict[str, Set[str]] = {
-        "top-100": set(re.findall(r"top-100/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
-        "daily-practice": set(re.findall(r"daily-practice/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
-        "luffy": set(re.findall(r"luffy/([a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
+        "problems/top-100": set(re.findall(r"problems/top-100/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
+        "problems/daily-practice": set(re.findall(r"problems/daily-practice/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
+        "problems/luffy": set(re.findall(r"problems/luffy/([a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
     }
     
     # Extract all relative file links pointing to repository tracks
-    links = re.findall(r"\[.*?\]\(((?:top-100|daily-practice|luffy)/[^)]+)\)", readme_text)
+    links = re.findall(r"\[.*?\]\(((?:problems/top-100|problems/daily-practice|problems/luffy)/[^)]+)\)", readme_text)
     return tracked_manifest, links
 
 
@@ -63,9 +63,9 @@ class TestTrackingIntegrity(unittest.TestCase):
         total_problems = sum(len(stems) for stems in disk_manifest.values())
         
         self.assertGreater(total_problems, 100, "Repository should contain > 100 problems")
-        self.assertGreater(len(disk_manifest["top-100"]), 80, "Top 100 track should have > 80 problems")
-        self.assertGreater(len(disk_manifest["daily-practice"]), 10, "Daily track should have > 10 problems")
-        self.assertGreater(len(disk_manifest["luffy"]), 40, "Luffy track should have > 40 problems")
+        self.assertGreater(len(disk_manifest["problems/top-100"]), 80, "Top 100 track should have > 80 problems")
+        self.assertGreater(len(disk_manifest["problems/daily-practice"]), 10, "Daily track should have > 10 problems")
+        self.assertGreater(len(disk_manifest["problems/luffy"]), 40, "Luffy track should have > 40 problems")
 
     def test_all_disk_problems_tracked_in_readme(self):
         disk_manifest = get_disk_problems(REPO_ROOT)

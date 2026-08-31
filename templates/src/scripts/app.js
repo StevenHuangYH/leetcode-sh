@@ -37,21 +37,21 @@ const items = {items_json};
       },
       {
         id: "top-100",
-        name: "top-100/",
+        name: "problems/top-100/",
         label: "Top 100 Liked",
-        filter: k => k.startsWith("top-100/")
+        filter: k => k.startsWith("problems/top-100/") || k.startsWith("top-100/")
       },
       {
         id: "daily-practice",
-        name: "daily-practice/",
+        name: "problems/daily-practice/",
         label: "Daily Practice",
-        filter: k => k.startsWith("daily-practice/")
+        filter: k => k.startsWith("problems/daily-practice/") || k.startsWith("daily-practice/")
       },
       {
         id: "luffy",
-        name: "luffy/",
+        name: "problems/luffy/",
         label: "Curriculum (01-42)",
-        filter: k => k.startsWith("luffy/")
+        filter: k => k.startsWith("problems/luffy/") || k.startsWith("luffy/")
       }
     ];
 
@@ -587,7 +587,7 @@ const items = {items_json};
 
       // 4. Track prefix fallback & Stem matching
       const stem = cleanPath.split("/").pop().replace(/\.(py|md)$/, "").toLowerCase();
-      const tracks = ["top-100", "daily-practice", "luffy"];
+      const tracks = ["problems/top-100", "problems/daily-practice", "problems/luffy", "top-100", "daily-practice", "luffy"];
       for (const track of tracks) {
         const tryPy = `${track}/${stem}.py`;
         const tryMd = `${track}/${stem}.md`;

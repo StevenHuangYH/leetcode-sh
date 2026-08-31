@@ -6,9 +6,9 @@ This file establishes the operational rules and standards for all AI coding assi
 
 ## 🎯 Repository Overview & Architecture
 
-* **`top-100/`**: High-frequency LeetCode Top 100 Liked problems with paired `.py` solutions and `.md` walkthrough notes.
-* **`luffy/`**: Structured 42-topic algorithmic curriculum problems and notes.
-* **`daily-practice/`**: Daily challenges, contest problems, and algorithmic practice.
+* **`problems/top-100/`**: High-frequency LeetCode Top 100 Liked problems with paired `.py` solutions and `.md` walkthrough notes.
+* **`problems/luffy/`**: Structured 42-topic algorithmic curriculum problems and notes.
+* **`problems/daily-practice/`**: Daily challenges, contest problems, and algorithmic practice.
 * **`index.html`**: Self-contained Single Page App (SPA) study station with notes-first default layout and dual split-pane viewer (Notes Left, Python Code Right).
 * **`update_index.py`**: Automated script that scans the repository, pairs `.py` and `.md` files, and compiles `index.html`.
 

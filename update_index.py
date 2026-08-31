@@ -38,9 +38,9 @@ def watch_mode():
     import time
     print("👀 [Watch Mode] Monitoring tracks and templates/src/ for changes... (Ctrl+C to stop)")
     watch_dirs = [
-        BASE_DIR / "top-100",
-        BASE_DIR / "daily-practice",
-        BASE_DIR / "luffy",
+        BASE_DIR / "problems" / "top-100",
+        BASE_DIR / "problems" / "daily-practice",
+        BASE_DIR / "problems" / "luffy",
         BASE_DIR / "templates" / "src",
     ]
     watch_files = [
@@ -79,7 +79,7 @@ def watch_mode():
 
 def run_lint_check(strict: bool = False) -> bool:
     """Audits all companion markdown notes across tracks."""
-    tracks = ["top-100", "daily-practice", "luffy"]
+    tracks = ["problems/top-100", "problems/daily-practice", "problems/luffy"]
     total_audited = 0
     total_invalid = 0
 

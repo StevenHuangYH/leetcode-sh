@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 # Add top-100 to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "top-100"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "problems" / "top-100"))
 
 # Import module
 import importlib

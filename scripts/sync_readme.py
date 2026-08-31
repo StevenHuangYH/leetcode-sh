@@ -88,7 +88,7 @@ def parse_existing_descriptions(readme_text: str) -> Dict[int, Tuple[str, str, s
 
 
 def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
-    top_100_dir = REPO_ROOT / "top-100"
+    top_100_dir = REPO_ROOT / "problems" / "top-100"
     stems = sorted(list(set(f.stem for f in top_100_dir.glob("lc-*"))))
     
     def get_num(stem):
@@ -111,9 +111,9 @@ def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
         
         sol_parts = []
         if py_path.exists():
-            sol_parts.append(format_markdown_link(f"top-100/{stem}.py"))
+            sol_parts.append(format_markdown_link(f"problems/top-100/{stem}.py"))
         if md_path.exists():
-            sol_parts.append(format_markdown_link(f"top-100/{stem}.md"))
+            sol_parts.append(format_markdown_link(f"problems/top-100/{stem}.md"))
         sol_str = "<br>".join(sol_parts)
         
         if num in existing_desc:

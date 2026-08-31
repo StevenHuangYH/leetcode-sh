@@ -131,10 +131,10 @@ This guide provides a comprehensive overview of object-oriented programming foun
 
     def test_sample_repository_notes(self):
         sample_paths = [
-            REPO_ROOT / "top-100" / "lc-0022-generate-parentheses.md",
-            REPO_ROOT / "daily-practice" / "lc-0077-combinations.md",
-            REPO_ROOT / "daily-practice" / "lc-0216-combination-sum-3.md",
-            REPO_ROOT / "daily-practice" / "lc-0153-find-minimum-in-rotated-sorted-array.md",
+            REPO_ROOT / "problems" / "top-100" / "lc-0022-generate-parentheses.md",
+            REPO_ROOT / "problems" / "daily-practice" / "lc-0077-combinations.md",
+            REPO_ROOT / "problems" / "daily-practice" / "lc-0216-combination-sum-3.md",
+            REPO_ROOT / "problems" / "daily-practice" / "lc-0153-find-minimum-in-rotated-sorted-array.md",
         ]
         for note_path in sample_paths:
             if note_path.exists():
@@ -145,7 +145,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
     def test_universal_notes_directory_auditing_covers_all_luffy_notes_and_docs(self):
         """Assert audit_notes_directory discovers all markdown files in luffy/ and all pass auditing."""
         from scripts.validator.note_validator import audit_notes_directory
-        luffy_results = audit_notes_directory(REPO_ROOT / "luffy")
+        luffy_results = audit_notes_directory(REPO_ROOT / "problems" / "luffy")
         self.assertEqual(len(luffy_results), 53, "Should audit all 53 markdown files in luffy/")
         for name, res in luffy_results.items():
             self.assertTrue(res.is_valid, f"Luffy note {name} failed validation: {res.errors}")
@@ -153,7 +153,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
     def test_daily_practice_notes_auditing(self):
         """Assert all companion notes in daily-practice/ pass validation."""
         from scripts.validator.note_validator import audit_notes_directory
-        daily_results = audit_notes_directory(REPO_ROOT / "daily-practice")
+        daily_results = audit_notes_directory(REPO_ROOT / "problems" / "daily-practice")
         self.assertEqual(len(daily_results), 20, "Should audit all 20 daily practice companion notes")
         for name, res in daily_results.items():
             self.assertTrue(res.is_valid, f"Daily practice note {name} failed validation: {res.errors}")
@@ -161,7 +161,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
     def test_top_100_notes_auditing(self):
         """Assert all companion notes in top-100/ pass validation."""
         from scripts.validator.note_validator import audit_notes_directory
-        top_100_results = audit_notes_directory(REPO_ROOT / "top-100")
+        top_100_results = audit_notes_directory(REPO_ROOT / "problems" / "top-100")
         self.assertEqual(len(top_100_results), 23, "Should audit all 23 top-100 companion notes")
         for name, res in top_100_results.items():
             self.assertTrue(res.is_valid, f"Top-100 note {name} failed validation: {res.errors}")
@@ -195,7 +195,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
 """
         res_valid = self.validator.validate_non_problem_doc(
             valid_doc,
-            str(REPO_ROOT / "luffy" / "02-lc-0001-two-sum.md")
+            str(REPO_ROOT / "problems" / "luffy" / "02-lc-0001-two-sum.md")
         )
         self.assertTrue(res_valid.is_valid, f"Expected valid doc to pass: {res_valid.errors}")
 
@@ -207,7 +207,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
 """
         res_broken = self.validator.validate_non_problem_doc(
             broken_doc,
-            str(REPO_ROOT / "luffy" / "02-lc-0001-two-sum.md")
+            str(REPO_ROOT / "problems" / "luffy" / "02-lc-0001-two-sum.md")
         )
         self.assertFalse(res_broken.is_valid)
         self.assertTrue(any("Broken relative link" in err for err in res_broken.errors))
