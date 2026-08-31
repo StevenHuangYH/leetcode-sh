@@ -1,6 +1,8 @@
 import sys
 import re
 from pathlib import Path
+from collections import Counter
+from typing import Dict, List, Tuple
 
 REPO_ROOT = Path(__file__).parent.parent
 if str(REPO_ROOT) not in sys.path:
@@ -9,20 +11,61 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.compiler.collector import ProblemCollector
 
 
-def get_problem_difficulty(num: int, collector_items: dict) -> str:
-    """Dynamically resolves problem difficulty from collected problem entities."""
+def build_difficulty_map(collector_items: dict) -> Dict[int, str]:
+    """Pre-builds an integer-keyed difficulty lookup map from collected problem entities."""
+    diff_map = {}
     for item in collector_items.values():
         if item.get("type") == "problem":
             lc_num = item.get("lc_num", "")
             m = re.search(r"\d+", lc_num)
-            if m and int(m.group(0)) == num:
+            if m:
                 diff = item.get("diff")
                 if diff and diff != "All":
-                    return diff
-    return "Medium"
+                    diff_map[int(m.group(0))] = diff
+    return diff_map
 
 
-def parse_existing_descriptions(readme_text):
+def build_problem_files_index(collector_items: dict) -> Dict[int, List[str]]:
+    """Dynamically maps problem number to repository-relative solution links across all tracks directly from collector entities."""
+    file_map: Dict[int, List[str]] = {}
+    
+    for key in sorted(collector_items.keys()):
+        item = collector_items[key]
+        if item.get("type") != "problem":
+            continue
+        
+        lc_num = item.get("lc_num", "")
+        m = re.search(r"\d+", lc_num)
+        if not m:
+            continue
+        num = int(m.group(0))
+        
+        track_dir = key.split("/")[0] if "/" in key else "top-100"
+        py_file = item.get("py_file")
+        md_file = item.get("md_file")
+        
+        links = file_map.setdefault(num, [])
+        
+        if py_file:
+            py_rel = f"{track_dir}/{py_file}"
+            py_link = f"[`{py_rel}`]({py_rel})"
+            if py_link not in links and (REPO_ROOT / py_rel).exists():
+                links.append(py_link)
+        elif key.endswith(".py") and (REPO_ROOT / key).exists():
+            key_link = f"[`{key}`]({key})"
+            if key_link not in links:
+                links.append(key_link)
+                
+        if md_file:
+            md_rel = f"{track_dir}/{md_file}"
+            md_link = f"[`{md_rel}`]({md_rel})"
+            if md_link not in links and (REPO_ROOT / md_rel).exists():
+                links.append(md_link)
+                
+    return file_map
+
+
+def parse_existing_descriptions(readme_text: str) -> Dict[int, Tuple[str, str, str]]:
     desc_map = {}
     for line in readme_text.split("\n"):
         if line.startswith("| **"):
@@ -35,7 +78,7 @@ def parse_existing_descriptions(readme_text):
     return desc_map
 
 
-def generate_top_100_table(existing_desc, collector_items):
+def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
     top_100_dir = REPO_ROOT / "top-100"
     stems = sorted(list(set(f.stem for f in top_100_dir.glob("lc-*"))))
     
@@ -68,7 +111,7 @@ def generate_top_100_table(existing_desc, collector_items):
             title, diff, tech = existing_desc[num]
         else:
             title = slug.replace("-", " ").title()
-            diff = get_problem_difficulty(num, collector_items)
+            diff = diff_map.get(num, "Medium")
             tech = "High-Frequency Top 100 Pattern"
             
         lines.append(f"| **{num}** | {title} | [LC {num}](https://leetcode.com/problems/{slug}/) | {sol_str} | {diff} | {tech} |")
@@ -76,44 +119,23 @@ def generate_top_100_table(existing_desc, collector_items):
     return "\n".join(lines)
 
 
-LUFFY_TRACK_REPLACEMENTS = [
-    (
-        "| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/lc-0167-two-sum-ii-input-array-is-sorted.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py) |",
-        "| **167** | Two Sum II - Input Array Is Sorted | [LC 167](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) | [`top-100/lc-0167-two-sum-ii-input-array-is-sorted.py`](top-100/lc-0167-two-sum-ii-input-array-is-sorted.py)<br>[`luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py`](luffy/03-lc-0167-two-sum-ii-input-array-is-sorted.py) |"
-    ),
-    (
-        "| **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`top-100/lc-0003-longest-substring-without-repeating-characters.py`](top-100/lc-0003-longest-substring-without-repeating-characters.py) |",
-        "| **3** | Longest Substring Without Repeating | [LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [`top-100/lc-0003-longest-substring-without-repeating-characters.py`](top-100/lc-0003-longest-substring-without-repeating-characters.py)<br>[`luffy/04-lc-0003-longest-substring-without-repeating-characters.py`](luffy/04-lc-0003-longest-substring-without-repeating-characters.py) |"
-    ),
-    (
-        "| **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/lc-0209-minimum-size-subarray-sum.py`](top-100/lc-0209-minimum-size-subarray-sum.py) |",
-        "| **209** | Minimum Size Subarray Sum | [LC 209](https://leetcode.com/problems/minimum-size-subarray-sum/) | [`top-100/lc-0209-minimum-size-subarray-sum.py`](top-100/lc-0209-minimum-size-subarray-sum.py)<br>[`luffy/06-lc-0209-minimum-size-subarray-sum.py`](luffy/06-lc-0209-minimum-size-subarray-sum.py) |"
-    ),
-    (
-        "| **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`luffy/08-lc-0059-spiral-matrix-ii.py`](luffy/08-lc-0059-spiral-matrix-ii.py) |",
-        "| **59** | Spiral Matrix II | [LC 59](https://leetcode.com/problems/spiral-matrix-ii/) | [`luffy/08-lc-0059-spiral-matrix-ii.py`](luffy/08-lc-0059-spiral-matrix-ii.py)<br>[`luffy/09-lc-0059-spiral-matrix-ii-alt.py`](luffy/09-lc-0059-spiral-matrix-ii-alt.py) |"
-    ),
-    (
-        "| **303** | Range Sum Query - Immutable | [LC 303](https://leetcode.com/problems/range-sum-query-immutable/) | [`luffy/10-lc-0303-range-sum-query-immutable.py`](luffy/10-lc-0303-range-sum-query-immutable.py) |",
-        "| **303** | Range Sum Query - Immutable | [LC 303](https://leetcode.com/problems/range-sum-query-immutable/) | [`luffy/10-lc-0303-range-sum-query-immutable.py`](luffy/10-lc-0303-range-sum-query-immutable.py)<br>[`luffy/10-lc-0303-range-sum-query-immutable-alt.py`](luffy/10-lc-0303-range-sum-query-immutable-alt.py)<br>[`luffy/10-lc-0303-prefix-sum-practices.py`](luffy/10-lc-0303-prefix-sum-practices.py)<br>[`luffy/11-prefix-sum-basic-example.py`](luffy/11-prefix-sum-basic-example.py) |"
-    ),
-    (
-        "| **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py) |",
-        "| **20** | Valid Parentheses | [LC 20](https://leetcode.com/problems/valid-parentheses/) | [`luffy/19-lc-0020-valid-parentheses.py`](luffy/19-lc-0020-valid-parentheses.py)<br>[`luffy/20-lc-0020-valid-parentheses-dict.py`](luffy/20-lc-0020-valid-parentheses-dict.py) |"
-    ),
-    (
-        "| **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-0098-validate-binary-search-tree-inorder.py`](luffy/29-lc-0098-validate-binary-search-tree-inorder.py) |",
-        "| **98** | Validate Binary Search Tree | [LC 98](https://leetcode.com/problems/validate-binary-search-tree/) | [`luffy/29-lc-0098-validate-binary-search-tree-inorder.py`](luffy/29-lc-0098-validate-binary-search-tree-inorder.py)<br>[`luffy/29-lc-0098-validate-binary-search-tree-bounds.py`](luffy/29-lc-0098-validate-binary-search-tree-bounds.py)<br>[`luffy/29-lc-0098-validate-binary-search-tree-recursion.py`](luffy/29-lc-0098-validate-binary-search-tree-recursion.py)<br>[`luffy/29-lc-0098-validate-binary-search-tree-stack.py`](luffy/29-lc-0098-validate-binary-search-tree-stack.py) |"
-    )
-]
+def sync_multi_track_solutions(readme_text: str, file_map: Dict[int, List[str]]) -> str:
+    """Dynamically ensures Section 5 curriculum rows include all companion solution links."""
+    def replace_row(match):
+        num_str = match.group(1)
+        if not num_str.isdigit():
+            return match.group(0)
+        num = int(num_str)
+        if num in file_map and len(file_map[num]) > 1:
+            title = match.group(2)
+            lc_link = match.group(3)
+            sol_cell = "<br>".join(file_map[num])
+            rest = match.group(5)
+            return f"| **{num}** | {title} | {lc_link} | {sol_cell} | {rest}"
+        return match.group(0)
 
-
-def sync_luffy_in_section5(readme_text):
-    """Synchronizes companion luffy track references in README Section 5."""
-    for old_snip, new_snip in LUFFY_TRACK_REPLACEMENTS:
-        if old_snip in readme_text:
-            readme_text = readme_text.replace(old_snip, new_snip)
-    return readme_text
+    row_pattern = r"\| \*\*(\d+)\*\* \| (.*?) \| (\[LC \d+\].*?) \| (.*?) \| (.*?)(?=\n\||\n\n|\Z)"
+    return re.sub(row_pattern, replace_row, readme_text)
 
 
 def update_readme():
@@ -121,29 +143,28 @@ def update_readme():
     readme_text = readme_path.read_text(encoding="utf-8")
     
     collector_items = ProblemCollector.collect(REPO_ROOT, use_cache=False)
+    diff_map = build_difficulty_map(collector_items)
+    file_map = build_problem_files_index(collector_items)
     existing_desc = parse_existing_descriptions(readme_text)
     
-    new_top_100_table = generate_top_100_table(existing_desc, collector_items)
+    new_top_100_table = generate_top_100_table(existing_desc, diff_map)
     
     sec3_pattern = r"(## Top 100 Liked Track\n\n[^\n]+\n\n)\| # \| Problem Title \|.*?(\n---|\n## )"
     replacement = f"\\1{new_top_100_table}\\n\\2"
     new_readme = re.sub(sec3_pattern, replacement, readme_text, flags=re.DOTALL)
     
-    new_readme = sync_luffy_in_section5(new_readme)
+    new_readme = sync_multi_track_solutions(new_readme, file_map)
     
     problem_entities = [v for v in collector_items.values() if v.get("type") == "problem"]
     total_problems = len(problem_entities)
-
-    easy_problems = len([p for p in problem_entities if p.get("diff") == "Easy"])
-    medium_problems = len([p for p in problem_entities if p.get("diff") == "Medium"])
-    hard_problems = len([p for p in problem_entities if p.get("diff") == "Hard"])
-
     notes_entities = [p for p in problem_entities if p.get("md_file") or (p.get("notes") and len(p.get("notes").strip()) > 0)]
     total_notes = len(notes_entities)
 
-    easy_notes = len([p for p in notes_entities if p.get("diff") == "Easy"])
-    medium_notes = len([p for p in notes_entities if p.get("diff") == "Medium"])
-    hard_notes = len([p for p in notes_entities if p.get("diff") == "Hard"])
+    prob_diffs = Counter(p.get("diff", "Medium") for p in problem_entities)
+    notes_diffs = Counter(p.get("diff", "Medium") for p in notes_entities)
+
+    easy_problems, medium_problems, hard_problems = prob_diffs["Easy"], prob_diffs["Medium"], prob_diffs["Hard"]
+    easy_notes, medium_notes, hard_notes = notes_diffs["Easy"], notes_diffs["Medium"], notes_diffs["Hard"]
 
     easy_pct = round((easy_notes / total_notes * 100)) if total_notes else 0
     medium_pct = round((medium_notes / total_notes * 100)) if total_notes else 0

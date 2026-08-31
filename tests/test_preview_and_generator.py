@@ -109,8 +109,12 @@ class TestPreviewAndGenerator(unittest.TestCase):
         )
 
     def test_search_precision_and_scroll_restoration(self):
-        """Assert search isolates problem ID tokens and clearSearch restores active scroll."""
+        """Assert search isolates problem ID tokens, pre-compiles regexes, and clearSearch restores active scroll."""
         content = self.index_html_path.read_text(encoding="utf-8")
+        self.assertIn('buildSearchMatcher', content)
+        self.assertIn('isAllNumeric', content)
+        self.assertIn('firstMatchElement', content)
+        self.assertIn('cleanSlug', content)
         self.assertIn('idBlob', content)
         self.assertIn('activeItem.scrollIntoView', content)
         self.assertIn('problem-item', content)

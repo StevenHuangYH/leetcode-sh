@@ -158,11 +158,15 @@ class TestUpdateIndexParser(unittest.TestCase):
         from pathlib import Path
         sync_readme_path = Path(__file__).parent.parent / "scripts" / "sync_readme.py"
         content = sync_readme_path.read_text(encoding="utf-8")
-        # Ensure hardcoded difficulty table constants are removed
+        # Ensure hardcoded difficulty table constants and replacement tuples are removed
         self.assertNotIn("| **Easy** | 31 | ~31% | 31 |", content)
         self.assertNotIn("| **Medium** | 62 | ~62% | 134 |", content)
         self.assertNotIn("| **Hard** | 7 | ~7% | 9 |", content)
         self.assertNotIn("total_problems = 174", content)
+        self.assertNotIn("LUFFY_TRACK_REPLACEMENTS", content)
+        self.assertNotIn("EXTRA_PROBLEM_MAPPINGS", content)
+        self.assertIn("sync_multi_track_solutions", content)
+        self.assertIn("build_problem_files_index(collector_items)", content)
 
 
 if __name__ == "__main__":

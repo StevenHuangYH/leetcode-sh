@@ -214,23 +214,39 @@ const items = {items_json};
       renderTree(document.getElementById("search").value);
     }
 
-    function matchesSearchQuery(item, query) {
-      if (!query) return true;
+    function buildSearchMatcher(query) {
+      if (!query) return () => true;
       const clean = query.trim().toLowerCase();
-      if (!clean) return true;
+      if (!clean) return () => true;
       const tokens = clean.split(/\s+/);
-      return tokens.every(token => {
+      const isAllNumeric = tokens.every(t => /^\d+$/.test(t));
+      const matchers = tokens.map(token => {
         if (/^\d+$/.test(token)) {
-          if (item.lc_num) {
-            const numOnly = item.lc_num.replace(/\D/g, "");
-            if (parseInt(numOnly, 10) === parseInt(token, 10)) return true;
-          }
-          const idBlob = `${item.key} ${item.title || ""} ${item.en_title || ""} ${item.slug || ""}`.toLowerCase();
+          const targetNum = parseInt(token, 10);
           const boundaryRegex = new RegExp(`\\b0*${token}\\b`, "i");
-          return boundaryRegex.test(idBlob);
+          return (item) => {
+            if (item.type !== "problem") {
+              return !isAllNumeric && item.search_blob.includes(token);
+            }
+            if (item.lc_num) {
+              const numOnly = item.lc_num.replace(/\D/g, "");
+              if (numOnly && parseInt(numOnly, 10) === targetNum) return true;
+            }
+            // Strip leading curriculum batch sequence prefix (e.g. 01-lc-2235 -> lc-2235)
+            const cleanSlug = (item.slug || "").replace(/^\d+-/, "");
+            const cleanKey = (item.key || "").replace(/^[^/]+\/\d+-/, "");
+            const idBlob = `${cleanKey} ${cleanSlug} ${item.title || ""} ${item.en_title || ""}`.toLowerCase();
+            return boundaryRegex.test(idBlob);
+          };
         }
-        return item.search_blob.includes(token);
+        return (item) => item.search_blob.includes(token);
       });
+      return (item) => matchers.every(m => m(item));
+    }
+
+    function matchesSearchQuery(item, query) {
+      const matcher = buildSearchMatcher(query);
+      return matcher(item);
     }
 
     function renderTree(query = "") {
@@ -238,6 +254,7 @@ const items = {items_json};
       if (!root) return;
 
       const isSearching = Boolean(query && query.trim().length > 0);
+      const searchMatcher = buildSearchMatcher(query);
       let html = "";
       let totalVisible = 0;
 
@@ -246,7 +263,7 @@ const items = {items_json};
           const matchingKey = Object.keys(items).find(k => folder.filter(k));
           if (!matchingKey) return;
           const item = items[matchingKey];
-          if (isSearching && !matchesSearchQuery(item, query)) return;
+          if (isSearching && !searchMatcher(item)) return;
 
           const isActive = matchingKey === currentKey && mainMode === "workspace";
           const iconSvg = getCategoryIcon(folder.id);
@@ -263,7 +280,7 @@ const items = {items_json};
 
         const folderKeys = Object.keys(items).filter(k => folder.filter(k));
         const matchingKeys = isSearching 
-          ? folderKeys.filter(k => matchesSearchQuery(items[k], query))
+          ? folderKeys.filter(k => searchMatcher(items[k]))
           : folderKeys;
 
         if (matchingKeys.length === 0) return;
@@ -804,12 +821,12 @@ const items = {items_json};
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          const firstProblem = document.querySelector("#treeRoot .problem-item, #treeRoot .nav-item");
-          if (firstProblem) {
-            const key = firstProblem.getAttribute("data-key");
+          const firstMatchElement = document.querySelector("#treeRoot .problem-item") || document.querySelector("#treeRoot .nav-item[data-key]");
+          if (firstMatchElement) {
+            const key = firstMatchElement.getAttribute("data-key");
             if (key && items[key]) {
               switchItem(key, false);
-              firstProblem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              firstMatchElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
               const notesViewer = document.getElementById("notesViewer");
               if (notesViewer) {
                 notesViewer.focus();
