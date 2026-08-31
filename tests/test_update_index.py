@@ -81,5 +81,13 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertEqual(readme_doc["title"], "LeetCode Self-Practices Overview")
         self.assertEqual(readme_doc["category"], "Overview")
 
+    def test_navigation_interceptor_bundled(self):
+        from scripts.compiler.bundler import TemplateBundler
+        bundler = TemplateBundler()
+        bundled_html = bundler.bundle(minify=False)
+        self.assertIn("function resolveEntityReference", bundled_html)
+        self.assertIn("function initLinkInterceptor", bundled_html)
+        self.assertIn("initLinkInterceptor();", bundled_html)
+
 if __name__ == "__main__":
     unittest.main()

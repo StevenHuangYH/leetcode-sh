@@ -13,6 +13,9 @@ This file serves as the single source of truth for domain vocabulary, topologica
 * **TopologyGraph**: The directed acyclic graph (DAG) domain model representing the algorithm learning lineage. Composed of `TopologyNode` entities (with status markers: `mastered`, `learning`, `unvisited`, and mental model summaries) and `TopologyEdge` entities (with perspective labels: `层序遍历`, `遍历视角`, `子问题视角`, `其他算法`).
 * **TemplateBundler**: The asset bundler that inlines modular CSS, JS, and HTML template sources into `index.html` without requiring external Node.js/npm dependencies.
 * **ProblemTitleFormatter**: The entity normalization model responsible for stripping raw file prefixes (e.g. `01-lc-2235-` -> `LC 2235`), formatting standard bilingual titles (`LC {num} · {English Title} ({Chinese Title})`), and providing semantic non-problem catalog titles for top breadcrumb and tree display.
+* **InternalNavigationInterceptor**: Client-side click delegation interceptor that captures link clicks within rendered notes and curriculum indexes, routing relative file references, in-page anchors, and external links without triggering browser navigation, page reloads, or file downloads.
+* **EntityReferenceResolver**: The resilient multi-tier resolution engine that normalizes arbitrary relative paths (`luffy/02-lc-0001-two-sum.py`, `top-100/lc-0015-3sum.md`, `lc-0015-3sum.py`), performs cross-track stem lookup, LC-number extraction, and extension swapping (`.md` ↔ `.py`) to map references directly to in-memory `DocumentEntity` keys.
+* **AdaptiveModeTargeting**: Viewport-aware routing policy where clicking `.md` walkthrough links switches the workspace to Notes-First view (`viewMode = "notes"` / mobile `notes` tab), while clicking `.py` solution code links switches to Dual-Split view (`viewMode = "dual"` / mobile `code` tab) to highlight syntax-highlighted code.
 
 ### 2. Integrity & Quality Guardians
 * **NoteStructureValidator**: The quality enforcement module that audits companion `.md` notes against the standard 7-Section Active Recall template mandated by `AGENTS.md`.
@@ -71,3 +74,7 @@ This file serves as the single source of truth for domain vocabulary, topologica
 
 6. **Semantic Breadcrumb & Bilingual Title Normalization**:
    * Top breadcrumb and UI headers display formatted semantic titles (`LC {num} · {English Title} ({Chinese Title})` for problems, and human-readable topic names for catalogs) with graceful ellipsis truncation and full-title tooltips, completely abstracting disk filenames.
+
+7. **Zero-Download In-App Navigation & Resilient Entity Routing**:
+   * Relative `.py` and `.md` links in curriculum catalogs and markdown notes are dynamically intercepted and routed in memory via `InternalNavigationInterceptor` and `EntityReferenceResolver`, completely preventing unwanted browser file downloads. Walkthrough links (`.md`) adaptively focus the notes pane, while solution links (`.py`) adaptively expand the dual/code pane to reveal syntax-highlighted source code. External URLs are strictly isolated in new browser tabs.
+

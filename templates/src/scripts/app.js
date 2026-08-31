@@ -869,6 +869,181 @@ const items = {items_json};
       document.getElementById("right-pane").scrollTop = 0;
     }
 
+    /**
+     * EntityReferenceResolver: Resolves relative file paths, stems, LC numbers, or slugs
+     * to a registered DocumentEntity key in the in-memory items manifest.
+     */
+    function resolveEntityReference(rawHref) {
+      if (!rawHref) return null;
+
+      let href = rawHref.trim();
+      let anchor = "";
+      const hashIndex = href.indexOf("#");
+      if (hashIndex !== -1) {
+        anchor = href.substring(hashIndex + 1);
+        href = href.substring(0, hashIndex);
+      }
+      const queryIndex = href.indexOf("?");
+      if (queryIndex !== -1) {
+        href = href.substring(0, queryIndex);
+      }
+
+      let cleanPath = href.replace(/^(\.\/|\/|\.\.\/)+/, "").trim();
+      if (!cleanPath && anchor) {
+        return { key: null, anchor: anchor, isAnchorOnly: true };
+      }
+      if (!cleanPath) return null;
+
+      const isCodeTarget = cleanPath.endsWith(".py");
+      const isNoteTarget = cleanPath.endsWith(".md");
+
+      // 1. Exact Match in items
+      if (items[cleanPath]) {
+        return { key: cleanPath, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+      }
+
+      // 2. Extension swap match (.md <-> .py)
+      if (isNoteTarget) {
+        const pyKey = cleanPath.replace(/\.md$/, ".py");
+        if (items[pyKey]) {
+          return { key: pyKey, isCode: false, isNote: true, anchor };
+        }
+      } else if (isCodeTarget) {
+        const mdKey = cleanPath.replace(/\.py$/, ".md");
+        if (items[mdKey]) {
+          return { key: mdKey, isCode: true, isNote: false, anchor };
+        }
+      }
+
+      // 3. Problem index / topic docs match
+      if (items[`problem-index/${cleanPath}`]) {
+        return { key: `problem-index/${cleanPath}`, isCode: false, isNote: true, anchor };
+      }
+      if (cleanPath.startsWith("topic-") && items[cleanPath]) {
+        return { key: cleanPath, isCode: false, isNote: true, anchor };
+      }
+
+      // 4. Track prefix fallback & Stem matching
+      const stem = cleanPath.split("/").pop().replace(/\.(py|md)$/, "").toLowerCase();
+      const tracks = ["top-100", "daily-practice", "luffy"];
+      for (const track of tracks) {
+        const tryPy = `${track}/${stem}.py`;
+        const tryMd = `${track}/${stem}.md`;
+        if (items[tryPy]) return { key: tryPy, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+        if (items[tryMd]) return { key: tryMd, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+      }
+
+      // 5. LC Number / Slug scanning
+      const lcNumMatch = stem.match(/(?:^|\b)(?:lc-?)(\d+)/i) || stem.match(/(?:^|\b)(\d+)\b/);
+      const targetLcNum = lcNumMatch ? parseInt(lcNumMatch[1], 10) : null;
+
+      for (const k in items) {
+        const item = items[k];
+        if (item.type === "problem") {
+          if (targetLcNum !== null && item.lc_num) {
+            const itemNum = parseInt(item.lc_num.replace(/\D/g, ""), 10);
+            if (itemNum === targetLcNum) {
+              return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+            }
+          }
+          if (item.slug && (item.slug === stem || item.slug.includes(stem) || stem.includes(item.slug))) {
+            return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+          }
+          if (item.key && item.key.toLowerCase().includes(stem)) {
+            return { key: k, isCode: isCodeTarget, isNote: isNoteTarget, anchor };
+          }
+        }
+      }
+
+      return null;
+    }
+
+    /**
+     * InternalNavigationInterceptor: Intercepts link clicks to route internal files,
+     * in-page anchors, and external links without triggering page downloads or reloads.
+     */
+    function initLinkInterceptor() {
+      document.addEventListener("click", (e) => {
+        const link = e.target.closest("a");
+        if (!link) return;
+
+        const rawHref = link.getAttribute("href");
+        if (!rawHref) return;
+
+        // 1. External URLs (http, https, mailto, etc.)
+        if (/^(https?:|\/\/|mailto:)/i.test(rawHref)) {
+          link.setAttribute("target", "_blank");
+          link.setAttribute("rel", "noopener noreferrer");
+          return;
+        }
+
+        // 2. Pure in-page anchor (#heading)
+        if (rawHref.startsWith("#")) {
+          e.preventDefault();
+          const anchorId = rawHref.substring(1);
+          if (items[anchorId]) {
+            switchItem(anchorId);
+            return;
+          }
+          const leftPane = document.getElementById("left-pane");
+          const notesViewer = document.getElementById("notesViewer");
+          if (!notesViewer || !leftPane) return;
+
+          const targetEl = document.getElementById(anchorId) ||
+                           notesViewer.querySelector(`[name="${anchorId}"]`) ||
+                           notesViewer.querySelector(`h1[id="${anchorId}"], h2[id="${anchorId}"], h3[id="${anchorId}"], h4[id="${anchorId}"], h5[id="${anchorId}"], h6[id="${anchorId}"]`) ||
+                           Array.from(notesViewer.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
+                             const cleanHeading = h.textContent.trim().toLowerCase();
+                             const slug1 = cleanHeading.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+                             const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
+                             return slug1 === anchorId.toLowerCase() || slug2 === anchorId.toLowerCase() || cleanHeading === anchorId.toLowerCase();
+                           });
+
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          return;
+        }
+
+        // 3. Relative File / Entity Reference
+        const resolved = resolveEntityReference(rawHref);
+        if (resolved && resolved.key && items[resolved.key]) {
+          e.preventDefault();
+          const targetKey = resolved.key;
+          const isPy = resolved.isCode || rawHref.endsWith(".py");
+          const isMd = resolved.isNote || rawHref.endsWith(".md");
+
+          if (window.innerWidth <= 768) {
+            setMobileTab(isPy ? "code" : "notes");
+          } else {
+            if (isPy) {
+              setViewMode("dual");
+            } else if (isMd) {
+              setViewMode("notes");
+            }
+          }
+
+          switchItem(targetKey);
+
+          if (resolved.anchor) {
+            setTimeout(() => {
+              const notesViewer = document.getElementById("notesViewer");
+              if (!notesViewer) return;
+              const targetEl = document.getElementById(resolved.anchor) ||
+                               notesViewer.querySelector(`[name="${resolved.anchor}"]`) ||
+                               Array.from(notesViewer.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(h => {
+                                 const cleanHeading = h.textContent.trim().toLowerCase();
+                                 const slug1 = cleanHeading.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+                                 const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
+                                 return slug1 === resolved.anchor.toLowerCase() || slug2 === resolved.anchor.toLowerCase();
+                               });
+              if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 60);
+          }
+        }
+      });
+    }
+
     function copyActiveCode() {
       const item = items[currentKey];
       if (!item || !item.code) return;
@@ -991,6 +1166,7 @@ const items = {items_json};
     });
 
     // Initialize SPA
+    initLinkInterceptor();
     renderTree();
     updateProgressBadge();
 
