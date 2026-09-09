@@ -14,7 +14,7 @@ In `templates/src/scripts/app.js`:
 
 **Status:** todo
 
-- [ ] Consolidate startup hash routing to delegate to `resolveEntityReference`
-- [ ] Remove duplicate legacy prefix iteration and hardcoded `'problems/'` literal in startup block
-- [ ] Remove duplicate extension swapping logic
-- [ ] Ensure `mainMode` and `currentKey` are correctly assigned
+- [x] Consolidate startup hash routing to delegate to `resolveEntityReference`
+- [x] Remove duplicate legacy prefix iteration and hardcoded `'problems/'` literal in startup block
+- [x] Remove duplicate extension swapping logic
+- [x] Ensure `mainMode` and `currentKey` are correctly assigned

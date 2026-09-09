@@ -11,40 +11,12 @@ const items = {items_json};
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
 
     // Check initial URL hash
+    let initialAnchor = "";
     if (window.location.hash && window.location.hash.length > 1) {
-      const hashKey = decodeURIComponent(window.location.hash.substring(1));
-      if (hashKey === "roadmap") {
-        mainMode = "roadmap";
-      } else if (items[hashKey]) {
-        currentKey = hashKey;
-        mainMode = "workspace";
-      } else if (hashKey.endsWith(".md") && items[hashKey.replace(/\.md$/, ".py")]) {
-        currentKey = hashKey.replace(/\.md$/, ".py");
-        mainMode = "workspace";
-      } else if (hashKey.endsWith(".py") && items[hashKey.replace(/\.py$/, ".md")]) {
-        currentKey = hashKey.replace(/\.py$/, ".md");
-        mainMode = "workspace";
-      } else if (Array.isArray(configuredTracks)) {
-        for (const t of configuredTracks) {
-          if (t.id && hashKey.startsWith(`${t.id}/`)) {
-            const canonicalKey = `problems/${hashKey}`;
-            if (items[canonicalKey]) {
-              currentKey = canonicalKey;
-              mainMode = "workspace";
-              break;
-            }
-            if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\.md$/, ".py")]) {
-              currentKey = canonicalKey.replace(/\.md$/, ".py");
-              mainMode = "workspace";
-              break;
-            } else if (hashKey.endsWith(".py") && items[canonicalKey.replace(/\.py$/, ".md")]) {
-              currentKey = canonicalKey.replace(/\.py$/, ".md");
-              mainMode = "workspace";
-              break;
-            }
-          }
-        }
-      }
+      const initialRoute = resolveInitialRoute(window.location.hash);
+      mainMode = initialRoute.mode;
+      currentKey = initialRoute.key;
+      initialAnchor = initialRoute.anchor;
     }
 
     // Tree folder structure definitions matching README.md repo structure
@@ -659,6 +631,34 @@ const items = {items_json};
     }
 
     /**
+     * Resolves an initial URL hash to a structured route target ({ mode, key, anchor }).
+     * Delegates entity resolution directly to resolveEntityReference.
+     */
+    function resolveInitialRoute(rawHash) {
+      if (!rawHash) {
+        return { mode: "workspace", key: "README.md", anchor: "" };
+      }
+      const cleanHash = rawHash.replace(/^#/, "");
+      if (!cleanHash) {
+        return { mode: "workspace", key: "README.md", anchor: "" };
+      }
+      let hashKey = "";
+      try {
+        hashKey = decodeURIComponent(cleanHash);
+      } catch (e) {
+        hashKey = cleanHash;
+      }
+      if (hashKey === "roadmap") {
+        return { mode: "roadmap", key: "README.md", anchor: "" };
+      }
+      const resolved = resolveEntityReference(hashKey);
+      if (resolved && resolved.key && items[resolved.key]) {
+        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+      }
+      return { mode: "workspace", key: "README.md", anchor: "" };
+    }
+
+    /**
      * Finds a heading DOM element strictly within a container matching an anchor id or slug.
      */
     function findHeadingElement(container, anchorId) {
@@ -901,4 +901,14 @@ const items = {items_json};
     } else {
       setMainMode("workspace", false);
       switchItem(currentKey);
+      if (initialAnchor) {
+        setTimeout(() => {
+          const notesViewer = document.getElementById("notesViewer");
+          if (!notesViewer) return;
+          const targetEl = findHeadingElement(notesViewer, initialAnchor);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, DOM_RENDER_DELAY_MS);
+      }
     }
