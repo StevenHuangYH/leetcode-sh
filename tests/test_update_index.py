@@ -272,11 +272,16 @@ class TestUpdateIndexParser(unittest.TestCase):
         top100 = TrackRegistry.get_track_by_id("top-100")
         self.assertIsNotNone(top100)
         self.assertEqual(top100.dir_path, "problems/top-100")
+        self.assertFalse(hasattr(top100, "legacy_prefix"))
         
         payload = TrackRegistry.to_client_json_payload()
         self.assertEqual(len(payload), 3)
         self.assertEqual(payload[0]["id"], "top-100")
         self.assertEqual(payload[0]["dir_path"], "problems/top-100")
+        self.assertEqual(payload[0]["display_label"], "Top 100 Liked")
+        self.assertEqual(payload[0]["category_name"], "Top 100 Liked Track")
+        self.assertNotIn("legacy_prefix", payload[0])
+        self.assertEqual(set(payload[0].keys()), {"id", "dir_path", "display_label", "category_name"})
 
     def test_study_station_compiler_injects_tracks_payload(self):
         """Assert StudyStationCompiler generates index.html containing valid tracks JSON and no unreplaced placeholders."""

@@ -8,9 +8,9 @@ In `scripts/compiler/track_definitions.py`:
 
 **Blocked by:** None (Frontier)
 
-**Status:** todo
+**Status:** done
 
-- [ ] Remove `legacy_prefix` from `TrackConfig`
-- [ ] Remove `legacy_prefix` from `TrackConfig.to_client_descriptor()`
-- [ ] Update `test_track_registry_domain_model` in `tests/test_update_index.py`
-- [ ] Run `python3 -m unittest tests/test_update_index.py` to confirm
+- [x] Remove `legacy_prefix` from `TrackConfig`
+- [x] Remove `legacy_prefix` from `TrackConfig.to_client_descriptor()`
+- [x] Update `test_track_registry_domain_model` in `tests/test_update_index.py`
+- [x] Run `python3 -m unittest tests/test_update_index.py` to confirm
