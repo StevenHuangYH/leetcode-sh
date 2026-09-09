@@ -578,30 +578,11 @@
       id: t.id,
       name: `${t.dir_path}/`,
       label: t.display_label,
-      filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`) || (t.legacy_prefix && k.startsWith(t.legacy_prefix))
+      filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`)
     }));
     const treeStructure = [
       ...staticFolders,
-      ...(dynamicTrackFolders.length > 0 ? dynamicTrackFolders : [
-        {
-          id: "top-100",
-          name: "problems/top-100/",
-          label: "Top 100 Liked",
-          filter: k => k.startsWith("problems/top-100/") || k.startsWith("top-100/")
-        },
-        {
-          id: "daily-practice",
-          name: "problems/daily-practice/",
-          label: "Daily Practice",
-          filter: k => k.startsWith("problems/daily-practice/") || k.startsWith("daily-practice/")
-        },
-        {
-          id: "luffy",
-          name: "problems/luffy/",
-          label: "Curriculum (01-42)",
-          filter: k => k.startsWith("problems/luffy/") || k.startsWith("luffy/")
-        }
-      ])
+      ...dynamicTrackFolders
     ];
     function updateProgressBadge() {
       const problemKeys = Object.keys(items).filter(k => items[k].type === "problem");
@@ -1064,14 +1045,7 @@
         for (const t of configuredTracks) {
           if (t.dir_path && !searchTracks.includes(t.dir_path)) searchTracks.push(t.dir_path);
           if (t.id && !searchTracks.includes(t.id)) searchTracks.push(t.id);
-          if (t.legacy_prefix) {
-            const cleanLegacy = t.legacy_prefix.replace(/\/$/, "");
-            if (cleanLegacy && !searchTracks.includes(cleanLegacy)) searchTracks.push(cleanLegacy);
-          }
         }
-      }
-      if (searchTracks.length === 0) {
-        searchTracks.push("problems/top-100", "problems/daily-practice", "problems/luffy", "top-100", "daily-practice", "luffy");
       }
       for (const track of searchTracks) {
         const tryPy = `${track}/${stem}.py`;
