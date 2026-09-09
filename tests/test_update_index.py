@@ -304,6 +304,136 @@ class TestUpdateIndexParser(unittest.TestCase):
             if tmp_path.exists():
                 tmp_path.unlink()
 
+    def test_compiled_html_contains_no_hardcoded_track_fallbacks(self):
+        """Assert compiled index.html contains zero hardcoded fallback arrays or fallback branches for tracks."""
+        from scripts.compiler.engine import compile_study_station
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
+            self.assertTrue(result.success)
+            html_text = tmp_path.read_text(encoding="utf-8")
+
+            # Assert absence of ternary fallback in treeStructure
+            self.assertNotIn("dynamicTrackFolders.length > 0 ? dynamicTrackFolders :", html_text)
+            self.assertNotIn("(dynamicTrackFolders.length > 0", html_text)
+
+            # Assert absence of searchTracks empty fallback in resolveEntityReference
+            self.assertNotIn("searchTracks.length === 0", html_text)
+            self.assertNotIn('searchTracks.push("problems/top-100"', html_text)
+            self.assertNotIn('searchTracks.push("problems/daily-practice"', html_text)
+            self.assertNotIn('searchTracks.push("problems/luffy"', html_text)
+
+            # Assert absence of old hardcoded fallback array elements
+            self.assertNotIn('name: "problems/top-100/"', html_text)
+            self.assertNotIn('name: "problems/daily-practice/"', html_text)
+            self.assertNotIn('name: "problems/luffy/"', html_text)
+
+            # Assert dynamicTrackFolders is constructed directly without fallback arrays
+            self.assertIn("const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({", html_text)
+            self.assertIn("...dynamicTrackFolders", html_text)
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
+
+    def test_client_folder_filter_predicates_match_canonical_and_legacy_paths(self):
+        """Assert client-side folder filter predicates match canonical and legacy paths while rejecting mismatches."""
+        from scripts.compiler.engine import compile_study_station
+        from scripts.compiler.track_definitions import TrackRegistry
+        import json
+        import re
+        import shutil
+        import subprocess
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
+            self.assertTrue(result.success)
+            html_text = tmp_path.read_text(encoding="utf-8")
+
+            # Verify predicate template syntax in compiled script
+            self.assertIn(
+                "filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`)",
+                html_text,
+                "Compiled script should define clean canonical and legacy prefix filter without schema creep"
+            )
+            self.assertNotIn("t.legacy_prefix", html_text)
+
+            # Parse injected tracks configuration directly from compiled HTML
+            tracks_match = re.search(r"const configuredTracks = (\[.*?\]);", html_text)
+            self.assertIsNotNone(tracks_match, "configuredTracks JSON payload must be present in compiled script")
+            tracks = json.loads(tracks_match.group(1))
+            self.assertEqual(len(tracks), len(TrackRegistry.get_all_tracks()))
+
+            # Evaluate filter behavior for each track against canonical, legacy, and cross-track keys
+            for track in tracks:
+                track_id = track["id"]
+                dir_path = track["dir_path"]
+                filter_fn = lambda k, d=dir_path, tid=track_id: k.startswith(f"{d}/") or k.startswith(f"{tid}/")
+
+                # 1. Canonical directory paths must match
+                self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.py"))
+                self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.md"))
+
+                # 2. Legacy prefix paths must match
+                self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.py"))
+                self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.md"))
+
+                # 3. Cross-track mismatches must be rejected
+                for other_track in tracks:
+                    if other_track["id"] == track_id:
+                        continue
+                    other_dir = other_track["dir_path"]
+                    other_id = other_track["id"]
+                    self.assertFalse(filter_fn(f"{other_dir}/lc-0001-example.py"))
+                    self.assertFalse(filter_fn(f"{other_id}/lc-0001-example.py"))
+
+                # 4. Partial substring collisions and non-track keys must be rejected
+                self.assertFalse(filter_fn(f"{dir_path}-suffix/lc-0001.py"))
+                self.assertFalse(filter_fn(f"{track_id}-suffix/lc-0001.py"))
+                self.assertFalse(filter_fn("README.md"))
+                self.assertFalse(filter_fn("topic-01-arrays-sliding-window"))
+                self.assertFalse(filter_fn("problem-index/topic-01"))
+
+            # Node.js runtime assertion of the exact compiled JS script
+            node_bin = shutil.which("node")
+            if node_bin:
+                js_test_script = f"""
+                const configuredTracks = {tracks_match.group(1)};
+                const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({{
+                  id: t.id,
+                  name: `${{t.dir_path}}/`,
+                  label: t.display_label,
+                  filter: k => k.startsWith(`${{t.dir_path}}/`) || k.startsWith(`${{t.id}}/`)
+                }}));
+
+                for (const t of configuredTracks) {{
+                  const folder = dynamicTrackFolders.find(f => f.id === t.id);
+                  if (!folder) process.exit(1);
+                  if (!folder.filter(`${{t.dir_path}}/lc-0001.py`)) process.exit(2);
+                  if (!folder.filter(`${{t.id}}/lc-0001.py`)) process.exit(3);
+                  if (folder.filter("README.md")) process.exit(4);
+                  if (folder.filter("topic-01-arrays")) process.exit(5);
+                  for (const other of configuredTracks) {{
+                    if (other.id !== t.id) {{
+                      if (folder.filter(`${{other.dir_path}}/lc-0001.py`)) process.exit(6);
+                      if (folder.filter(`${{other.id}}/lc-0001.py`)) process.exit(7);
+                    }}
+                  }}
+                }}
+                process.exit(0);
+                """
+                proc = subprocess.run([node_bin, "-e", js_test_script], capture_output=True, text=True)
+                self.assertEqual(proc.returncode, 0, f"Client JS filter evaluation in Node failed: {proc.stderr}")
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
+
+
 
 if __name__ == "__main__":
     unittest.main()
