@@ -9,9 +9,9 @@ In `templates/src/scripts/app.js`:
 
 **Blocked by:** 01: Streamline TrackConfig and TrackRegistry Schema
 
-**Status:** todo
+**Status:** done
 
-- [ ] Remove hardcoded fallback arrays in `treeStructure`
-- [ ] Remove hardcoded fallback arrays in `resolveEntityReference`
-- [ ] Derive legacy prefix dynamically from `${t.id}/`
-- [ ] Verify client script syntax
+- [x] Remove hardcoded fallback arrays in `treeStructure`
+- [x] Remove hardcoded fallback arrays in `resolveEntityReference`
+- [x] Derive legacy prefix dynamically from `${t.id}/`
+- [x] Verify client script syntax
