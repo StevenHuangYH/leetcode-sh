@@ -9,9 +9,9 @@
 
 **Blocked by:** 02: Eliminate Client Speculative Fallbacks, 03: Complete Validator and Tracking Integrity Registry Adoption, 04: Harden Documentation Synchronizer
 
-**Status:** todo
+**Status:** done
 
-- [ ] Add high-seam tests in `tests/test_update_index.py`
-- [ ] Run `python3 update_index.py` to regenerate `index.html`
-- [ ] Run full test suite
-- [ ] Verify index.html contains updated client scripts
+- [x] Add high-seam tests in `tests/test_update_index.py`
+- [x] Run `python3 update_index.py` to regenerate `index.html`
+- [x] Run full test suite
+- [x] Verify index.html contains updated client scripts
