@@ -7,6 +7,7 @@ from .note_validator import (
     NoteStructureValidator,
     validate_note,
     audit_notes_directory,
+    audit_workspace_tracks,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "NoteStructureValidator",
     "validate_note",
     "audit_notes_directory",
+    "audit_workspace_tracks",
 ]

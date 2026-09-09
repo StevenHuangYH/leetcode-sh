@@ -166,6 +166,20 @@ This guide provides a comprehensive overview of object-oriented programming foun
         for name, res in top_100_results.items():
             self.assertTrue(res.is_valid, f"Top-100 note {name} failed validation: {res.errors}")
 
+    def test_audit_workspace_tracks(self):
+        """Assert audit_workspace_tracks audits all registered tracks across the repository."""
+        from scripts.validator.note_validator import audit_workspace_tracks
+        from scripts.compiler.track_definitions import TrackRegistry
+
+        track_results = audit_workspace_tracks(REPO_ROOT)
+        expected_tracks = set(TrackRegistry.get_track_paths())
+        self.assertEqual(set(track_results.keys()), expected_tracks)
+
+        for track_path, file_results in track_results.items():
+            self.assertTrue(len(file_results) > 0, f"Track {track_path} should contain audited notes")
+            for filename, result in file_results.items():
+                self.assertTrue(result.is_valid, f"Note {filename} in {track_path} failed: {result.errors}")
+
     def test_canonical_topology_data_cache_consistency(self):
         """Assert _get_canonical_topology_data caches keywords and entities properly."""
         from scripts.validator.note_validator import (

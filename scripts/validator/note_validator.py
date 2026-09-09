@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import List, Dict, Optional, Any, Set, Tuple
 from dataclasses import dataclass, field
 
+from scripts.compiler.track_definitions import TrackRegistry
+
 @dataclass
 class ValidationResult:
     is_valid: bool
@@ -319,6 +321,20 @@ def audit_notes_directory(dir_path: Path) -> Dict[str, ValidationResult]:
             results[md_file.name] = validator.validate(content, str(md_file))
         else:
             results[md_file.name] = validator.validate_non_problem_doc(content, str(md_file))
+
+    return results
+
+def audit_workspace_tracks(repo_root: Optional[Path] = None) -> Dict[str, Dict[str, ValidationResult]]:
+    """Audits all companion markdown notes across all registered workspace tracks."""
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parent.parent.parent
+    else:
+        repo_root = Path(repo_root)
+
+    results: Dict[str, Dict[str, ValidationResult]] = {}
+    for track_path in TrackRegistry.get_track_paths():
+        track_dir = repo_root / track_path
+        results[track_path] = audit_notes_directory(track_dir)
 
     return results
 
