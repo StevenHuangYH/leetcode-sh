@@ -7,7 +7,7 @@ In `scripts/sync_readme.py`:
 
 **Blocked by:** 01: Streamline TrackConfig and TrackRegistry Schema
 
-**Status:** todo
+**Status:** done
 
-- [ ] Remove raw string fallback in `generate_top_100_table` in `scripts/sync_readme.py`
-- [ ] Verify README generation via `python3 scripts/sync_readme.py` or unit tests
+- [x] Remove raw string fallback in `generate_top_100_table` in `scripts/sync_readme.py`
+- [x] Verify README generation via `python3 scripts/sync_readme.py` or unit tests
