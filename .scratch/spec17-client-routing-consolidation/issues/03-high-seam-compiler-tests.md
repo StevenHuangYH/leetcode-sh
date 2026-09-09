@@ -12,9 +12,9 @@ In `tests/test_update_index.py`:
 
 **Blocked by:** 02-centralize-startup-hash-routing.md
 
-**Status:** todo
+**Status:** done
 
-- [ ] Remove synthetic `resolveInitialHash` function from test string
-- [ ] Extract real compiled production routing/resolver routines from HTML
-- [ ] Add assertions verifying dynamic directory path substitution for standard and non-standard tracks
-- [ ] Assert zero `'problems/' + cleanPath` or `'problems/' + hashKey` literals in compiled HTML
+- [x] Remove synthetic `resolveInitialHash` function from test string
+- [x] Extract real compiled production routing/resolver routines from HTML
+- [x] Add assertions verifying dynamic directory path substitution for standard and non-standard tracks
+- [x] Assert zero `'problems/' + cleanPath` or `'problems/' + hashKey` literals in compiled HTML

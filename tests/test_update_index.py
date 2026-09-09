@@ -436,22 +436,42 @@ class TestUpdateIndexParser(unittest.TestCase):
 
         # Extract real compiled declarations from HTML
         tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
-        self.assertIsNotNone(tracks_decl_match)
+        self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
         tracks_decl = tracks_decl_match.group(0)
 
         resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
-        self.assertIsNotNone(resolver_match)
+        self.assertIsNotNone(resolver_match, "resolveEntityReference function must be in compiled HTML")
         resolver_fn = resolver_match.group(0)
+
+        router_match = re.search(r"function resolveInitialRoute\(rawHash\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
+        router_fn = router_match.group(0)
+
+        # Assert zero hardcoded 'problems/' prefix literals in routing / entity resolution routines and HTML
+        self.assertNotIn("problems/${", resolver_fn)
+        self.assertNotIn("'problems/' +", resolver_fn)
+        self.assertNotIn('"problems/" +', resolver_fn)
+        self.assertNotIn("problems/${", router_fn)
+        self.assertNotIn("'problems/' +", router_fn)
+        self.assertNotIn('"problems/" +', router_fn)
+        self.assertNotIn("'problems/' + cleanPath", html_text)
+        self.assertNotIn("'problems/' + hashKey", html_text)
+        self.assertNotIn('"problems/" + cleanPath', html_text)
+        self.assertNotIn('"problems/" + hashKey', html_text)
 
         js_code = f"""
         const items = {{
+          "README.md": {{ type: "doc", title: "Overview" }},
           "problems/top-100/lc-0001-two-sum.py": {{ type: "problem", lc_num: "LC 1", slug: "lc-0001-two-sum" }},
-          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }}
+          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }},
+          "external/custom/demo.py": {{ type: "problem", lc_num: "LC 999", slug: "demo" }}
         }};
         {tracks_decl}
+        configuredTracks.push({{ id: "custom", dir_path: "external/custom" }});
         {resolver_fn}
+        {router_fn}
 
-        // 1. Direct legacy path resolution (step 3)
+        // 1. Direct legacy path resolution on standard tracks (step 3)
         const r1 = resolveEntityReference("top-100/lc-0001-two-sum.md");
         if (!r1 || r1.key !== "problems/top-100/lc-0001-two-sum.py") {{
           console.error("Direct legacy md failed:", r1);
@@ -470,36 +490,37 @@ class TestUpdateIndexParser(unittest.TestCase):
           process.exit(3);
         }}
 
-        // 3. Hash redirection simulation
-        function resolveInitialHash(rawHash) {{
-          const hashKey = decodeURIComponent(rawHash.replace(/^#/, ""));
-          let currentKey = "README.md";
-          if (items[hashKey]) {{
-            currentKey = hashKey;
-          }} else if (hashKey.endsWith(".md") && items[hashKey.replace(/\\.md$/, ".py")]) {{
-            currentKey = hashKey.replace(/\\.md$/, ".py");
-          }} else if (Array.isArray(configuredTracks)) {{
-            for (const t of configuredTracks) {{
-              if (t.id && hashKey.startsWith(`${{t.id}}/`)) {{
-                const canonicalKey = `problems/${{hashKey}}`;
-                if (items[canonicalKey]) {{
-                  currentKey = canonicalKey;
-                  break;
-                }}
-                if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\\.md$/, ".py")]) {{
-                  currentKey = canonicalKey.replace(/\\.md$/, ".py");
-                  break;
-                }}
-              }}
-            }}
-          }}
-          return currentKey;
-        }}
-
-        if (resolveInitialHash("#top-100/lc-0001-two-sum.md") !== "problems/top-100/lc-0001-two-sum.py") {{
-          console.error("Hash legacy redirect failed");
+        // 3. Dynamic directory mapping on custom non-standard directory tracks
+        const rCustomMd = resolveEntityReference("custom/demo.md");
+        if (!rCustomMd || rCustomMd.key !== "external/custom/demo.py") {{
+          console.error("Custom track legacy md failed:", rCustomMd);
           process.exit(4);
         }}
+        const rCustomPy = resolveEntityReference("custom/demo.py");
+        if (!rCustomPy || rCustomPy.key !== "external/custom/demo.py") {{
+          console.error("Custom track py failed:", rCustomPy);
+          process.exit(5);
+        }}
+
+        // 4. Production startup hash routing delegation to resolveEntityReference
+        const route1 = resolveInitialRoute("#top-100/lc-0001-two-sum.md");
+        if (!route1 || route1.mode !== "workspace" || route1.key !== "problems/top-100/lc-0001-two-sum.py") {{
+          console.error("Initial route legacy md redirect failed:", route1);
+          process.exit(6);
+        }}
+
+        const routeRoadmap = resolveInitialRoute("#roadmap");
+        if (!routeRoadmap || routeRoadmap.mode !== "roadmap" || routeRoadmap.key !== "README.md") {{
+          console.error("Initial route roadmap failed:", routeRoadmap);
+          process.exit(7);
+        }}
+
+        const routeCustom = resolveInitialRoute("#custom/demo.md");
+        if (!routeCustom || routeCustom.mode !== "workspace" || routeCustom.key !== "external/custom/demo.py") {{
+          console.error("Initial route custom track failed:", routeCustom);
+          process.exit(8);
+        }}
+
         process.exit(0);
         """
         proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)
