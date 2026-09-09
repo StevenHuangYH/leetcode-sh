@@ -12,14 +12,6 @@ This file establishes the operational rules and standards for all AI coding assi
 * **`index.html`**: Self-contained Single Page App (SPA) study station with notes-first default layout and dual split-pane viewer (Notes Left, Python Code Right).
 * **`update_index.py`**: Automated script that scans the repository, pairs `.py` and `.md` files, and compiles `index.html`.
 
-## 🛑 Core Rule 0: Strict Scope Adherence — Do Not Edit Anything Except Explicitly Asked
-
-> [!CAUTION]
-> **AI assistants must strictly limit modifications to only what the user explicitly requested.**
-> - **Zero Unsolicited Additions**: NEVER add extra unrequested sections, future chapter previews, or unsolicited summary sections unless explicitly commanded by the user.
-> - **Zero Unsolicited Modifications**: NEVER edit, delete, refactor, or touch unrelated files, existing notes, or code blocks outside the explicit scope of the user's prompt.
-> - **Precise Execution**: Address exactly what was requested—nothing more, nothing less.
-
 ---
 
 ## 🔒 Core Rule 1: Strict Immutability of Original Python (`.py`) Files

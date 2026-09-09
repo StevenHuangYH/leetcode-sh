@@ -283,159 +283,228 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertNotIn("legacy_prefix", payload[0])
         self.assertEqual(set(payload[0].keys()), {"id", "dir_path", "display_label", "category_name"})
 
-    def test_study_station_compiler_injects_tracks_payload(self):
-        """Assert StudyStationCompiler generates index.html containing valid tracks JSON and no unreplaced placeholders."""
+    def _compile_index_html(self) -> str:
+        """Helper to compile study station to a temporary file and return its HTML text content."""
         from scripts.compiler.engine import compile_study_station
         import tempfile
-        
+
         with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
             tmp_path = Path(tmp.name)
         try:
             result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
-            self.assertTrue(result.success)
-            html_text = tmp_path.read_text(encoding="utf-8")
-            self.assertNotIn("{tracks_json}", html_text)
-            self.assertNotIn("{items_json}", html_text)
-            self.assertNotIn("{roadmap_graph_json}", html_text)
-            self.assertIn('"dir_path":"problems/top-100"', html_text)
-            self.assertIn('"dir_path":"problems/daily-practice"', html_text)
-            self.assertIn('"dir_path":"problems/luffy"', html_text)
+            self.assertTrue(result.success, f"Compilation failed: {result.error_message}")
+            return tmp_path.read_text(encoding="utf-8")
         finally:
             if tmp_path.exists():
                 tmp_path.unlink()
+
+    def test_study_station_compiler_injects_tracks_payload(self):
+        """Assert StudyStationCompiler generates index.html containing valid tracks JSON and no unreplaced placeholders."""
+        html_text = self._compile_index_html()
+        self.assertNotIn("{tracks_json}", html_text)
+        self.assertNotIn("{items_json}", html_text)
+        self.assertNotIn("{roadmap_graph_json}", html_text)
+        self.assertIn('"dir_path":"problems/top-100"', html_text)
+        self.assertIn('"dir_path":"problems/daily-practice"', html_text)
+        self.assertIn('"dir_path":"problems/luffy"', html_text)
 
     def test_compiled_html_contains_no_hardcoded_track_fallbacks(self):
         """Assert compiled index.html contains zero hardcoded fallback arrays or fallback branches for tracks."""
-        from scripts.compiler.engine import compile_study_station
-        import tempfile
+        html_text = self._compile_index_html()
 
-        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
-            tmp_path = Path(tmp.name)
-        try:
-            result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
-            self.assertTrue(result.success)
-            html_text = tmp_path.read_text(encoding="utf-8")
+        # Assert absence of ternary fallback in treeStructure
+        self.assertNotIn("dynamicTrackFolders.length > 0 ? dynamicTrackFolders :", html_text)
+        self.assertNotIn("(dynamicTrackFolders.length > 0", html_text)
 
-            # Assert absence of ternary fallback in treeStructure
-            self.assertNotIn("dynamicTrackFolders.length > 0 ? dynamicTrackFolders :", html_text)
-            self.assertNotIn("(dynamicTrackFolders.length > 0", html_text)
+        # Assert absence of searchTracks empty fallback in resolveEntityReference
+        self.assertNotIn("searchTracks.length === 0", html_text)
+        self.assertNotIn('searchTracks.push("problems/top-100"', html_text)
+        self.assertNotIn('searchTracks.push("problems/daily-practice"', html_text)
+        self.assertNotIn('searchTracks.push("problems/luffy"', html_text)
 
-            # Assert absence of searchTracks empty fallback in resolveEntityReference
-            self.assertNotIn("searchTracks.length === 0", html_text)
-            self.assertNotIn('searchTracks.push("problems/top-100"', html_text)
-            self.assertNotIn('searchTracks.push("problems/daily-practice"', html_text)
-            self.assertNotIn('searchTracks.push("problems/luffy"', html_text)
+        # Assert absence of old hardcoded fallback array elements
+        self.assertNotIn('name: "problems/top-100/"', html_text)
+        self.assertNotIn('name: "problems/daily-practice/"', html_text)
+        self.assertNotIn('name: "problems/luffy/"', html_text)
 
-            # Assert absence of old hardcoded fallback array elements
-            self.assertNotIn('name: "problems/top-100/"', html_text)
-            self.assertNotIn('name: "problems/daily-practice/"', html_text)
-            self.assertNotIn('name: "problems/luffy/"', html_text)
-
-            # Assert dynamicTrackFolders is constructed directly without fallback arrays
-            self.assertIn("const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({", html_text)
-            self.assertIn("...dynamicTrackFolders", html_text)
-        finally:
-            if tmp_path.exists():
-                tmp_path.unlink()
+        # Assert dynamicTrackFolders is constructed directly without fallback arrays
+        self.assertIn("const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({", html_text)
+        self.assertIn("...dynamicTrackFolders", html_text)
 
     def test_client_folder_filter_predicates_match_canonical_and_legacy_paths(self):
         """Assert client-side folder filter predicates match canonical and legacy paths while rejecting mismatches."""
-        from scripts.compiler.engine import compile_study_station
         from scripts.compiler.track_definitions import TrackRegistry
         import json
         import re
         import shutil
         import subprocess
-        import tempfile
 
-        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
-            tmp_path = Path(tmp.name)
-        try:
-            result = compile_study_station(REPO_ROOT, tmp_path, use_cache=True)
-            self.assertTrue(result.success)
-            html_text = tmp_path.read_text(encoding="utf-8")
+        html_text = self._compile_index_html()
 
-            # Verify predicate template syntax in compiled script
-            self.assertIn(
-                "filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`)",
+        # Verify predicate template syntax in compiled script
+        self.assertIn(
+            "filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`)",
+            html_text,
+            "Compiled script should define clean canonical and legacy prefix filter without schema creep"
+        )
+        self.assertNotIn("t.legacy_prefix", html_text)
+
+        # Parse injected tracks configuration directly from compiled HTML
+        tracks_match = re.search(r"const configuredTracks = (\[.*?\]);", html_text)
+        self.assertIsNotNone(tracks_match, "configuredTracks JSON payload must be present in compiled script")
+        tracks = json.loads(tracks_match.group(1))
+        self.assertEqual(len(tracks), len(TrackRegistry.get_all_tracks()))
+
+        # Evaluate filter behavior for each track against canonical, legacy, and cross-track keys in Python
+        for track in tracks:
+            track_id = track["id"]
+            dir_path = track["dir_path"]
+            filter_fn = lambda k, d=dir_path, tid=track_id: k.startswith(f"{d}/") or k.startswith(f"{tid}/")
+
+            # 1. Canonical directory paths must match
+            self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.py"))
+            self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.md"))
+
+            # 2. Legacy prefix paths must match
+            self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.py"))
+            self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.md"))
+
+            # 3. Cross-track mismatches must be rejected
+            for other_track in tracks:
+                if other_track["id"] == track_id:
+                    continue
+                other_dir = other_track["dir_path"]
+                other_id = other_track["id"]
+                self.assertFalse(filter_fn(f"{other_dir}/lc-0001-example.py"))
+                self.assertFalse(filter_fn(f"{other_id}/lc-0001-example.py"))
+
+            # 4. Partial substring collisions and non-track keys must be rejected
+            self.assertFalse(filter_fn(f"{dir_path}-suffix/lc-0001.py"))
+            self.assertFalse(filter_fn(f"{track_id}-suffix/lc-0001.py"))
+            self.assertFalse(filter_fn("README.md"))
+            self.assertFalse(filter_fn("topic-01-arrays-sliding-window"))
+            self.assertFalse(filter_fn("problem-index/topic-01"))
+
+        # Node.js runtime assertion of the exact compiled JS script extracted from HTML
+        node_bin = shutil.which("node")
+        if node_bin:
+            tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
+            self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
+            tracks_decl = tracks_decl_match.group(0)
+
+            folders_decl_match = re.search(
+                r"const dynamicTrackFolders = \(Array\.isArray\(configuredTracks\).*?\);",
                 html_text,
-                "Compiled script should define clean canonical and legacy prefix filter without schema creep"
+                re.DOTALL
             )
-            self.assertNotIn("t.legacy_prefix", html_text)
+            self.assertIsNotNone(folders_decl_match, "dynamicTrackFolders declaration must be in compiled HTML")
+            folders_decl = folders_decl_match.group(0)
 
-            # Parse injected tracks configuration directly from compiled HTML
-            tracks_match = re.search(r"const configuredTracks = (\[.*?\]);", html_text)
-            self.assertIsNotNone(tracks_match, "configuredTracks JSON payload must be present in compiled script")
-            tracks = json.loads(tracks_match.group(1))
-            self.assertEqual(len(tracks), len(TrackRegistry.get_all_tracks()))
+            js_test_script = f"""
+            {tracks_decl}
+            {folders_decl}
 
-            # Evaluate filter behavior for each track against canonical, legacy, and cross-track keys
-            for track in tracks:
-                track_id = track["id"]
-                dir_path = track["dir_path"]
-                filter_fn = lambda k, d=dir_path, tid=track_id: k.startswith(f"{d}/") or k.startswith(f"{tid}/")
-
-                # 1. Canonical directory paths must match
-                self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.py"))
-                self.assertTrue(filter_fn(f"{dir_path}/lc-0001-example.md"))
-
-                # 2. Legacy prefix paths must match
-                self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.py"))
-                self.assertTrue(filter_fn(f"{track_id}/lc-0001-example.md"))
-
-                # 3. Cross-track mismatches must be rejected
-                for other_track in tracks:
-                    if other_track["id"] == track_id:
-                        continue
-                    other_dir = other_track["dir_path"]
-                    other_id = other_track["id"]
-                    self.assertFalse(filter_fn(f"{other_dir}/lc-0001-example.py"))
-                    self.assertFalse(filter_fn(f"{other_id}/lc-0001-example.py"))
-
-                # 4. Partial substring collisions and non-track keys must be rejected
-                self.assertFalse(filter_fn(f"{dir_path}-suffix/lc-0001.py"))
-                self.assertFalse(filter_fn(f"{track_id}-suffix/lc-0001.py"))
-                self.assertFalse(filter_fn("README.md"))
-                self.assertFalse(filter_fn("topic-01-arrays-sliding-window"))
-                self.assertFalse(filter_fn("problem-index/topic-01"))
-
-            # Node.js runtime assertion of the exact compiled JS script
-            node_bin = shutil.which("node")
-            if node_bin:
-                js_test_script = f"""
-                const configuredTracks = {tracks_match.group(1)};
-                const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({{
-                  id: t.id,
-                  name: `${{t.dir_path}}/`,
-                  label: t.display_label,
-                  filter: k => k.startsWith(`${{t.dir_path}}/`) || k.startsWith(`${{t.id}}/`)
-                }}));
-
-                for (const t of configuredTracks) {{
-                  const folder = dynamicTrackFolders.find(f => f.id === t.id);
-                  if (!folder) process.exit(1);
-                  if (!folder.filter(`${{t.dir_path}}/lc-0001.py`)) process.exit(2);
-                  if (!folder.filter(`${{t.id}}/lc-0001.py`)) process.exit(3);
-                  if (folder.filter("README.md")) process.exit(4);
-                  if (folder.filter("topic-01-arrays")) process.exit(5);
-                  for (const other of configuredTracks) {{
-                    if (other.id !== t.id) {{
-                      if (folder.filter(`${{other.dir_path}}/lc-0001.py`)) process.exit(6);
-                      if (folder.filter(`${{other.id}}/lc-0001.py`)) process.exit(7);
-                    }}
-                  }}
+            for (const t of configuredTracks) {{
+              const folder = dynamicTrackFolders.find(f => f.id === t.id);
+              if (!folder) process.exit(1);
+              if (!folder.filter(`${{t.dir_path}}/lc-0001.py`)) process.exit(2);
+              if (!folder.filter(`${{t.id}}/lc-0001.py`)) process.exit(3);
+              if (folder.filter("README.md")) process.exit(4);
+              if (folder.filter("topic-01-arrays")) process.exit(5);
+              for (const other of configuredTracks) {{
+                if (other.id !== t.id) {{
+                  if (folder.filter(`${{other.dir_path}}/lc-0001.py`)) process.exit(6);
+                  if (folder.filter(`${{other.id}}/lc-0001.py`)) process.exit(7);
                 }}
-                process.exit(0);
-                """
-                proc = subprocess.run([node_bin, "-e", js_test_script], capture_output=True, text=True)
-                self.assertEqual(proc.returncode, 0, f"Client JS filter evaluation in Node failed: {proc.stderr}")
-        finally:
-            if tmp_path.exists():
-                tmp_path.unlink()
+              }}
+            }}
+            process.exit(0);
+            """
+            proc = subprocess.run([node_bin, "-e", js_test_script], capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, f"Client JS filter evaluation in Node failed: {proc.stderr}")
 
+    def test_client_entity_resolution_and_legacy_hash_redirection(self):
+        """Assert client-side resolveEntityReference and legacy hash router redirect correctly in Node.js."""
+        import re
+        import shutil
+        import subprocess
+
+        html_text = self._compile_index_html()
+        node_bin = shutil.which("node")
+        if not node_bin:
+            self.skipTest("node binary not found on PATH")
+
+        # Extract real compiled declarations from HTML
+        tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
+        self.assertIsNotNone(tracks_decl_match)
+        tracks_decl = tracks_decl_match.group(0)
+
+        resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(resolver_match)
+        resolver_fn = resolver_match.group(0)
+
+        js_code = f"""
+        const items = {{
+          "problems/top-100/lc-0001-two-sum.py": {{ type: "problem", lc_num: "LC 1", slug: "lc-0001-two-sum" }},
+          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }}
+        }};
+        {tracks_decl}
+        {resolver_fn}
+
+        // 1. Direct legacy path resolution (step 3)
+        const r1 = resolveEntityReference("top-100/lc-0001-two-sum.md");
+        if (!r1 || r1.key !== "problems/top-100/lc-0001-two-sum.py") {{
+          console.error("Direct legacy md failed:", r1);
+          process.exit(1);
+        }}
+        const r2 = resolveEntityReference("daily-practice/lc-0025-reverse-nodes-in-k-group.py");
+        if (!r2 || r2.key !== "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py") {{
+          console.error("Direct legacy py failed:", r2);
+          process.exit(2);
+        }}
+
+        // 2. Canonical stem resolution (step 4)
+        const r3 = resolveEntityReference("lc-0001-two-sum");
+        if (!r3 || r3.key !== "problems/top-100/lc-0001-two-sum.py") {{
+          console.error("Stem resolution failed:", r3);
+          process.exit(3);
+        }}
+
+        // 3. Hash redirection simulation
+        function resolveInitialHash(rawHash) {{
+          const hashKey = decodeURIComponent(rawHash.replace(/^#/, ""));
+          let currentKey = "README.md";
+          if (items[hashKey]) {{
+            currentKey = hashKey;
+          }} else if (hashKey.endsWith(".md") && items[hashKey.replace(/\\.md$/, ".py")]) {{
+            currentKey = hashKey.replace(/\\.md$/, ".py");
+          }} else if (Array.isArray(configuredTracks)) {{
+            for (const t of configuredTracks) {{
+              if (t.id && hashKey.startsWith(`${{t.id}}/`)) {{
+                const canonicalKey = `problems/${{hashKey}}`;
+                if (items[canonicalKey]) {{
+                  currentKey = canonicalKey;
+                  break;
+                }}
+                if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\\.md$/, ".py")]) {{
+                  currentKey = canonicalKey.replace(/\\.md$/, ".py");
+                  break;
+                }}
+              }}
+            }}
+          }}
+          return currentKey;
+        }}
+
+        if (resolveInitialHash("#top-100/lc-0001-two-sum.md") !== "problems/top-100/lc-0001-two-sum.py") {{
+          console.error("Hash legacy redirect failed");
+          process.exit(4);
+        }}
+        process.exit(0);
+        """
+        proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, f"Node client entity resolution failed: {proc.stderr}")
 
 
 if __name__ == "__main__":
     unittest.main()
-
-

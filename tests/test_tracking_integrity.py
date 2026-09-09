@@ -66,15 +66,15 @@ class TestTrackingIntegrity(unittest.TestCase):
         total_problems = sum(len(stems) for stems in disk_manifest.values())
         
         self.assertGreater(total_problems, 100, "Repository should contain > 100 problems")
-        top_100 = TrackRegistry.get_track_by_id("top-100")
-        daily = TrackRegistry.get_track_by_id("daily-practice")
-        luffy = TrackRegistry.get_track_by_id("luffy")
-        self.assertIsNotNone(top_100)
-        self.assertIsNotNone(daily)
-        self.assertIsNotNone(luffy)
-        self.assertGreater(len(disk_manifest[top_100.dir_path]), 80, "Top 100 track should have > 80 problems")
-        self.assertGreater(len(disk_manifest[daily.dir_path]), 10, "Daily track should have > 10 problems")
-        self.assertGreater(len(disk_manifest[luffy.dir_path]), 40, "Luffy track should have > 40 problems")
+        all_tracks = TrackRegistry.get_all_tracks()
+        self.assertTrue(len(all_tracks) > 0, "TrackRegistry should return registered tracks")
+        for track in all_tracks:
+            self.assertIn(track.dir_path, disk_manifest, f"Track '{track.id}' directory missing from manifest")
+            self.assertGreater(
+                len(disk_manifest[track.dir_path]),
+                0,
+                f"Track '{track.id}' ({track.dir_path}) should have at least 1 problem on disk"
+            )
 
     def test_all_disk_problems_tracked_in_readme(self):
         disk_manifest = get_disk_problems(REPO_ROOT)

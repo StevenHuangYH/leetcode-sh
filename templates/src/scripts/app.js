@@ -18,6 +18,32 @@ const items = {items_json};
       } else if (items[hashKey]) {
         currentKey = hashKey;
         mainMode = "workspace";
+      } else if (hashKey.endsWith(".md") && items[hashKey.replace(/\.md$/, ".py")]) {
+        currentKey = hashKey.replace(/\.md$/, ".py");
+        mainMode = "workspace";
+      } else if (hashKey.endsWith(".py") && items[hashKey.replace(/\.py$/, ".md")]) {
+        currentKey = hashKey.replace(/\.py$/, ".md");
+        mainMode = "workspace";
+      } else if (Array.isArray(configuredTracks)) {
+        for (const t of configuredTracks) {
+          if (t.id && hashKey.startsWith(`${t.id}/`)) {
+            const canonicalKey = `problems/${hashKey}`;
+            if (items[canonicalKey]) {
+              currentKey = canonicalKey;
+              mainMode = "workspace";
+              break;
+            }
+            if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\.md$/, ".py")]) {
+              currentKey = canonicalKey.replace(/\.md$/, ".py");
+              mainMode = "workspace";
+              break;
+            } else if (hashKey.endsWith(".py") && items[canonicalKey.replace(/\.py$/, ".md")]) {
+              currentKey = canonicalKey.replace(/\.py$/, ".md");
+              mainMode = "workspace";
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -579,6 +605,21 @@ const items = {items_json};
       if (cleanPath.startsWith("topic-") && items[cleanPath]) {
         return { key: cleanPath, anchor };
       }
+      if (Array.isArray(configuredTracks)) {
+        for (const t of configuredTracks) {
+          if (t.id && cleanPath.startsWith(`${t.id}/`)) {
+            const canonicalCandidate = `problems/${cleanPath}`;
+            if (items[canonicalCandidate]) return { key: canonicalCandidate, anchor };
+            if (cleanPath.endsWith(".md")) {
+              const pyKey = canonicalCandidate.replace(/\.md$/, ".py");
+              if (items[pyKey]) return { key: pyKey, anchor };
+            } else if (cleanPath.endsWith(".py")) {
+              const mdKey = canonicalCandidate.replace(/\.py$/, ".md");
+              if (items[mdKey]) return { key: mdKey, anchor };
+            }
+          }
+        }
+      }
 
       // 4. Track prefix fallback & Stem matching
       const stem = cleanPath.split("/").pop().replace(/\.(py|md)$/, "").toLowerCase();
@@ -586,7 +627,6 @@ const items = {items_json};
       if (Array.isArray(configuredTracks)) {
         for (const t of configuredTracks) {
           if (t.dir_path && !searchTracks.includes(t.dir_path)) searchTracks.push(t.dir_path);
-          if (t.id && !searchTracks.includes(t.id)) searchTracks.push(t.id);
         }
       }
       for (const track of searchTracks) {

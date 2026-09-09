@@ -20,7 +20,7 @@ from scripts.compiler import (
     compile_study_station,
 )
 
-from scripts.validator import audit_notes_directory
+from scripts.validator.note_validator import audit_workspace_tracks
 
 BASE_DIR = Path(__file__).parent.resolve()
 
@@ -79,16 +79,12 @@ def watch_mode():
 
 def run_lint_check(strict: bool = False) -> bool:
     """Audits all companion markdown notes across tracks."""
-    tracks = TrackRegistry.get_track_paths()
     total_audited = 0
     total_invalid = 0
 
     print("🔍 Auditing companion note active recall structures...")
-    for track in tracks:
-        track_dir = BASE_DIR / track
-        if not track_dir.exists():
-            continue
-        results = audit_notes_directory(track_dir)
+    track_results = audit_workspace_tracks(BASE_DIR)
+    for track, results in track_results.items():
         for name, res in results.items():
             total_audited += 1
             if not res.is_valid:
