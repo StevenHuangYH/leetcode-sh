@@ -9,7 +9,6 @@ class TrackConfig:
     dir_path: str
     display_label: str
     category_name: str
-    legacy_prefix: Optional[str] = None
 
     def to_client_descriptor(self) -> Dict[str, Any]:
         """Converts track configuration to JSON-serializable descriptor for client runtime."""
@@ -18,7 +17,6 @@ class TrackConfig:
             "dir_path": self.dir_path,
             "display_label": self.display_label,
             "category_name": self.category_name,
-            "legacy_prefix": self.legacy_prefix or f"{self.id}/"
         }
 
 
@@ -28,21 +26,18 @@ CANONICAL_TRACKS: List[TrackConfig] = [
         dir_path="problems/top-100",
         display_label="Top 100 Liked",
         category_name="Top 100 Liked Track",
-        legacy_prefix="top-100/"
     ),
     TrackConfig(
         id="daily-practice",
         dir_path="problems/daily-practice",
         display_label="Daily Practice",
         category_name="Daily Practice Track",
-        legacy_prefix="daily-practice/"
     ),
     TrackConfig(
         id="luffy",
         dir_path="problems/luffy",
         display_label="Curriculum (01-42)",
         category_name="Luffy Curriculum (01-42)",
-        legacy_prefix="luffy/"
     )
 ]
 

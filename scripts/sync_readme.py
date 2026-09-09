@@ -90,7 +90,9 @@ def parse_existing_descriptions(readme_text: str) -> Dict[int, Tuple[str, str, s
 
 def generate_top_100_table(existing_desc: dict, diff_map: dict) -> str:
     top_100_track = TrackRegistry.get_track_by_id("top-100")
-    top_100_rel = top_100_track.dir_path if top_100_track else "problems/top-100"
+    if not top_100_track:
+        raise RuntimeError("Canonical track 'top-100' is not registered in TrackRegistry.")
+    top_100_rel = top_100_track.dir_path
     top_100_dir = REPO_ROOT / top_100_rel
     stems = sorted(list(set(f.stem for f in top_100_dir.glob("lc-*"))))
     

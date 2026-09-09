@@ -18,6 +18,32 @@ const items = {items_json};
       } else if (items[hashKey]) {
         currentKey = hashKey;
         mainMode = "workspace";
+      } else if (hashKey.endsWith(".md") && items[hashKey.replace(/\.md$/, ".py")]) {
+        currentKey = hashKey.replace(/\.md$/, ".py");
+        mainMode = "workspace";
+      } else if (hashKey.endsWith(".py") && items[hashKey.replace(/\.py$/, ".md")]) {
+        currentKey = hashKey.replace(/\.py$/, ".md");
+        mainMode = "workspace";
+      } else if (Array.isArray(configuredTracks)) {
+        for (const t of configuredTracks) {
+          if (t.id && hashKey.startsWith(`${t.id}/`)) {
+            const canonicalKey = `problems/${hashKey}`;
+            if (items[canonicalKey]) {
+              currentKey = canonicalKey;
+              mainMode = "workspace";
+              break;
+            }
+            if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\.md$/, ".py")]) {
+              currentKey = canonicalKey.replace(/\.md$/, ".py");
+              mainMode = "workspace";
+              break;
+            } else if (hashKey.endsWith(".py") && items[canonicalKey.replace(/\.py$/, ".md")]) {
+              currentKey = canonicalKey.replace(/\.py$/, ".md");
+              mainMode = "workspace";
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -42,31 +68,12 @@ const items = {items_json};
       id: t.id,
       name: `${t.dir_path}/`,
       label: t.display_label,
-      filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`) || (t.legacy_prefix && k.startsWith(t.legacy_prefix))
+      filter: k => k.startsWith(`${t.dir_path}/`) || k.startsWith(`${t.id}/`)
     }));
 
     const treeStructure = [
       ...staticFolders,
-      ...(dynamicTrackFolders.length > 0 ? dynamicTrackFolders : [
-        {
-          id: "top-100",
-          name: "problems/top-100/",
-          label: "Top 100 Liked",
-          filter: k => k.startsWith("problems/top-100/") || k.startsWith("top-100/")
-        },
-        {
-          id: "daily-practice",
-          name: "problems/daily-practice/",
-          label: "Daily Practice",
-          filter: k => k.startsWith("problems/daily-practice/") || k.startsWith("daily-practice/")
-        },
-        {
-          id: "luffy",
-          name: "problems/luffy/",
-          label: "Curriculum (01-42)",
-          filter: k => k.startsWith("problems/luffy/") || k.startsWith("luffy/")
-        }
-      ])
+      ...dynamicTrackFolders
     ];
 
     function updateProgressBadge() {
@@ -598,6 +605,21 @@ const items = {items_json};
       if (cleanPath.startsWith("topic-") && items[cleanPath]) {
         return { key: cleanPath, anchor };
       }
+      if (Array.isArray(configuredTracks)) {
+        for (const t of configuredTracks) {
+          if (t.id && cleanPath.startsWith(`${t.id}/`)) {
+            const canonicalCandidate = `problems/${cleanPath}`;
+            if (items[canonicalCandidate]) return { key: canonicalCandidate, anchor };
+            if (cleanPath.endsWith(".md")) {
+              const pyKey = canonicalCandidate.replace(/\.md$/, ".py");
+              if (items[pyKey]) return { key: pyKey, anchor };
+            } else if (cleanPath.endsWith(".py")) {
+              const mdKey = canonicalCandidate.replace(/\.py$/, ".md");
+              if (items[mdKey]) return { key: mdKey, anchor };
+            }
+          }
+        }
+      }
 
       // 4. Track prefix fallback & Stem matching
       const stem = cleanPath.split("/").pop().replace(/\.(py|md)$/, "").toLowerCase();
@@ -605,15 +627,7 @@ const items = {items_json};
       if (Array.isArray(configuredTracks)) {
         for (const t of configuredTracks) {
           if (t.dir_path && !searchTracks.includes(t.dir_path)) searchTracks.push(t.dir_path);
-          if (t.id && !searchTracks.includes(t.id)) searchTracks.push(t.id);
-          if (t.legacy_prefix) {
-            const cleanLegacy = t.legacy_prefix.replace(/\/$/, "");
-            if (cleanLegacy && !searchTracks.includes(cleanLegacy)) searchTracks.push(cleanLegacy);
-          }
         }
-      }
-      if (searchTracks.length === 0) {
-        searchTracks.push("problems/top-100", "problems/daily-practice", "problems/luffy", "top-100", "daily-practice", "luffy");
       }
       for (const track of searchTracks) {
         const tryPy = `${track}/${stem}.py`;
