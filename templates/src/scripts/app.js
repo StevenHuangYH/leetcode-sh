@@ -608,14 +608,11 @@ const items = {items_json};
       if (Array.isArray(configuredTracks)) {
         for (const t of configuredTracks) {
           if (t.id && cleanPath.startsWith(`${t.id}/`)) {
-            const canonicalCandidate = `problems/${cleanPath}`;
+            const canonicalCandidate = `${t.dir_path}/${cleanPath.slice(t.id.length + 1)}`;
             if (items[canonicalCandidate]) return { key: canonicalCandidate, anchor };
             if (cleanPath.endsWith(".md")) {
               const pyKey = canonicalCandidate.replace(/\.md$/, ".py");
               if (items[pyKey]) return { key: pyKey, anchor };
-            } else if (cleanPath.endsWith(".py")) {
-              const mdKey = canonicalCandidate.replace(/\.py$/, ".md");
-              if (items[mdKey]) return { key: mdKey, anchor };
             }
           }
         }

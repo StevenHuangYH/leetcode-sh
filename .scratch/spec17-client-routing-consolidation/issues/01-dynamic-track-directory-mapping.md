@@ -10,9 +10,9 @@ In `templates/src/scripts/app.js` (`resolveEntityReference`):
 
 **Blocked by:** None (Frontier)
 
-**Status:** todo
+**Status:** done
 
-- [ ] Replace `'problems/' + cleanPath` with dynamic `${t.dir_path}/` replacement
-- [ ] Remove dead `.replace(/\.py$/, ".md")` lookup branch in step 3
-- [ ] Verify stem search collects unique `t.dir_path`
-- [ ] Confirm basic syntax integrity
+- [x] Replace `'problems/' + cleanPath` with dynamic `${t.dir_path}/` replacement
+- [x] Remove dead `.replace(/\.py$/, ".md")` lookup branch in step 3
+- [x] Verify stem search collects unique `t.dir_path`
+- [x] Confirm basic syntax integrity
