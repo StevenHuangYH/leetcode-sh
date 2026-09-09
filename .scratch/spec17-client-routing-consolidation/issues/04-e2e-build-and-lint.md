@@ -8,9 +8,9 @@
 
 **Blocked by:** 03-high-seam-compiler-tests.md
 
-**Status:** todo
+**Status:** done
 
-- [ ] Rebuild `index.html` via `python3 update_index.py`
-- [ ] Run `python3 update_index.py --lint` (pass all notes)
-- [ ] Run `python3 -m unittest discover tests` (all pass)
-- [ ] Verify clean build artifact
+- [x] Rebuild `index.html` via `python3 update_index.py`
+- [x] Run `python3 update_index.py --lint` (pass all notes)
+- [x] Run `python3 -m unittest discover tests` (all pass)
+- [x] Verify clean build artifact
