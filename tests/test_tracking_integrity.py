@@ -3,8 +3,10 @@ import unittest
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
+from scripts.compiler.track_definitions import TrackRegistry
+
 REPO_ROOT = Path(__file__).parent.parent
-TRACKS = ["problems/top-100", "problems/daily-practice", "problems/luffy"]
+TRACKS = TrackRegistry.get_track_paths()
 
 def get_disk_problems(repo_root: Path = REPO_ROOT) -> Dict[str, Set[str]]:
     disk_manifest: Dict[str, Set[str]] = {}
@@ -23,19 +25,20 @@ def get_disk_problems(repo_root: Path = REPO_ROOT) -> Dict[str, Set[str]]:
 
 def get_readme_tracked_problems(repo_root: Path = REPO_ROOT) -> Tuple[Dict[str, Set[str]], List[str]]:
     readme_path = repo_root / "README.md"
+    track_paths = TrackRegistry.get_track_paths()
     if not readme_path.exists():
-        return {track: set() for track in TRACKS}, []
+        return {track: set() for track in track_paths}, []
     
     readme_text = readme_path.read_text(encoding="utf-8")
     
-    tracked_manifest: Dict[str, Set[str]] = {
-        "problems/top-100": set(re.findall(r"problems/top-100/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
-        "problems/daily-practice": set(re.findall(r"problems/daily-practice/(lc-[a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
-        "problems/luffy": set(re.findall(r"problems/luffy/([a-zA-Z0-9\-]+)\.(?:py|md)", readme_text)),
-    }
+    tracked_manifest: Dict[str, Set[str]] = {}
+    for track in track_paths:
+        pattern = rf"{re.escape(track)}/([a-zA-Z0-9\-]+)\.(?:py|md)"
+        tracked_manifest[track] = set(re.findall(pattern, readme_text))
     
     # Extract all relative file links pointing to repository tracks
-    links = re.findall(r"\[.*?\]\(((?:problems/top-100|problems/daily-practice|problems/luffy)/[^)]+)\)", readme_text)
+    tracks_regex = "|".join(re.escape(track) for track in track_paths)
+    links = re.findall(rf"\[.*?\]\(((?:{tracks_regex})/[^)]+)\)", readme_text)
     return tracked_manifest, links
 
 
@@ -63,9 +66,15 @@ class TestTrackingIntegrity(unittest.TestCase):
         total_problems = sum(len(stems) for stems in disk_manifest.values())
         
         self.assertGreater(total_problems, 100, "Repository should contain > 100 problems")
-        self.assertGreater(len(disk_manifest["problems/top-100"]), 80, "Top 100 track should have > 80 problems")
-        self.assertGreater(len(disk_manifest["problems/daily-practice"]), 10, "Daily track should have > 10 problems")
-        self.assertGreater(len(disk_manifest["problems/luffy"]), 40, "Luffy track should have > 40 problems")
+        top_100 = TrackRegistry.get_track_by_id("top-100")
+        daily = TrackRegistry.get_track_by_id("daily-practice")
+        luffy = TrackRegistry.get_track_by_id("luffy")
+        self.assertIsNotNone(top_100)
+        self.assertIsNotNone(daily)
+        self.assertIsNotNone(luffy)
+        self.assertGreater(len(disk_manifest[top_100.dir_path]), 80, "Top 100 track should have > 80 problems")
+        self.assertGreater(len(disk_manifest[daily.dir_path]), 10, "Daily track should have > 10 problems")
+        self.assertGreater(len(disk_manifest[luffy.dir_path]), 40, "Luffy track should have > 40 problems")
 
     def test_all_disk_problems_tracked_in_readme(self):
         disk_manifest = get_disk_problems(REPO_ROOT)
