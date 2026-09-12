@@ -23,9 +23,9 @@ In `templates/src/scripts/app.js`:
 
 **Blocked by:** None (Frontier)
 
-**Status:** todo
+**Status:** done
 
-- [ ] Remove dead `.py` -> `.md` lookup branch in step 2 of `resolveEntityReference`
-- [ ] Remove dead `.py` -> `.md` lookup branch in stem matching (step 4)
-- [ ] Verify unidirectional `.md` -> `.py` conversion remains intact
-- [ ] Verify static `.md` documentation retains exact key matching
+- [x] Remove dead `.py` -> `.md` lookup branch in step 2 of `resolveEntityReference`
+- [x] Remove dead `.py` -> `.md` lookup branch in stem matching (step 4)
+- [x] Verify unidirectional `.md` -> `.py` conversion remains intact
+- [x] Verify static `.md` documentation retains exact key matching

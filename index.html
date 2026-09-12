@@ -1027,9 +1027,6 @@
       if (cleanPath.endsWith(".md")) {
         const pyKey = cleanPath.replace(/\.md$/, ".py");
         if (items[pyKey]) return { key: pyKey, anchor };
-      } else if (cleanPath.endsWith(".py")) {
-        const mdKey = cleanPath.replace(/\.py$/, ".md");
-        if (items[mdKey]) return { key: mdKey, anchor };
       }
       if (items[`problem-index/${cleanPath}`]) {
         return { key: `problem-index/${cleanPath}`, anchor };

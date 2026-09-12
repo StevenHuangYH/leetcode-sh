@@ -561,13 +561,10 @@ const items = {items_json};
         return { key: cleanPath, anchor };
       }
 
-      // 2. Extension swap match (.md <-> .py)
+      // 2. Companion note link conversion (.md -> .py)
       if (cleanPath.endsWith(".md")) {
         const pyKey = cleanPath.replace(/\.md$/, ".py");
         if (items[pyKey]) return { key: pyKey, anchor };
-      } else if (cleanPath.endsWith(".py")) {
-        const mdKey = cleanPath.replace(/\.py$/, ".md");
-        if (items[mdKey]) return { key: mdKey, anchor };
       }
 
       // 3. Problem index / topic docs match
