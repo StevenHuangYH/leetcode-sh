@@ -1084,27 +1084,50 @@
       return null;
     }
     function resolveInitialRoute(rawHash) {
+      const fallbackKey = (typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md";
+      const DEFAULT_ROUTE = { mode: "workspace", key: "README.md", anchor: "" };
+      const fallbackRoute = (typeof mainMode !== "undefined" && mainMode)
+        ? { ...DEFAULT_ROUTE, mode: mainMode }
+        : DEFAULT_ROUTE;
       if (!rawHash) {
-        return { mode: "workspace", key: "README.md", anchor: "" };
-      }
-      const cleanHash = rawHash.replace(/^#/, "");
-      if (!cleanHash) {
-        return { mode: "workspace", key: "README.md", anchor: "" };
+        return fallbackRoute;
       }
       let hashKey = "";
       try {
-        hashKey = decodeURIComponent(cleanHash);
+        hashKey = decodeURIComponent(rawHash);
       } catch (e) {
-        hashKey = cleanHash;
+        hashKey = rawHash;
       }
-      if (hashKey === "roadmap") {
+      const cleanHash = hashKey.replace(/^#/, "").trim();
+      if (!cleanHash) {
+        return fallbackRoute;
+      }
+      if (cleanHash === "roadmap") {
         return { mode: "roadmap", key: "README.md", anchor: "" };
       }
       const resolved = resolveEntityReference(hashKey);
-      if (resolved && resolved.key && items[resolved.key]) {
-        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+      if (resolved) {
+        if (resolved.isAnchorOnly) {
+          const targetEntity = resolveEntityReference(resolved.anchor);
+          if (targetEntity && targetEntity.key && items[targetEntity.key]) {
+            return { mode: "workspace", key: targetEntity.key, anchor: targetEntity.anchor || "" };
+          }
+          const isPathOrSlug = resolved.anchor.includes("/") ||
+            resolved.anchor.endsWith(".md") ||
+            resolved.anchor.endsWith(".py") ||
+            resolved.anchor.startsWith("topic-") ||
+            resolved.anchor.startsWith("lc-") ||
+            resolved.anchor.includes("slug");
+          if (isPathOrSlug) {
+            return fallbackRoute;
+          }
+          return { mode: "workspace", key: fallbackKey, anchor: resolved.anchor };
+        }
+        if (resolved.key && items[resolved.key]) {
+          return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+        }
       }
-      return { mode: "workspace", key: "README.md", anchor: "" };
+      return fallbackRoute;
     }
     function findHeadingElement(container, anchorId) {
       if (!container || !anchorId) return null;
