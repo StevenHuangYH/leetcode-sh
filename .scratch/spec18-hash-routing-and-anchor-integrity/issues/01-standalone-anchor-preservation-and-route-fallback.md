@@ -10,9 +10,9 @@ In `templates/src/scripts/app.js`:
 
 **Blocked by:** None (Frontier)
 
-**Status:** todo
+**Status:** done
 
-- [ ] Preserve leading `#` when passing hash to `resolveEntityReference` for anchor-only detection
-- [ ] Consolidate duplicated `{ mode: "workspace", key: "README.md", anchor: "" }` into a shared constant
-- [ ] Implement non-destructive route fallback
-- [ ] Ensure `resolveInitialRoute` returns `{ mode, key, anchor }` deterministically
+- [x] Preserve leading `#` when passing hash to `resolveEntityReference` for anchor-only detection
+- [x] Consolidate duplicated `{ mode: "workspace", key: "README.md", anchor: "" }` into a shared constant
+- [x] Implement non-destructive route fallback
+- [x] Ensure `resolveInitialRoute` returns `{ mode, key, anchor }` deterministically
