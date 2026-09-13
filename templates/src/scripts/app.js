@@ -9,6 +9,8 @@ const items = {items_json};
     let mobileTab = "notes"; // 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
+    let isInternalUrlUpdate = false;
+    let lastHandledHash = (typeof window !== "undefined" && window.location && window.location.hash) ? window.location.hash : "";
 
     // Check initial URL hash
     let initialAnchor = "";
@@ -146,9 +148,7 @@ const items = {items_json};
             <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
-        if (history.replaceState) {
-          history.replaceState(null, null, "#roadmap");
-        }
+        updateUrlHash("#roadmap");
         setTimeout(() => {
           if (!roadmapGraphInstance) {
             initRoadmapGraph();
@@ -415,11 +415,7 @@ const items = {items_json};
 
       setMainMode("workspace", false);
 
-      if (history.replaceState) {
-        history.replaceState(null, null, "#" + key);
-      } else {
-        window.location.hash = "#" + key;
-      }
+      updateUrlHash("#" + key);
 
       treeStructure.forEach(folder => {
         if (folder.filter && folder.filter(key) && collapsedFolders[folder.id]) {
@@ -700,6 +696,69 @@ const items = {items_json};
     }
 
     /**
+     * Updates the window URL hash while protecting against recursive hashchange loops.
+     */
+    function updateUrlHash(newHash) {
+      if (!newHash) return;
+      if (typeof window !== "undefined" && window.location && window.location.hash === newHash) {
+        lastHandledHash = newHash;
+        return;
+      }
+      isInternalUrlUpdate = true;
+      lastHandledHash = newHash;
+      try {
+        if (typeof history !== "undefined" && history.replaceState) {
+          history.replaceState(null, null, newHash);
+        } else if (typeof window !== "undefined" && window.location) {
+          window.location.hash = newHash;
+        }
+      } finally {
+        setTimeout(() => {
+          isInternalUrlUpdate = false;
+        }, 0);
+      }
+    }
+
+    /**
+     * Handles in-session window hashchange events, dispatching route updates,
+     * view mode transitions, and deep anchor scrolling without page reloads.
+     */
+    function handleHashChange() {
+      if (isInternalUrlUpdate) return;
+      const currentHash = window.location.hash;
+      if (currentHash === lastHandledHash) return;
+      lastHandledHash = currentHash;
+
+      const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
+      if (mode !== mainMode) {
+        setMainMode(mode, false);
+      }
+
+      if (mode === "workspace") {
+        const itemChanged = (key !== currentKey);
+        if (itemChanged && items[key]) {
+          switchItem(key);
+        }
+        if (anchor) {
+          const scrollTarget = () => {
+            const notesViewer = document.getElementById("notesViewer");
+            if (!notesViewer) return;
+            const targetEl = findHeadingElement(notesViewer, anchor);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          };
+
+          if (itemChanged) {
+            setTimeout(scrollTarget, DOM_RENDER_DELAY_MS);
+          } else {
+            scrollTarget();
+          }
+        }
+      }
+    }
+
+    /**
      * Enforces Notes-First view mode across desktop and mobile breakpoints.
      */
     function enforceNotesView() {
@@ -917,6 +976,7 @@ const items = {items_json};
     });
 
     // Initialize SPA
+    window.addEventListener("hashchange", handleHashChange);
     initLinkInterceptor();
     renderTree();
     updateProgressBadge();
