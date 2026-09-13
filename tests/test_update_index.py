@@ -95,6 +95,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIn("const DOM_RENDER_DELAY_MS = 60;", bundled_html)
         self.assertIn("function resolveEntityReference", bundled_html)
         self.assertIn("function findHeadingElement", bundled_html)
+        self.assertIn("function scrollToAnchor", bundled_html)
         self.assertIn("function initLinkInterceptor", bundled_html)
         self.assertIn("initLinkInterceptor();", bundled_html)
 
@@ -381,7 +382,11 @@ class TestUpdateIndexParser(unittest.TestCase):
             self.assertFalse(filter_fn("problem-index/topic-01"))
 
         # Node.js runtime assertion of the exact compiled JS script extracted from HTML
-        node_bin = shutil.which("node")
+        node_bin = shutil.which("node") or shutil.which("nodejs")
+        if not node_bin:
+            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
+            if fnm_candidates:
+                node_bin = str(fnm_candidates[-1])
         if node_bin:
             tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
             self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
@@ -439,6 +444,18 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
         router_fn = router_match.group(0)
 
+        heading_finder_match = re.search(r"function findHeadingElement\(.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(heading_finder_match, "findHeadingElement function must be in compiled HTML")
+        heading_finder_fn = heading_finder_match.group(0)
+
+        scroll_match = re.search(r"function scrollToAnchor\(.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(scroll_match, "scrollToAnchor function must be in compiled HTML")
+        scroll_fn = scroll_match.group(0)
+
+        hashchange_match = re.search(r"function handleHashChange\(\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(hashchange_match, "handleHashChange function must be in compiled HTML")
+        hashchange_fn = hashchange_match.group(0)
+
         # Assert zero hardcoded 'problems/' prefix literals in routing / entity resolution routines and HTML
         forbidden_fn_prefixes = ["problems/${", "'problems/' +", '"problems/" +']
         for fn_name, fn_code in [("resolveEntityReference", resolver_fn), ("resolveInitialRoute", router_fn)]:
@@ -463,11 +480,16 @@ class TestUpdateIndexParser(unittest.TestCase):
             for pattern in dead_extension_patterns:
                 self.assertNotIn(pattern, fn_code, f"Dead .py -> .md extension swap '{pattern}' found in {fn_name}")
 
-        # Assert window hashchange listener registration and handler existence in compiled HTML
+        # Assert window hashchange listener registration, handler, and scroll helper existence in compiled HTML
         self.assertIn('window.addEventListener("hashchange", handleHashChange)', html_text)
         self.assertIn("function handleHashChange()", html_text)
+        self.assertIn("function scrollToAnchor(", html_text)
 
         node_bin = shutil.which("node") or shutil.which("nodejs")
+        if not node_bin:
+            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
+            if fnm_candidates:
+                node_bin = str(fnm_candidates[-1])
         if not node_bin:
             self.skipTest("node binary not found on PATH")
 
@@ -478,10 +500,59 @@ class TestUpdateIndexParser(unittest.TestCase):
           "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }},
           "external/custom/demo.py": {{ type: "problem", lc_num: "LC 999", slug: "demo" }}
         }};
+        let mainMode = "workspace";
+        let currentKey = "README.md";
+        let isInternalUrlUpdate = false;
+        let lastHandledHash = "";
+        const DOM_RENDER_DELAY_MS = 60;
+
+        let switchedCalls = [];
+        function switchItem(key, rerenderSearch = true, syncHash = true) {{
+          switchedCalls.push({{ key, rerenderSearch, syncHash }});
+          currentKey = key;
+        }}
+
+        let modeChanges = [];
+        function setMainMode(mode, persist) {{
+          modeChanges.push({{ mode, persist }});
+          mainMode = mode;
+        }}
+
+        let scrolledTargets = [];
+        const fakeTargetEl = {{
+          scrollIntoView: (opts) => {{
+            scrolledTargets.push({{ el: "fakeTargetEl", opts }});
+          }}
+        }};
+
+        const fakeNotesViewer = {{
+          querySelector: (sel) => {{
+            if (sel.includes("complexity") || sel.includes("the-error-log") || sel.includes("walkthrough")) return fakeTargetEl;
+            return null;
+          }},
+          querySelectorAll: () => []
+        }};
+
+        global.document = {{
+          getElementById: (id) => {{
+            if (id === "notesViewer") return fakeNotesViewer;
+            return null;
+          }}
+        }};
+
+        global.window = {{
+          location: {{
+            hash: ""
+          }}
+        }};
+
         {tracks_decl}
         configuredTracks.push({{ id: "custom", dir_path: "external/custom" }});
         {resolver_fn}
         {router_fn}
+        {heading_finder_fn}
+        {scroll_fn}
+        {hashchange_fn}
 
         // 1. Direct legacy path resolution on standard tracks (step 3)
         const r1 = resolveEntityReference("top-100/lc-0001-two-sum.md");
@@ -552,6 +623,47 @@ class TestUpdateIndexParser(unittest.TestCase):
         if (!routeInvalid || routeInvalid.mode !== "workspace" || routeInvalid.key !== "README.md" || routeInvalid.anchor !== "") {{
           console.error("Invalid hash fallback failed:", routeInvalid);
           process.exit(11);
+        }}
+
+        // 8. Non-destructive mode preservation when mainMode = "roadmap"
+        mainMode = "roadmap";
+        const routeRoadmapPreserved = resolveInitialRoute("#nonexistent-slug-xyz");
+        if (!routeRoadmapPreserved || routeRoadmapPreserved.mode !== "roadmap" || routeRoadmapPreserved.key !== "README.md" || routeRoadmapPreserved.anchor !== "") {{
+          console.error("Roadmap mode preservation failed:", routeRoadmapPreserved);
+          process.exit(12);
+        }}
+        mainMode = "workspace";
+
+        // 9. Standalone section anchor preserves active non-README document key
+        currentKey = "problems/top-100/lc-0001-two-sum.py";
+        const routeAnchorActiveDoc = resolveInitialRoute("#the-error-log");
+        if (!routeAnchorActiveDoc || routeAnchorActiveDoc.mode !== "workspace" || routeAnchorActiveDoc.key !== "problems/top-100/lc-0001-two-sum.py" || routeAnchorActiveDoc.anchor !== "the-error-log") {{
+          console.error("Standalone anchor active doc failed:", routeAnchorActiveDoc);
+          process.exit(13);
+        }}
+        currentKey = "README.md";
+
+        // 10. Direct invocation of scrollToAnchor executes scrollIntoView
+        scrolledTargets = [];
+        scrollToAnchor("complexity", 0);
+        if (scrolledTargets.length !== 1 || scrolledTargets[0].opts.behavior !== "smooth") {{
+          console.error("scrollToAnchor failed:", scrolledTargets);
+          process.exit(14);
+        }}
+
+        // 11. Reactive in-session hash change via handleHashChange passes syncHash=false to avoid stripping anchor
+        switchedCalls = [];
+        scrolledTargets = [];
+        window.location.hash = "#problems/top-100/lc-0001-two-sum.py#complexity";
+        handleHashChange();
+        if (switchedCalls.length !== 1) {{
+          console.error("handleHashChange switchItem call count mismatch:", switchedCalls);
+          process.exit(15);
+        }}
+        const lastCall = switchedCalls[0];
+        if (lastCall.key !== "problems/top-100/lc-0001-two-sum.py" || lastCall.syncHash !== false) {{
+          console.error("handleHashChange failed to pass syncHash=false:", lastCall);
+          process.exit(16);
         }}
 
         process.exit(0);
