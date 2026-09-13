@@ -408,14 +408,16 @@ const items = {items_json};
       return html;
     }
     
-    function switchItem(key, rerenderSearch = true) {
+    function switchItem(key, rerenderSearch = true, syncHash = true) {
       if (!items[key]) return;
       currentKey = key;
       const item = items[key];
 
       setMainMode("workspace", false);
 
-      updateUrlHash("#" + key);
+      if (syncHash) {
+        updateUrlHash("#" + key);
+      }
 
       treeStructure.forEach(folder => {
         if (folder.filter && folder.filter(key) && collapsedFolders[folder.id]) {
@@ -652,28 +654,44 @@ const items = {items_json};
         return { mode: "roadmap", key: "README.md", anchor: "" };
       }
 
-      // Preserve leading '#' for anchor-only detection in resolveEntityReference
-      const resolved = resolveEntityReference(hashKey);
-      if (resolved) {
-        if (resolved.isAnchorOnly) {
-          const targetEntity = resolveEntityReference(resolved.anchor);
-          if (targetEntity && targetEntity.key && items[targetEntity.key]) {
-            return { mode: "workspace", key: targetEntity.key, anchor: targetEntity.anchor || "" };
-          }
-          const isPathOrSlug = resolved.anchor.includes("/") ||
-            resolved.anchor.endsWith(".md") ||
-            resolved.anchor.endsWith(".py") ||
-            resolved.anchor.startsWith("topic-") ||
-            resolved.anchor.startsWith("lc-") ||
-            resolved.anchor.includes("slug");
-          if (isPathOrSlug) {
-            return fallbackRoute;
-          }
-          return { mode: "workspace", key: fallbackKey, anchor: resolved.anchor };
+      if (cleanHash.includes("#")) {
+        const hashIdx = cleanHash.indexOf("#");
+        const docRef = cleanHash.slice(0, hashIdx).trim();
+        const anchor = cleanHash.slice(hashIdx + 1).trim();
+        const resolved = resolveEntityReference(docRef);
+        if (resolved && resolved.key && items[resolved.key]) {
+          return { mode: "workspace", key: resolved.key, anchor: anchor || resolved.anchor || "" };
         }
-        if (resolved.key && items[resolved.key]) {
-          return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
-        }
+        return fallbackRoute;
+      }
+
+      const resolved = resolveEntityReference(cleanHash);
+      if (resolved && resolved.key && items[resolved.key]) {
+        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+      }
+
+      const STANDALONE_SECTION_ANCHORS = new Set([
+        "complexity",
+        "complexity-analysis",
+        "the-error-log",
+        "error-log",
+        "walkthrough",
+        "step-by-step-code-walkthrough",
+        "code-walkthrough",
+        "constraints",
+        "problem-statement-and-constraints",
+        "problem-statement",
+        "mental-model",
+        "core-idea",
+        "core-idea-mental-model-and-pattern-lineage",
+        "interview-simulation",
+        "interview-simulation-alternative-paradigms-and-follow-up-pivots",
+        "header",
+        "file-links"
+      ]);
+
+      if (STANDALONE_SECTION_ANCHORS.has(cleanHash.toLowerCase())) {
+        return { mode: "workspace", key: fallbackKey, anchor: cleanHash };
       }
 
       return fallbackRoute;
@@ -693,6 +711,27 @@ const items = {items_json};
         const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
         return slug1 === cleanAnchor || slug2 === cleanAnchor || cleanHeading === cleanAnchor;
       }) || null;
+    }
+
+    /**
+     * Scrolls the notes viewer to a target heading matching the anchor.
+     * Optionally waits for delay ms (e.g. DOM_RENDER_DELAY_MS) before scrolling.
+     */
+    function scrollToAnchor(anchor, delay = 0) {
+      if (!anchor) return;
+      const doScroll = () => {
+        const notesViewer = document.getElementById("notesViewer");
+        if (!notesViewer) return;
+        const targetEl = findHeadingElement(notesViewer, anchor);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      };
+      if (delay > 0) {
+        setTimeout(doScroll, delay);
+      } else {
+        doScroll();
+      }
     }
 
     /**
@@ -737,23 +776,10 @@ const items = {items_json};
       if (mode === "workspace") {
         const itemChanged = (key !== currentKey);
         if (itemChanged && items[key]) {
-          switchItem(key);
+          switchItem(key, true, false);
         }
         if (anchor) {
-          const scrollTarget = () => {
-            const notesViewer = document.getElementById("notesViewer");
-            if (!notesViewer) return;
-            const targetEl = findHeadingElement(notesViewer, anchor);
-            if (targetEl) {
-              targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-          };
-
-          if (itemChanged) {
-            setTimeout(scrollTarget, DOM_RENDER_DELAY_MS);
-          } else {
-            scrollTarget();
-          }
+          scrollToAnchor(anchor, itemChanged ? DOM_RENDER_DELAY_MS : 0);
         }
       }
     }
@@ -797,12 +823,8 @@ const items = {items_json};
             switchItem(anchorId);
             return;
           }
-          const notesViewer = document.getElementById("notesViewer");
-          if (!notesViewer) return;
-          const targetEl = findHeadingElement(notesViewer, anchorId);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+          scrollToAnchor(anchorId);
+          updateUrlHash(currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`);
           return;
         }
 
@@ -817,12 +839,7 @@ const items = {items_json};
           switchItem(targetKey);
 
           if (resolved.anchor) {
-            setTimeout(() => {
-              const notesViewer = document.getElementById("notesViewer");
-              if (!notesViewer) return;
-              const targetEl = findHeadingElement(notesViewer, resolved.anchor);
-              if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, DOM_RENDER_DELAY_MS);
+            scrollToAnchor(resolved.anchor, DOM_RENDER_DELAY_MS);
           }
           return;
         } else if (isRelativeDocLink) {
@@ -985,15 +1002,8 @@ const items = {items_json};
       setMainMode("roadmap");
     } else {
       setMainMode("workspace", false);
-      switchItem(currentKey);
+      switchItem(currentKey, true, !initialAnchor);
       if (initialAnchor) {
-        setTimeout(() => {
-          const notesViewer = document.getElementById("notesViewer");
-          if (!notesViewer) return;
-          const targetEl = findHeadingElement(notesViewer, initialAnchor);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }, DOM_RENDER_DELAY_MS);
+        scrollToAnchor(initialAnchor, DOM_RENDER_DELAY_MS);
       }
     }
