@@ -95,6 +95,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIn("const DOM_RENDER_DELAY_MS = 60;", bundled_html)
         self.assertIn("function resolveEntityReference", bundled_html)
         self.assertIn("function findHeadingElement", bundled_html)
+        self.assertIn("function scrollToAnchor", bundled_html)
         self.assertIn("function initLinkInterceptor", bundled_html)
         self.assertIn("initLinkInterceptor();", bundled_html)
 
@@ -318,14 +319,9 @@ class TestUpdateIndexParser(unittest.TestCase):
 
         # Assert absence of searchTracks empty fallback in resolveEntityReference
         self.assertNotIn("searchTracks.length === 0", html_text)
-        self.assertNotIn('searchTracks.push("problems/top-100"', html_text)
-        self.assertNotIn('searchTracks.push("problems/daily-practice"', html_text)
-        self.assertNotIn('searchTracks.push("problems/luffy"', html_text)
-
-        # Assert absence of old hardcoded fallback array elements
-        self.assertNotIn('name: "problems/top-100/"', html_text)
-        self.assertNotIn('name: "problems/daily-practice/"', html_text)
-        self.assertNotIn('name: "problems/luffy/"', html_text)
+        for track_id in ["top-100", "daily-practice", "luffy"]:
+            self.assertNotIn(f'searchTracks.push("problems/{track_id}"', html_text)
+            self.assertNotIn(f'name: "problems/{track_id}/"', html_text)
 
         # Assert dynamicTrackFolders is constructed directly without fallback arrays
         self.assertIn("const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({", html_text)
@@ -386,7 +382,11 @@ class TestUpdateIndexParser(unittest.TestCase):
             self.assertFalse(filter_fn("problem-index/topic-01"))
 
         # Node.js runtime assertion of the exact compiled JS script extracted from HTML
-        node_bin = shutil.which("node")
+        node_bin = shutil.which("node") or shutil.which("nodejs")
+        if not node_bin:
+            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
+            if fnm_candidates:
+                node_bin = str(fnm_candidates[-1])
         if node_bin:
             tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
             self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
@@ -430,28 +430,131 @@ class TestUpdateIndexParser(unittest.TestCase):
         import subprocess
 
         html_text = self._compile_index_html()
-        node_bin = shutil.which("node")
-        if not node_bin:
-            self.skipTest("node binary not found on PATH")
 
         # Extract real compiled declarations from HTML
         tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
-        self.assertIsNotNone(tracks_decl_match)
+        self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
         tracks_decl = tracks_decl_match.group(0)
 
         resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
-        self.assertIsNotNone(resolver_match)
+        self.assertIsNotNone(resolver_match, "resolveEntityReference function must be in compiled HTML")
         resolver_fn = resolver_match.group(0)
+
+        router_match = re.search(r"function resolveInitialRoute\(rawHash\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
+        router_fn = router_match.group(0)
+
+        heading_finder_match = re.search(r"function findHeadingElement\(.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(heading_finder_match, "findHeadingElement function must be in compiled HTML")
+        heading_finder_fn = heading_finder_match.group(0)
+
+        scroll_match = re.search(r"function scrollToAnchor\(.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(scroll_match, "scrollToAnchor function must be in compiled HTML")
+        scroll_fn = scroll_match.group(0)
+
+        hashchange_match = re.search(r"function handleHashChange\(\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(hashchange_match, "handleHashChange function must be in compiled HTML")
+        hashchange_fn = hashchange_match.group(0)
+
+        # Assert zero hardcoded 'problems/' prefix literals in routing / entity resolution routines and HTML
+        forbidden_fn_prefixes = ["problems/${", "'problems/' +", '"problems/" +']
+        for fn_name, fn_code in [("resolveEntityReference", resolver_fn), ("resolveInitialRoute", router_fn)]:
+            for prefix in forbidden_fn_prefixes:
+                self.assertNotIn(prefix, fn_code, f"Forbidden prefix '{prefix}' found in {fn_name}")
+
+        forbidden_html_patterns = [
+            "'problems/' + cleanPath",
+            "'problems/' + hashKey",
+            '"problems/" + cleanPath',
+            '"problems/" + hashKey',
+        ]
+        for pattern in forbidden_html_patterns:
+            self.assertNotIn(pattern, html_text)
+
+        # Assert zero dead reverse .py -> .md extension swapping in resolver and router
+        dead_extension_patterns = [
+            r'.replace(/\.py$/, ".md")',
+            r".replace(/\.py$/, '.md')",
+        ]
+        for fn_name, fn_code in [("resolveEntityReference", resolver_fn), ("resolveInitialRoute", router_fn)]:
+            for pattern in dead_extension_patterns:
+                self.assertNotIn(pattern, fn_code, f"Dead .py -> .md extension swap '{pattern}' found in {fn_name}")
+
+        # Assert window hashchange listener registration, handler, and scroll helper existence in compiled HTML
+        self.assertIn('window.addEventListener("hashchange", handleHashChange)', html_text)
+        self.assertIn("function handleHashChange()", html_text)
+        self.assertIn("function scrollToAnchor(", html_text)
+
+        node_bin = shutil.which("node") or shutil.which("nodejs")
+        if not node_bin:
+            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
+            if fnm_candidates:
+                node_bin = str(fnm_candidates[-1])
+        if not node_bin:
+            self.skipTest("node binary not found on PATH")
 
         js_code = f"""
         const items = {{
+          "README.md": {{ type: "doc", title: "Overview" }},
           "problems/top-100/lc-0001-two-sum.py": {{ type: "problem", lc_num: "LC 1", slug: "lc-0001-two-sum" }},
-          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }}
+          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }},
+          "external/custom/demo.py": {{ type: "problem", lc_num: "LC 999", slug: "demo" }}
         }};
-        {tracks_decl}
-        {resolver_fn}
+        let mainMode = "workspace";
+        let currentKey = "README.md";
+        let isInternalUrlUpdate = false;
+        let lastHandledHash = "";
+        const DOM_RENDER_DELAY_MS = 60;
 
-        // 1. Direct legacy path resolution (step 3)
+        let switchedCalls = [];
+        function switchItem(key, rerenderSearch = true, syncHash = true) {{
+          switchedCalls.push({{ key, rerenderSearch, syncHash }});
+          currentKey = key;
+        }}
+
+        let modeChanges = [];
+        function setMainMode(mode, persist) {{
+          modeChanges.push({{ mode, persist }});
+          mainMode = mode;
+        }}
+
+        let scrolledTargets = [];
+        const fakeTargetEl = {{
+          scrollIntoView: (opts) => {{
+            scrolledTargets.push({{ el: "fakeTargetEl", opts }});
+          }}
+        }};
+
+        const fakeNotesViewer = {{
+          querySelector: (sel) => {{
+            if (sel.includes("complexity") || sel.includes("the-error-log") || sel.includes("walkthrough")) return fakeTargetEl;
+            return null;
+          }},
+          querySelectorAll: () => []
+        }};
+
+        global.document = {{
+          getElementById: (id) => {{
+            if (id === "notesViewer") return fakeNotesViewer;
+            return null;
+          }}
+        }};
+
+        global.window = {{
+          location: {{
+            hash: ""
+          }}
+        }};
+
+        {tracks_decl}
+        configuredTracks.push({{ id: "custom", dir_path: "external/custom" }});
+        {resolver_fn}
+        {router_fn}
+        {heading_finder_fn}
+        {scroll_fn}
+        {hashchange_fn}
+
+        // 1. Direct legacy path resolution on standard tracks (step 3)
         const r1 = resolveEntityReference("top-100/lc-0001-two-sum.md");
         if (!r1 || r1.key !== "problems/top-100/lc-0001-two-sum.py") {{
           console.error("Direct legacy md failed:", r1);
@@ -470,36 +573,99 @@ class TestUpdateIndexParser(unittest.TestCase):
           process.exit(3);
         }}
 
-        // 3. Hash redirection simulation
-        function resolveInitialHash(rawHash) {{
-          const hashKey = decodeURIComponent(rawHash.replace(/^#/, ""));
-          let currentKey = "README.md";
-          if (items[hashKey]) {{
-            currentKey = hashKey;
-          }} else if (hashKey.endsWith(".md") && items[hashKey.replace(/\\.md$/, ".py")]) {{
-            currentKey = hashKey.replace(/\\.md$/, ".py");
-          }} else if (Array.isArray(configuredTracks)) {{
-            for (const t of configuredTracks) {{
-              if (t.id && hashKey.startsWith(`${{t.id}}/`)) {{
-                const canonicalKey = `problems/${{hashKey}}`;
-                if (items[canonicalKey]) {{
-                  currentKey = canonicalKey;
-                  break;
-                }}
-                if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\\.md$/, ".py")]) {{
-                  currentKey = canonicalKey.replace(/\\.md$/, ".py");
-                  break;
-                }}
-              }}
-            }}
-          }}
-          return currentKey;
-        }}
-
-        if (resolveInitialHash("#top-100/lc-0001-two-sum.md") !== "problems/top-100/lc-0001-two-sum.py") {{
-          console.error("Hash legacy redirect failed");
+        // 3. Dynamic directory mapping on custom non-standard directory tracks
+        const rCustomMd = resolveEntityReference("custom/demo.md");
+        if (!rCustomMd || rCustomMd.key !== "external/custom/demo.py") {{
+          console.error("Custom track legacy md failed:", rCustomMd);
           process.exit(4);
         }}
+        const rCustomPy = resolveEntityReference("custom/demo.py");
+        if (!rCustomPy || rCustomPy.key !== "external/custom/demo.py") {{
+          console.error("Custom track py failed:", rCustomPy);
+          process.exit(5);
+        }}
+
+        // 4. Static document resolution
+        const rDoc = resolveEntityReference("README.md");
+        if (!rDoc || rDoc.key !== "README.md" || rDoc.anchor !== "") {{
+          console.error("Static document resolution failed:", rDoc);
+          process.exit(6);
+        }}
+
+        // 5. Production startup hash routing delegation to resolveEntityReference
+        const route1 = resolveInitialRoute("#top-100/lc-0001-two-sum.md");
+        if (!route1 || route1.mode !== "workspace" || route1.key !== "problems/top-100/lc-0001-two-sum.py") {{
+          console.error("Initial route legacy md redirect failed:", route1);
+          process.exit(7);
+        }}
+
+        const routeRoadmap = resolveInitialRoute("#roadmap");
+        if (!routeRoadmap || routeRoadmap.mode !== "roadmap" || routeRoadmap.key !== "README.md") {{
+          console.error("Initial route roadmap failed:", routeRoadmap);
+          process.exit(8);
+        }}
+
+        const routeCustom = resolveInitialRoute("#custom/demo.md");
+        if (!routeCustom || routeCustom.mode !== "workspace" || routeCustom.key !== "external/custom/demo.py") {{
+          console.error("Initial route custom track failed:", routeCustom);
+          process.exit(9);
+        }}
+
+        // 6. Standalone anchor resolution
+        const routeAnchor = resolveInitialRoute("#complexity");
+        if (!routeAnchor || routeAnchor.mode !== "workspace" || routeAnchor.key !== "README.md" || routeAnchor.anchor !== "complexity") {{
+          console.error("Standalone anchor resolution failed:", routeAnchor);
+          process.exit(10);
+        }}
+
+        // 7. Invalid hash fallback preserves safety without crashing
+        const routeInvalid = resolveInitialRoute("#nonexistent-slug-xyz");
+        if (!routeInvalid || routeInvalid.mode !== "workspace" || routeInvalid.key !== "README.md" || routeInvalid.anchor !== "") {{
+          console.error("Invalid hash fallback failed:", routeInvalid);
+          process.exit(11);
+        }}
+
+        // 8. Non-destructive mode preservation when mainMode = "roadmap"
+        mainMode = "roadmap";
+        const routeRoadmapPreserved = resolveInitialRoute("#nonexistent-slug-xyz");
+        if (!routeRoadmapPreserved || routeRoadmapPreserved.mode !== "roadmap" || routeRoadmapPreserved.key !== "README.md" || routeRoadmapPreserved.anchor !== "") {{
+          console.error("Roadmap mode preservation failed:", routeRoadmapPreserved);
+          process.exit(12);
+        }}
+        mainMode = "workspace";
+
+        // 9. Standalone section anchor preserves active non-README document key
+        currentKey = "problems/top-100/lc-0001-two-sum.py";
+        const routeAnchorActiveDoc = resolveInitialRoute("#the-error-log");
+        if (!routeAnchorActiveDoc || routeAnchorActiveDoc.mode !== "workspace" || routeAnchorActiveDoc.key !== "problems/top-100/lc-0001-two-sum.py" || routeAnchorActiveDoc.anchor !== "the-error-log") {{
+          console.error("Standalone anchor active doc failed:", routeAnchorActiveDoc);
+          process.exit(13);
+        }}
+        currentKey = "README.md";
+
+        // 10. Direct invocation of scrollToAnchor executes scrollIntoView
+        scrolledTargets = [];
+        scrollToAnchor("complexity", 0);
+        if (scrolledTargets.length !== 1 || scrolledTargets[0].opts.behavior !== "smooth") {{
+          console.error("scrollToAnchor failed:", scrolledTargets);
+          process.exit(14);
+        }}
+
+        // 11. Reactive in-session hash change via handleHashChange passes syncHash=false to avoid stripping anchor
+        switchedCalls = [];
+        scrolledTargets = [];
+        window.location.hash = "#problems/top-100/lc-0001-two-sum.py#complexity";
+        handleHashChange();
+        if (switchedCalls.length !== 1) {{
+          console.error("handleHashChange switchItem call count mismatch:", switchedCalls);
+          process.exit(15);
+        }}
+        const lastCall = switchedCalls[0];
+        if (lastCall.key !== "problems/top-100/lc-0001-two-sum.py" || lastCall.syncHash !== false) {{
+          console.error("handleHashChange failed to pass syncHash=false:", lastCall);
+          process.exit(16);
+        }}
+
         process.exit(0);
         """
         proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)

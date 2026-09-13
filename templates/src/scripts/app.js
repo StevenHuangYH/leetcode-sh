@@ -9,42 +9,16 @@ const items = {items_json};
     let mobileTab = "notes"; // 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
+    let isInternalUrlUpdate = false;
+    let lastHandledHash = (typeof window !== "undefined" && window.location && window.location.hash) ? window.location.hash : "";
 
     // Check initial URL hash
+    let initialAnchor = "";
     if (window.location.hash && window.location.hash.length > 1) {
-      const hashKey = decodeURIComponent(window.location.hash.substring(1));
-      if (hashKey === "roadmap") {
-        mainMode = "roadmap";
-      } else if (items[hashKey]) {
-        currentKey = hashKey;
-        mainMode = "workspace";
-      } else if (hashKey.endsWith(".md") && items[hashKey.replace(/\.md$/, ".py")]) {
-        currentKey = hashKey.replace(/\.md$/, ".py");
-        mainMode = "workspace";
-      } else if (hashKey.endsWith(".py") && items[hashKey.replace(/\.py$/, ".md")]) {
-        currentKey = hashKey.replace(/\.py$/, ".md");
-        mainMode = "workspace";
-      } else if (Array.isArray(configuredTracks)) {
-        for (const t of configuredTracks) {
-          if (t.id && hashKey.startsWith(`${t.id}/`)) {
-            const canonicalKey = `problems/${hashKey}`;
-            if (items[canonicalKey]) {
-              currentKey = canonicalKey;
-              mainMode = "workspace";
-              break;
-            }
-            if (hashKey.endsWith(".md") && items[canonicalKey.replace(/\.md$/, ".py")]) {
-              currentKey = canonicalKey.replace(/\.md$/, ".py");
-              mainMode = "workspace";
-              break;
-            } else if (hashKey.endsWith(".py") && items[canonicalKey.replace(/\.py$/, ".md")]) {
-              currentKey = canonicalKey.replace(/\.py$/, ".md");
-              mainMode = "workspace";
-              break;
-            }
-          }
-        }
-      }
+      const initialRoute = resolveInitialRoute(window.location.hash);
+      mainMode = initialRoute.mode;
+      currentKey = initialRoute.key;
+      initialAnchor = initialRoute.anchor;
     }
 
     // Tree folder structure definitions matching README.md repo structure
@@ -174,9 +148,7 @@ const items = {items_json};
             <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
-        if (history.replaceState) {
-          history.replaceState(null, null, "#roadmap");
-        }
+        updateUrlHash("#roadmap");
         setTimeout(() => {
           if (!roadmapGraphInstance) {
             initRoadmapGraph();
@@ -436,17 +408,15 @@ const items = {items_json};
       return html;
     }
     
-    function switchItem(key, rerenderSearch = true) {
+    function switchItem(key, rerenderSearch = true, syncHash = true) {
       if (!items[key]) return;
       currentKey = key;
       const item = items[key];
 
       setMainMode("workspace", false);
 
-      if (history.replaceState) {
-        history.replaceState(null, null, "#" + key);
-      } else {
-        window.location.hash = "#" + key;
+      if (syncHash) {
+        updateUrlHash("#" + key);
       }
 
       treeStructure.forEach(folder => {
@@ -589,13 +559,10 @@ const items = {items_json};
         return { key: cleanPath, anchor };
       }
 
-      // 2. Extension swap match (.md <-> .py)
+      // 2. Companion note link conversion (.md -> .py)
       if (cleanPath.endsWith(".md")) {
         const pyKey = cleanPath.replace(/\.md$/, ".py");
         if (items[pyKey]) return { key: pyKey, anchor };
-      } else if (cleanPath.endsWith(".py")) {
-        const mdKey = cleanPath.replace(/\.py$/, ".md");
-        if (items[mdKey]) return { key: mdKey, anchor };
       }
 
       // 3. Problem index / topic docs match
@@ -608,14 +575,11 @@ const items = {items_json};
       if (Array.isArray(configuredTracks)) {
         for (const t of configuredTracks) {
           if (t.id && cleanPath.startsWith(`${t.id}/`)) {
-            const canonicalCandidate = `problems/${cleanPath}`;
+            const canonicalCandidate = `${t.dir_path}/${cleanPath.slice(t.id.length + 1)}`;
             if (items[canonicalCandidate]) return { key: canonicalCandidate, anchor };
             if (cleanPath.endsWith(".md")) {
               const pyKey = canonicalCandidate.replace(/\.md$/, ".py");
               if (items[pyKey]) return { key: pyKey, anchor };
-            } else if (cleanPath.endsWith(".py")) {
-              const mdKey = canonicalCandidate.replace(/\.py$/, ".md");
-              if (items[mdKey]) return { key: mdKey, anchor };
             }
           }
         }
@@ -662,6 +626,78 @@ const items = {items_json};
     }
 
     /**
+     * Resolves an initial URL hash to a structured route target ({ mode, key, anchor }).
+     * Delegates entity resolution directly to resolveEntityReference while preserving
+     * standalone anchor targets and user view mode.
+     */
+    function resolveInitialRoute(rawHash) {
+      const fallbackKey = (typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md";
+      const DEFAULT_ROUTE = { mode: "workspace", key: "README.md", anchor: "" };
+      const fallbackRoute = (typeof mainMode !== "undefined" && mainMode)
+        ? { ...DEFAULT_ROUTE, mode: mainMode }
+        : DEFAULT_ROUTE;
+
+      if (!rawHash) {
+        return fallbackRoute;
+      }
+      let hashKey = "";
+      try {
+        hashKey = decodeURIComponent(rawHash);
+      } catch (e) {
+        hashKey = rawHash;
+      }
+      const cleanHash = hashKey.replace(/^#/, "").trim();
+      if (!cleanHash) {
+        return fallbackRoute;
+      }
+      if (cleanHash === "roadmap") {
+        return { mode: "roadmap", key: "README.md", anchor: "" };
+      }
+
+      if (cleanHash.includes("#")) {
+        const hashIdx = cleanHash.indexOf("#");
+        const docRef = cleanHash.slice(0, hashIdx).trim();
+        const anchor = cleanHash.slice(hashIdx + 1).trim();
+        const resolved = resolveEntityReference(docRef);
+        if (resolved && resolved.key && items[resolved.key]) {
+          return { mode: "workspace", key: resolved.key, anchor: anchor || resolved.anchor || "" };
+        }
+        return fallbackRoute;
+      }
+
+      const resolved = resolveEntityReference(cleanHash);
+      if (resolved && resolved.key && items[resolved.key]) {
+        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+      }
+
+      const STANDALONE_SECTION_ANCHORS = new Set([
+        "complexity",
+        "complexity-analysis",
+        "the-error-log",
+        "error-log",
+        "walkthrough",
+        "step-by-step-code-walkthrough",
+        "code-walkthrough",
+        "constraints",
+        "problem-statement-and-constraints",
+        "problem-statement",
+        "mental-model",
+        "core-idea",
+        "core-idea-mental-model-and-pattern-lineage",
+        "interview-simulation",
+        "interview-simulation-alternative-paradigms-and-follow-up-pivots",
+        "header",
+        "file-links"
+      ]);
+
+      if (STANDALONE_SECTION_ANCHORS.has(cleanHash.toLowerCase())) {
+        return { mode: "workspace", key: fallbackKey, anchor: cleanHash };
+      }
+
+      return fallbackRoute;
+    }
+
+    /**
      * Finds a heading DOM element strictly within a container matching an anchor id or slug.
      */
     function findHeadingElement(container, anchorId) {
@@ -675,6 +711,77 @@ const items = {items_json};
         const slug2 = cleanHeading.replace(/[^\w\s-]/g, " ").trim().replace(/\s+/g, "-");
         return slug1 === cleanAnchor || slug2 === cleanAnchor || cleanHeading === cleanAnchor;
       }) || null;
+    }
+
+    /**
+     * Scrolls the notes viewer to a target heading matching the anchor.
+     * Optionally waits for delay ms (e.g. DOM_RENDER_DELAY_MS) before scrolling.
+     */
+    function scrollToAnchor(anchor, delay = 0) {
+      if (!anchor) return;
+      const doScroll = () => {
+        const notesViewer = document.getElementById("notesViewer");
+        if (!notesViewer) return;
+        const targetEl = findHeadingElement(notesViewer, anchor);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      };
+      if (delay > 0) {
+        setTimeout(doScroll, delay);
+      } else {
+        doScroll();
+      }
+    }
+
+    /**
+     * Updates the window URL hash while protecting against recursive hashchange loops.
+     */
+    function updateUrlHash(newHash) {
+      if (!newHash) return;
+      if (typeof window !== "undefined" && window.location && window.location.hash === newHash) {
+        lastHandledHash = newHash;
+        return;
+      }
+      isInternalUrlUpdate = true;
+      lastHandledHash = newHash;
+      try {
+        if (typeof history !== "undefined" && history.replaceState) {
+          history.replaceState(null, null, newHash);
+        } else if (typeof window !== "undefined" && window.location) {
+          window.location.hash = newHash;
+        }
+      } finally {
+        setTimeout(() => {
+          isInternalUrlUpdate = false;
+        }, 0);
+      }
+    }
+
+    /**
+     * Handles in-session window hashchange events, dispatching route updates,
+     * view mode transitions, and deep anchor scrolling without page reloads.
+     */
+    function handleHashChange() {
+      if (isInternalUrlUpdate) return;
+      const currentHash = window.location.hash;
+      if (currentHash === lastHandledHash) return;
+      lastHandledHash = currentHash;
+
+      const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
+      if (mode !== mainMode) {
+        setMainMode(mode, false);
+      }
+
+      if (mode === "workspace") {
+        const itemChanged = (key !== currentKey);
+        if (itemChanged && items[key]) {
+          switchItem(key, true, false);
+        }
+        if (anchor) {
+          scrollToAnchor(anchor, itemChanged ? DOM_RENDER_DELAY_MS : 0);
+        }
+      }
     }
 
     /**
@@ -716,12 +823,8 @@ const items = {items_json};
             switchItem(anchorId);
             return;
           }
-          const notesViewer = document.getElementById("notesViewer");
-          if (!notesViewer) return;
-          const targetEl = findHeadingElement(notesViewer, anchorId);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+          scrollToAnchor(anchorId);
+          updateUrlHash(currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`);
           return;
         }
 
@@ -736,12 +839,7 @@ const items = {items_json};
           switchItem(targetKey);
 
           if (resolved.anchor) {
-            setTimeout(() => {
-              const notesViewer = document.getElementById("notesViewer");
-              if (!notesViewer) return;
-              const targetEl = findHeadingElement(notesViewer, resolved.anchor);
-              if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, DOM_RENDER_DELAY_MS);
+            scrollToAnchor(resolved.anchor, DOM_RENDER_DELAY_MS);
           }
           return;
         } else if (isRelativeDocLink) {
@@ -895,6 +993,7 @@ const items = {items_json};
     });
 
     // Initialize SPA
+    window.addEventListener("hashchange", handleHashChange);
     initLinkInterceptor();
     renderTree();
     updateProgressBadge();
@@ -903,5 +1002,8 @@ const items = {items_json};
       setMainMode("roadmap");
     } else {
       setMainMode("workspace", false);
-      switchItem(currentKey);
+      switchItem(currentKey, true, !initialAnchor);
+      if (initialAnchor) {
+        scrollToAnchor(initialAnchor, DOM_RENDER_DELAY_MS);
+      }
     }
