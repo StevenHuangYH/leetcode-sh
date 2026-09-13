@@ -1,11 +1,36 @@
+import os
+import re
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
+
+
+def _get_node_binary(self=None):
+    """Discover Node.js executable via NODE_BIN env, PATH, or fnm installation."""
+    env_node = os.environ.get("NODE_BIN")
+    if env_node:
+        if shutil.which(env_node):
+            return shutil.which(env_node)
+        if os.path.isfile(env_node) and os.access(env_node, os.X_OK):
+            return env_node
+        return env_node
+    node_bin = shutil.which("node") or shutil.which("nodejs")
+    if not node_bin:
+        fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
+        if fnm_candidates:
+            node_bin = str(fnm_candidates[-1])
+    return node_bin
 from update_index import collect_workspace_documents
 from scripts.compiler.entities import format_problem_title
 
 REPO_ROOT = Path(__file__).parent.parent
 
-class TestUpdateIndexParser(unittest.TestCase):
+class TestUpdateIndex(unittest.TestCase):
+    def _get_node_binary(self):
+        """Instance method hook delegating to centralized _get_node_binary helper."""
+        return _get_node_binary(self)
+
     def test_all_11_topics_curriculum_are_parsed_without_empty_content(self):
         documents = collect_workspace_documents()
         
@@ -382,11 +407,7 @@ class TestUpdateIndexParser(unittest.TestCase):
             self.assertFalse(filter_fn("problem-index/topic-01"))
 
         # Node.js runtime assertion of the exact compiled JS script extracted from HTML
-        node_bin = shutil.which("node") or shutil.which("nodejs")
-        if not node_bin:
-            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
-            if fnm_candidates:
-                node_bin = str(fnm_candidates[-1])
+        node_bin = self._get_node_binary()
         if node_bin:
             tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
             self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
@@ -423,7 +444,7 @@ class TestUpdateIndexParser(unittest.TestCase):
             proc = subprocess.run([node_bin, "-e", js_test_script], capture_output=True, text=True)
             self.assertEqual(proc.returncode, 0, f"Client JS filter evaluation in Node failed: {proc.stderr}")
 
-    def test_client_entity_resolution_and_legacy_hash_redirection(self):
+    def test_client_routing_with_node(self):
         """Assert client-side resolveEntityReference and legacy hash router redirect correctly in Node.js."""
         import re
         import shutil
@@ -432,6 +453,10 @@ class TestUpdateIndexParser(unittest.TestCase):
         html_text = self._compile_index_html()
 
         # Extract real compiled declarations from HTML
+        tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
+        self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
+        tracks_decl = tracks_decl_match.group(0)
+
         tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
         self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
         tracks_decl = tracks_decl_match.group(0)
@@ -485,11 +510,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         self.assertIn("function handleHashChange()", html_text)
         self.assertIn("function scrollToAnchor(", html_text)
 
-        node_bin = shutil.which("node") or shutil.which("nodejs")
-        if not node_bin:
-            fnm_candidates = list(Path.home().glob(".local/share/fnm/node-versions/*/installation/bin/node"))
-            if fnm_candidates:
-                node_bin = str(fnm_candidates[-1])
+        node_bin = self._get_node_binary()
         if not node_bin:
             self.skipTest("node binary not found on PATH")
 
@@ -619,7 +640,7 @@ class TestUpdateIndexParser(unittest.TestCase):
         }}
 
         // 7. Invalid hash fallback preserves safety without crashing
-        const routeInvalid = resolveInitialRoute("#nonexistent-slug-xyz");
+        const routeInvalid = resolveInitialRoute("#nonexistent-track/missing-problem.py");
         if (!routeInvalid || routeInvalid.mode !== "workspace" || routeInvalid.key !== "README.md" || routeInvalid.anchor !== "") {{
           console.error("Invalid hash fallback failed:", routeInvalid);
           process.exit(11);
@@ -627,7 +648,7 @@ class TestUpdateIndexParser(unittest.TestCase):
 
         // 8. Non-destructive mode preservation when mainMode = "roadmap"
         mainMode = "roadmap";
-        const routeRoadmapPreserved = resolveInitialRoute("#nonexistent-slug-xyz");
+        const routeRoadmapPreserved = resolveInitialRoute("#nonexistent-track/missing-problem.py");
         if (!routeRoadmapPreserved || routeRoadmapPreserved.mode !== "roadmap" || routeRoadmapPreserved.key !== "README.md" || routeRoadmapPreserved.anchor !== "") {{
           console.error("Roadmap mode preservation failed:", routeRoadmapPreserved);
           process.exit(12);
@@ -670,6 +691,226 @@ class TestUpdateIndexParser(unittest.TestCase):
         """
         proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, f"Node client entity resolution failed: {proc.stderr}")
+
+    test_client_entity_resolution_and_legacy_hash_redirection = test_client_routing_with_node
+
+    def test_client_standalone_anchor_and_route_fallback_with_node(self):
+        """Assert generic standalone anchor resolution, allowlist elimination, and updateUrlHash in Node.js."""
+        html_text = self._compile_index_html()
+
+        # 1. Assert that STANDALONE_SECTION_ANCHORS allowlist is not present in compiled client code
+        self.assertNotIn("STANDALONE_SECTION_ANCHORS", html_text)
+
+        node_bin = self._get_node_binary()
+        if not node_bin:
+            self.skipTest("node binary not found on PATH")
+
+        tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
+        self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
+        tracks_decl = tracks_decl_match.group(0)
+
+        resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(resolver_match, "resolveEntityReference function must be in compiled HTML")
+        resolver_fn = resolver_match.group(0)
+
+        router_match = re.search(r"function resolveInitialRoute\(rawHash\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
+        router_fn = router_match.group(0)
+
+        update_hash_match = re.search(r"function updateUrlHash\(hashKey.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(update_hash_match, "updateUrlHash function must be in compiled HTML")
+        update_url_hash_fn = update_hash_match.group(0)
+
+        js_code = f"""
+        const items = {{
+          "README.md": {{ type: "doc", title: "Overview" }},
+          "problems/top-100/lc-0001-two-sum.py": {{ type: "problem", lc_num: "LC 1", slug: "lc-0001-two-sum" }},
+          "problems/daily-practice/lc-0025-reverse-nodes-in-k-group.py": {{ type: "problem", lc_num: "LC 25", slug: "lc-0025-reverse-nodes-in-k-group" }}
+        }};
+        let mainMode = "workspace";
+        let currentKey = "README.md";
+        let isInternalUrlUpdate = false;
+        let lastHandledHash = "";
+
+        let historyCalls = [];
+        global.history = {{
+          pushState: (state, title, url) => {{
+            historyCalls.push({{ action: "pushState", state, title, url }});
+          }},
+          replaceState: (state, title, url) => {{
+            historyCalls.push({{ action: "replaceState", state, title, url }});
+          }}
+        }};
+
+        global.window = {{
+          location: {{
+            hash: ""
+          }}
+        }};
+
+        {tracks_decl}
+        {resolver_fn}
+        {router_fn}
+        {update_url_hash_fn}
+
+        // 1. Generic syntax standalone anchor resolution without static allowlists
+        const customAnchors = [
+          "my-custom-proof-section",
+          "random-anchor-slug",
+          "arbitrary-new-math-lemma",
+          "interview-pivot-advanced-edge-case"
+        ];
+
+        // 1a. On default document (README.md)
+        for (const anchor of customAnchors) {{
+          const route = resolveInitialRoute("#" + anchor);
+          if (!route || route.mode !== "workspace" || route.key !== "README.md" || route.anchor !== anchor) {{
+            console.error("Generic anchor resolution failed for #" + anchor + ":", route);
+            process.exit(1);
+          }}
+          const ref = resolveEntityReference("#" + anchor, "README.md");
+          if (!ref || !ref.isAnchorOnly || ref.anchor !== anchor || ref.key !== "README.md") {{
+            console.error("resolveEntityReference anchor-only failed for #" + anchor + ":", ref);
+            process.exit(2);
+          }}
+        }}
+
+        // 1b. On active problem document
+        currentKey = "problems/top-100/lc-0001-two-sum.py";
+        for (const anchor of customAnchors) {{
+          const route = resolveInitialRoute("#" + anchor);
+          if (!route || route.mode !== "workspace" || route.key !== "problems/top-100/lc-0001-two-sum.py" || route.anchor !== anchor) {{
+            console.error("Generic anchor resolution on active problem failed for #" + anchor + ":", route);
+            process.exit(3);
+          }}
+          const ref = resolveEntityReference("#" + anchor, currentKey);
+          if (!ref || !ref.isAnchorOnly || ref.anchor !== anchor || ref.key !== currentKey) {{
+            console.error("resolveEntityReference on active problem failed for #" + anchor + ":", ref);
+            process.exit(4);
+          }}
+        }}
+        currentKey = "README.md";
+
+        // 1c. Composite problem reference with custom anchor
+        const compRef = resolveEntityReference("lc-0001-two-sum#my-custom-proof-section");
+        if (!compRef || compRef.key !== "problems/top-100/lc-0001-two-sum.py" || compRef.anchor !== "my-custom-proof-section") {{
+          console.error("Composite reference resolution failed:", compRef);
+          process.exit(5);
+        }}
+
+        // 2. Route fallback for unrecognized / invalid paths
+        const invalidRoutes = [
+          "#nonexistent-track/missing-problem.py",
+          "#unknown-dir/notes.md",
+          "#topic-99-unknown",
+          "#lc-9999-unknown"
+        ];
+        for (const inv of invalidRoutes) {{
+          const route = resolveInitialRoute(inv);
+          if (!route || route.mode !== "workspace" || route.key !== "README.md" || route.anchor !== "") {{
+            console.error("Invalid route fallback failed for " + inv + ":", route);
+            process.exit(6);
+          }}
+        }}
+
+        // Mode preservation on invalid route when in roadmap mode
+        mainMode = "roadmap";
+        const routeRoadmapInvalid = resolveInitialRoute("#nonexistent-track/missing-problem.py");
+        if (!routeRoadmapInvalid || routeRoadmapInvalid.mode !== "roadmap" || routeRoadmapInvalid.key !== "README.md" || routeRoadmapInvalid.anchor !== "") {{
+          console.error("Roadmap mode preservation on invalid route failed:", routeRoadmapInvalid);
+          process.exit(7);
+        }}
+        mainMode = "workspace";
+
+        // 3. updateUrlHash History Management (pushState vs replaceState)
+        // 3a. replace: false -> history.pushState
+        historyCalls = [];
+        window.location.hash = "";
+        lastHandledHash = "";
+        updateUrlHash("problems/top-100/lc-0001-two-sum.py", {{ replace: false }});
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "pushState" || historyCalls[0].url !== "#problems/top-100/lc-0001-two-sum.py") {{
+          console.error("updateUrlHash pushState failed:", historyCalls);
+          process.exit(8);
+        }}
+        if (lastHandledHash !== "#problems/top-100/lc-0001-two-sum.py") {{
+          console.error("lastHandledHash mismatch after pushState:", lastHandledHash);
+          process.exit(9);
+        }}
+
+        // 3b. replace: true -> history.replaceState
+        historyCalls = [];
+        window.location.hash = "";
+        lastHandledHash = "";
+        updateUrlHash("README.md", {{ replace: true }});
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].url !== "#README.md") {{
+          console.error("updateUrlHash replaceState failed:", historyCalls);
+          process.exit(10);
+        }}
+        if (lastHandledHash !== "#README.md") {{
+          console.error("lastHandledHash mismatch after replaceState:", lastHandledHash);
+          process.exit(11);
+        }}
+
+        // 3c. Default options (empty object) -> defaults to history.pushState (replace is false)
+        historyCalls = [];
+        window.location.hash = "";
+        lastHandledHash = "";
+        updateUrlHash("#roadmap");
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "pushState" || historyCalls[0].url !== "#roadmap") {{
+          console.error("updateUrlHash default pushState failed:", historyCalls);
+          process.exit(12);
+        }}
+
+        // 3d. Deduplication guard: does not invoke pushState or replaceState if location.hash already equals targetHash
+        window.location.hash = "#roadmap";
+        historyCalls = [];
+        updateUrlHash("#roadmap", {{ replace: false }});
+        updateUrlHash("#roadmap", {{ replace: true }});
+        if (historyCalls.length !== 0) {{
+          console.error("updateUrlHash deduplication guard failed, recorded calls:", historyCalls);
+          process.exit(13);
+        }}
+
+        // 3e. Custom heading anchor with pushState
+        window.location.hash = "";
+        lastHandledHash = "";
+        historyCalls = [];
+        updateUrlHash("#problems/top-100/lc-0001-two-sum.py#my-custom-proof-section", {{ replace: false }});
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "pushState" || historyCalls[0].url !== "#problems/top-100/lc-0001-two-sum.py#my-custom-proof-section") {{
+          console.error("updateUrlHash custom anchor pushState failed:", historyCalls);
+          process.exit(14);
+        }}
+
+        // 3f. Custom heading anchor with replaceState
+        window.location.hash = "";
+        lastHandledHash = "";
+        historyCalls = [];
+        updateUrlHash("#random-anchor-slug", {{ replace: true }});
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].url !== "#random-anchor-slug") {{
+          console.error("updateUrlHash random anchor slug replaceState failed:", historyCalls);
+          process.exit(15);
+        }}
+
+        process.exit(0);
+        """
+        proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, f"Node client standalone anchor and updateUrlHash test failed: {proc.stderr}")
+
+    def test_get_node_binary_resolution(self):
+        """Assert _get_node_binary respects NODE_BIN override and discovers Node."""
+        import tempfile
+        import unittest.mock
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+            tmp_path.chmod(0o755)
+        try:
+            with unittest.mock.patch.dict(os.environ, {"NODE_BIN": str(tmp_path)}):
+                discovered = self._get_node_binary()
+                self.assertEqual(discovered, str(tmp_path))
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
+
 
 
 if __name__ == "__main__":

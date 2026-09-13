@@ -700,8 +700,7 @@ const items = {items_json};
             resolved.anchor.endsWith(".md") ||
             resolved.anchor.endsWith(".py") ||
             resolved.anchor.startsWith("topic-") ||
-            resolved.anchor.startsWith("lc-") ||
-            resolved.anchor.includes("slug");
+            resolved.anchor.startsWith("lc-");
           if (isPathOrSlug) {
             return fallbackRoute;
           }
