@@ -534,9 +534,23 @@ const items = {items_json};
      * to a registered DocumentEntity key in the in-memory items manifest.
      */
     function resolveEntityReference(rawHref) {
+      const activeDocKey = arguments[1];
       if (!rawHref) return null;
 
       let href = rawHref.trim();
+      if (!href) return null;
+
+      // Handle leading '#' prefix for standalone anchors or fragment-based routing
+      if (href.startsWith("#")) {
+        const sub = href.replace(/^#+/, "").trim();
+        if (!sub) return null;
+        const targetEntity = resolveEntityReference(sub);
+        if (targetEntity && targetEntity.key && typeof items !== "undefined" && items[targetEntity.key]) {
+          return targetEntity;
+        }
+        return { key: activeDocKey || null, anchor: sub, isAnchorOnly: true };
+      }
+
       let anchor = "";
       const hashIndex = href.indexOf("#");
       if (hashIndex !== -1) {
@@ -550,7 +564,7 @@ const items = {items_json};
 
       let cleanPath = href.replace(/^(\.\/|\/|\.\.\/)+/, "").trim();
       if (!cleanPath && anchor) {
-        return { key: null, anchor: anchor, isAnchorOnly: true };
+        return { key: activeDocKey || null, anchor: anchor, isAnchorOnly: true };
       }
       if (!cleanPath) return null;
 
@@ -631,7 +645,8 @@ const items = {items_json};
      * standalone anchor targets and user view mode.
      */
     function resolveInitialRoute(rawHash) {
-      const fallbackKey = (typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md";
+      const activeDocumentKey = arguments[1];
+      const fallbackKey = activeDocumentKey || ((typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md");
       const DEFAULT_ROUTE = { mode: "workspace", key: "README.md", anchor: "" };
       const fallbackRoute = (typeof mainMode !== "undefined" && mainMode)
         ? { ...DEFAULT_ROUTE, mode: mainMode }
@@ -654,44 +669,23 @@ const items = {items_json};
         return { mode: "roadmap", key: "README.md", anchor: "" };
       }
 
-      if (cleanHash.includes("#")) {
-        const hashIdx = cleanHash.indexOf("#");
-        const docRef = cleanHash.slice(0, hashIdx).trim();
-        const anchor = cleanHash.slice(hashIdx + 1).trim();
-        const resolved = resolveEntityReference(docRef);
-        if (resolved && resolved.key && items[resolved.key]) {
-          return { mode: "workspace", key: resolved.key, anchor: anchor || resolved.anchor || "" };
+      const resolved = resolveEntityReference(hashKey, fallbackKey);
+      if (resolved) {
+        if (resolved.isAnchorOnly) {
+          const isPathOrSlug = resolved.anchor.includes("/") ||
+            resolved.anchor.endsWith(".md") ||
+            resolved.anchor.endsWith(".py") ||
+            resolved.anchor.startsWith("topic-") ||
+            resolved.anchor.startsWith("lc-") ||
+            resolved.anchor.includes("slug");
+          if (isPathOrSlug) {
+            return fallbackRoute;
+          }
+          return { mode: "workspace", key: resolved.key || fallbackKey, anchor: resolved.anchor };
         }
-        return fallbackRoute;
-      }
-
-      const resolved = resolveEntityReference(cleanHash);
-      if (resolved && resolved.key && items[resolved.key]) {
-        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
-      }
-
-      const STANDALONE_SECTION_ANCHORS = new Set([
-        "complexity",
-        "complexity-analysis",
-        "the-error-log",
-        "error-log",
-        "walkthrough",
-        "step-by-step-code-walkthrough",
-        "code-walkthrough",
-        "constraints",
-        "problem-statement-and-constraints",
-        "problem-statement",
-        "mental-model",
-        "core-idea",
-        "core-idea-mental-model-and-pattern-lineage",
-        "interview-simulation",
-        "interview-simulation-alternative-paradigms-and-follow-up-pivots",
-        "header",
-        "file-links"
-      ]);
-
-      if (STANDALONE_SECTION_ANCHORS.has(cleanHash.toLowerCase())) {
-        return { mode: "workspace", key: fallbackKey, anchor: cleanHash };
+        if (resolved.key && items[resolved.key]) {
+          return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+        }
       }
 
       return fallbackRoute;
