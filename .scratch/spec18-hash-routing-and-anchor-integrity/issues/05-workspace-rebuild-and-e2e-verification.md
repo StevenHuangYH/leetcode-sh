@@ -9,8 +9,8 @@
 
 **Blocked by:** 04-high-seam-compiler-tests-expansion-and-dry.md
 
-**Status:** todo
+**Status:** done
 
-- [ ] Rebuild `index.html` via `python3 update_index.py`
-- [ ] Run full test suite (`python3 -m unittest discover tests`)
-- [ ] Verify clean git diff and Core Rules compliance
+- [x] Rebuild `index.html` via `python3 update_index.py`
+- [x] Run full test suite (`python3 -m unittest discover tests`)
+- [x] Verify clean git diff and Core Rules compliance
