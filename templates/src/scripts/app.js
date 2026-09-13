@@ -121,7 +121,7 @@ const items = {items_json};
       }
     }
 
-    function setMainMode(mode, triggerSwitch = true) {
+    function setMainMode(mode, triggerSwitch = true, options = {}) {
       mainMode = mode;
       localStorage.setItem("mainMode", mode);
 
@@ -148,7 +148,7 @@ const items = {items_json};
             <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
-        updateUrlHash("#roadmap");
+        updateUrlHash("#roadmap", { replace: Boolean(options && (options.replaceHistory || options.replace)) });
         setTimeout(() => {
           if (!roadmapGraphInstance) {
             initRoadmapGraph();
@@ -167,7 +167,7 @@ const items = {items_json};
         if (mobileNav) mobileNav.classList.remove("hidden");
         syncResponsiveLayout();
         if (triggerSwitch) {
-          switchItem(currentKey, false);
+          switchItem(currentKey, false, true, options);
         }
       }
     }
@@ -408,15 +408,28 @@ const items = {items_json};
       return html;
     }
     
-    function switchItem(key, rerenderSearch = true, syncHash = true) {
+    function switchItem(key, rerenderSearch = true, syncHash = true, options = {}) {
+      let shouldRerender = rerenderSearch;
+      let shouldSyncHash = syncHash;
+      let opts = options || {};
+
+      if (typeof rerenderSearch === "object" && rerenderSearch !== null) {
+        opts = rerenderSearch;
+        shouldRerender = true;
+        shouldSyncHash = true;
+      } else if (typeof syncHash === "object" && syncHash !== null) {
+        opts = syncHash;
+        shouldSyncHash = true;
+      }
+
       if (!items[key]) return;
       currentKey = key;
       const item = items[key];
 
       setMainMode("workspace", false);
 
-      if (syncHash) {
-        updateUrlHash("#" + key);
+      if (shouldSyncHash) {
+        updateUrlHash(key, { replace: Boolean(opts && (opts.replaceHistory || opts.replace)) });
       }
 
       treeStructure.forEach(folder => {
@@ -426,7 +439,7 @@ const items = {items_json};
         }
       });
 
-      if (rerenderSearch) {
+      if (shouldRerender) {
         renderTree(document.getElementById("search").value);
       } else {
         document.querySelectorAll(".nav-item").forEach(el => {
@@ -533,10 +546,48 @@ const items = {items_json};
      * EntityReferenceResolver: Resolves relative file paths, stems, LC numbers, or slugs
      * to a registered DocumentEntity key in the in-memory items manifest.
      */
-    function resolveEntityReference(rawHref) {
+    function resolveEntityReference(rawHref, activeDocKey = null) {
       if (!rawHref) return null;
 
       let href = rawHref.trim();
+      try {
+        href = decodeURIComponent(href);
+      } catch (_) {}
+      if (!href) return null;
+
+      // Handle leading '#' prefix for standalone anchors or fragment-based routing
+      if (href.startsWith("#")) {
+        const candidate = href.replace(/^#+/, "").trim();
+        if (!candidate) return null;
+
+        // Composite #doc#anchor reference
+        if (candidate.includes("#")) {
+          const subHashIdx = candidate.indexOf("#");
+          const docPart = candidate.substring(0, subHashIdx);
+          const anchorPart = candidate.substring(subHashIdx + 1);
+          const resolvedDoc = resolveEntityReference(docPart, activeDocKey);
+          if (resolvedDoc && resolvedDoc.key && typeof items !== "undefined" && items[resolvedDoc.key]) {
+            return { key: resolvedDoc.key, anchor: anchorPart };
+          }
+          return null;
+        }
+
+        // Direct entity key or problem slug match
+        const targetEntity = resolveEntityReference(candidate, activeDocKey);
+        if (targetEntity && targetEntity.key && typeof items !== "undefined" && items[targetEntity.key]) {
+          return targetEntity;
+        }
+
+        // Unindexed paths containing '/' or '.py'/'.md'
+        const isUnindexedPath = candidate.includes("/") || candidate.endsWith(".py") || candidate.endsWith(".md");
+        if (isUnindexedPath) {
+          return null;
+        }
+
+        // Generic standalone anchor bound to active document
+        return { key: activeDocKey || null, anchor: candidate, isAnchorOnly: true };
+      }
+
       let anchor = "";
       const hashIndex = href.indexOf("#");
       if (hashIndex !== -1) {
@@ -550,7 +601,7 @@ const items = {items_json};
 
       let cleanPath = href.replace(/^(\.\/|\/|\.\.\/)+/, "").trim();
       if (!cleanPath && anchor) {
-        return { key: null, anchor: anchor, isAnchorOnly: true };
+        return { key: activeDocKey || null, anchor: anchor, isAnchorOnly: true };
       }
       if (!cleanPath) return null;
 
@@ -630,8 +681,8 @@ const items = {items_json};
      * Delegates entity resolution directly to resolveEntityReference while preserving
      * standalone anchor targets and user view mode.
      */
-    function resolveInitialRoute(rawHash) {
-      const fallbackKey = (typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md";
+    function resolveInitialRoute(rawHash, activeDocumentKey = null) {
+      const fallbackKey = activeDocumentKey || ((typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md");
       const DEFAULT_ROUTE = { mode: "workspace", key: "README.md", anchor: "" };
       const fallbackRoute = (typeof mainMode !== "undefined" && mainMode)
         ? { ...DEFAULT_ROUTE, mode: mainMode }
@@ -640,13 +691,7 @@ const items = {items_json};
       if (!rawHash) {
         return fallbackRoute;
       }
-      let hashKey = "";
-      try {
-        hashKey = decodeURIComponent(rawHash);
-      } catch (e) {
-        hashKey = rawHash;
-      }
-      const cleanHash = hashKey.replace(/^#/, "").trim();
+      const cleanHash = rawHash.replace(/^#/, "").trim();
       if (!cleanHash) {
         return fallbackRoute;
       }
@@ -654,47 +699,17 @@ const items = {items_json};
         return { mode: "roadmap", key: "README.md", anchor: "" };
       }
 
-      if (cleanHash.includes("#")) {
-        const hashIdx = cleanHash.indexOf("#");
-        const docRef = cleanHash.slice(0, hashIdx).trim();
-        const anchor = cleanHash.slice(hashIdx + 1).trim();
-        const resolved = resolveEntityReference(docRef);
-        if (resolved && resolved.key && items[resolved.key]) {
-          return { mode: "workspace", key: resolved.key, anchor: anchor || resolved.anchor || "" };
+      const resolved = resolveEntityReference(rawHash, activeDocumentKey);
+      if (resolved) {
+        if (resolved.isAnchorOnly) {
+          return { mode: "workspace", key: fallbackKey, anchor: resolved.anchor };
         }
-        return fallbackRoute;
+        if (resolved.key && items[resolved.key]) {
+          return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
+        }
       }
 
-      const resolved = resolveEntityReference(cleanHash);
-      if (resolved && resolved.key && items[resolved.key]) {
-        return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
-      }
-
-      const STANDALONE_SECTION_ANCHORS = new Set([
-        "complexity",
-        "complexity-analysis",
-        "the-error-log",
-        "error-log",
-        "walkthrough",
-        "step-by-step-code-walkthrough",
-        "code-walkthrough",
-        "constraints",
-        "problem-statement-and-constraints",
-        "problem-statement",
-        "mental-model",
-        "core-idea",
-        "core-idea-mental-model-and-pattern-lineage",
-        "interview-simulation",
-        "interview-simulation-alternative-paradigms-and-follow-up-pivots",
-        "header",
-        "file-links"
-      ]);
-
-      if (STANDALONE_SECTION_ANCHORS.has(cleanHash.toLowerCase())) {
-        return { mode: "workspace", key: fallbackKey, anchor: cleanHash };
-      }
-
-      return fallbackRoute;
+      return { ...fallbackRoute, isFallback: true };
     }
 
     /**
@@ -736,21 +751,39 @@ const items = {items_json};
 
     /**
      * Updates the window URL hash while protecting against recursive hashchange loops.
+     * Supports options: { replace = false }.
+     * When options.replace is true, calls history.replaceState.
+     * When options.replace is false, calls history.pushState.
      */
-    function updateUrlHash(newHash) {
-      if (!newHash) return;
-      if (typeof window !== "undefined" && window.location && window.location.hash === newHash) {
-        lastHandledHash = newHash;
+    function updateUrlHash(hashKey, { replace = false } = {}) {
+      if (!hashKey) return;
+      const targetHash = hashKey.startsWith("#") ? hashKey : "#" + hashKey;
+      if (typeof window !== "undefined" && window.location && window.location.hash === targetHash) {
+        lastHandledHash = targetHash;
         return;
       }
       isInternalUrlUpdate = true;
-      lastHandledHash = newHash;
+      lastHandledHash = targetHash;
       try {
-        if (typeof history !== "undefined" && history.replaceState) {
-          history.replaceState(null, null, newHash);
+        if (typeof history !== "undefined") {
+          if (replace && typeof history.replaceState === "function") {
+            history.replaceState(null, "", targetHash);
+          } else if (!replace && typeof history.pushState === "function") {
+            history.pushState(null, "", targetHash);
+          } else if (typeof history.replaceState === "function") {
+            history.replaceState(null, "", targetHash);
+          } else if (typeof window !== "undefined" && window.location) {
+            window.location.hash = targetHash;
+          }
         } else if (typeof window !== "undefined" && window.location) {
-          window.location.hash = newHash;
+          window.location.hash = targetHash;
         }
+      } catch (err) {
+        try {
+          if (typeof window !== "undefined" && window.location) {
+            window.location.hash = targetHash;
+          }
+        } catch (_) {}
       } finally {
         setTimeout(() => {
           isInternalUrlUpdate = false;
@@ -768,15 +801,20 @@ const items = {items_json};
       if (currentHash === lastHandledHash) return;
       lastHandledHash = currentHash;
 
-      const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
+      const route = resolveInitialRoute(window.location.hash);
+      if (route && route.isFallback) {
+        updateUrlHash(route.key, { replace: true });
+      }
+
+      const { mode, key, anchor } = route;
       if (mode !== mainMode) {
-        setMainMode(mode, false);
+        setMainMode(mode, false, { replaceHistory: true });
       }
 
       if (mode === "workspace") {
         const itemChanged = (key !== currentKey);
         if (itemChanged && items[key]) {
-          switchItem(key, true, false);
+          switchItem(key, true, false, { replaceHistory: true });
         }
         if (anchor) {
           scrollToAnchor(anchor, itemChanged ? DOM_RENDER_DELAY_MS : 0);
@@ -799,6 +837,13 @@ const items = {items_json};
      * InternalNavigationInterceptor: Intercepts link clicks within workspace & notes
      * to route internal files, in-page anchors, and external links without triggering page downloads.
      */
+    /**
+     * Formats a canonical URL hash for deep anchor navigation.
+     */
+    function formatAnchorHash(docKey, anchor) {
+      return docKey === "README.md" ? `#${anchor}` : `#${docKey}#${anchor}`;
+    }
+
     function initLinkInterceptor() {
       document.addEventListener("click", (e) => {
         const link = e.target.closest("a");
@@ -820,26 +865,30 @@ const items = {items_json};
           const anchorId = rawHref.substring(1);
           if (items[anchorId]) {
             enforceNotesView();
-            switchItem(anchorId);
+            switchItem(anchorId, true, true, { replaceHistory: false });
             return;
           }
           scrollToAnchor(anchorId);
-          updateUrlHash(currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`);
+          const targetHash = formatAnchorHash(currentKey, anchorId);
+          updateUrlHash(targetHash, { replace: false });
           return;
         }
 
         // 3. Relative File / Entity Reference
         const isRelativeDocLink = rawHref.endsWith(".py") || rawHref.endsWith(".md") || rawHref.startsWith("./") || rawHref.startsWith("../") || rawHref.startsWith("problem-index/") || rawHref.startsWith("topic-");
-        const resolved = resolveEntityReference(rawHref);
+        const resolved = resolveEntityReference(rawHref, currentKey);
         if (resolved && resolved.key && items[resolved.key]) {
           e.preventDefault();
           const targetKey = resolved.key;
 
           enforceNotesView();
-          switchItem(targetKey);
-
           if (resolved.anchor) {
+            switchItem(targetKey, true, false, { replaceHistory: false });
             scrollToAnchor(resolved.anchor, DOM_RENDER_DELAY_MS);
+            const targetHash = formatAnchorHash(targetKey, resolved.anchor);
+            updateUrlHash(targetHash, { replace: false });
+          } else {
+            switchItem(targetKey, true, true, { replaceHistory: false });
           }
           return;
         } else if (isRelativeDocLink) {
@@ -959,7 +1008,7 @@ const items = {items_json};
           if (firstMatchElement) {
             const key = firstMatchElement.getAttribute("data-key");
             if (key && items[key]) {
-              switchItem(key, false);
+              switchItem(key, false, true, { replaceHistory: false });
               firstMatchElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
               const notesViewer = document.getElementById("notesViewer");
               if (notesViewer) {
@@ -999,10 +1048,10 @@ const items = {items_json};
     updateProgressBadge();
 
     if (mainMode === "roadmap") {
-      setMainMode("roadmap");
+      setMainMode("roadmap", true, { replaceHistory: true });
     } else {
       setMainMode("workspace", false);
-      switchItem(currentKey, true, !initialAnchor);
+      switchItem(currentKey, true, !initialAnchor, { replaceHistory: true });
       if (initialAnchor) {
         scrollToAnchor(initialAnchor, DOM_RENDER_DELAY_MS);
       }
