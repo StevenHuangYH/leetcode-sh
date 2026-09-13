@@ -318,14 +318,9 @@ class TestUpdateIndexParser(unittest.TestCase):
 
         # Assert absence of searchTracks empty fallback in resolveEntityReference
         self.assertNotIn("searchTracks.length === 0", html_text)
-        self.assertNotIn('searchTracks.push("problems/top-100"', html_text)
-        self.assertNotIn('searchTracks.push("problems/daily-practice"', html_text)
-        self.assertNotIn('searchTracks.push("problems/luffy"', html_text)
-
-        # Assert absence of old hardcoded fallback array elements
-        self.assertNotIn('name: "problems/top-100/"', html_text)
-        self.assertNotIn('name: "problems/daily-practice/"', html_text)
-        self.assertNotIn('name: "problems/luffy/"', html_text)
+        for track_id in ["top-100", "daily-practice", "luffy"]:
+            self.assertNotIn(f'searchTracks.push("problems/{track_id}"', html_text)
+            self.assertNotIn(f'name: "problems/{track_id}/"', html_text)
 
         # Assert dynamicTrackFolders is constructed directly without fallback arrays
         self.assertIn("const dynamicTrackFolders = (Array.isArray(configuredTracks) ? configuredTracks : []).map(t => ({", html_text)
@@ -430,9 +425,6 @@ class TestUpdateIndexParser(unittest.TestCase):
         import subprocess
 
         html_text = self._compile_index_html()
-        node_bin = shutil.which("node")
-        if not node_bin:
-            self.skipTest("node binary not found on PATH")
 
         # Extract real compiled declarations from HTML
         tracks_decl_match = re.search(r"const configuredTracks = \[.*?\];", html_text)
@@ -448,16 +440,36 @@ class TestUpdateIndexParser(unittest.TestCase):
         router_fn = router_match.group(0)
 
         # Assert zero hardcoded 'problems/' prefix literals in routing / entity resolution routines and HTML
-        self.assertNotIn("problems/${", resolver_fn)
-        self.assertNotIn("'problems/' +", resolver_fn)
-        self.assertNotIn('"problems/" +', resolver_fn)
-        self.assertNotIn("problems/${", router_fn)
-        self.assertNotIn("'problems/' +", router_fn)
-        self.assertNotIn('"problems/" +', router_fn)
-        self.assertNotIn("'problems/' + cleanPath", html_text)
-        self.assertNotIn("'problems/' + hashKey", html_text)
-        self.assertNotIn('"problems/" + cleanPath', html_text)
-        self.assertNotIn('"problems/" + hashKey', html_text)
+        forbidden_fn_prefixes = ["problems/${", "'problems/' +", '"problems/" +']
+        for fn_name, fn_code in [("resolveEntityReference", resolver_fn), ("resolveInitialRoute", router_fn)]:
+            for prefix in forbidden_fn_prefixes:
+                self.assertNotIn(prefix, fn_code, f"Forbidden prefix '{prefix}' found in {fn_name}")
+
+        forbidden_html_patterns = [
+            "'problems/' + cleanPath",
+            "'problems/' + hashKey",
+            '"problems/" + cleanPath',
+            '"problems/" + hashKey',
+        ]
+        for pattern in forbidden_html_patterns:
+            self.assertNotIn(pattern, html_text)
+
+        # Assert zero dead reverse .py -> .md extension swapping in resolver and router
+        dead_extension_patterns = [
+            r'.replace(/\.py$/, ".md")',
+            r".replace(/\.py$/, '.md')",
+        ]
+        for fn_name, fn_code in [("resolveEntityReference", resolver_fn), ("resolveInitialRoute", router_fn)]:
+            for pattern in dead_extension_patterns:
+                self.assertNotIn(pattern, fn_code, f"Dead .py -> .md extension swap '{pattern}' found in {fn_name}")
+
+        # Assert window hashchange listener registration and handler existence in compiled HTML
+        self.assertIn('window.addEventListener("hashchange", handleHashChange)', html_text)
+        self.assertIn("function handleHashChange()", html_text)
+
+        node_bin = shutil.which("node") or shutil.which("nodejs")
+        if not node_bin:
+            self.skipTest("node binary not found on PATH")
 
         js_code = f"""
         const items = {{
@@ -502,23 +514,44 @@ class TestUpdateIndexParser(unittest.TestCase):
           process.exit(5);
         }}
 
-        // 4. Production startup hash routing delegation to resolveEntityReference
+        // 4. Static document resolution
+        const rDoc = resolveEntityReference("README.md");
+        if (!rDoc || rDoc.key !== "README.md" || rDoc.anchor !== "") {{
+          console.error("Static document resolution failed:", rDoc);
+          process.exit(6);
+        }}
+
+        // 5. Production startup hash routing delegation to resolveEntityReference
         const route1 = resolveInitialRoute("#top-100/lc-0001-two-sum.md");
         if (!route1 || route1.mode !== "workspace" || route1.key !== "problems/top-100/lc-0001-two-sum.py") {{
           console.error("Initial route legacy md redirect failed:", route1);
-          process.exit(6);
+          process.exit(7);
         }}
 
         const routeRoadmap = resolveInitialRoute("#roadmap");
         if (!routeRoadmap || routeRoadmap.mode !== "roadmap" || routeRoadmap.key !== "README.md") {{
           console.error("Initial route roadmap failed:", routeRoadmap);
-          process.exit(7);
+          process.exit(8);
         }}
 
         const routeCustom = resolveInitialRoute("#custom/demo.md");
         if (!routeCustom || routeCustom.mode !== "workspace" || routeCustom.key !== "external/custom/demo.py") {{
           console.error("Initial route custom track failed:", routeCustom);
-          process.exit(8);
+          process.exit(9);
+        }}
+
+        // 6. Standalone anchor resolution
+        const routeAnchor = resolveInitialRoute("#complexity");
+        if (!routeAnchor || routeAnchor.mode !== "workspace" || routeAnchor.key !== "README.md" || routeAnchor.anchor !== "complexity") {{
+          console.error("Standalone anchor resolution failed:", routeAnchor);
+          process.exit(10);
+        }}
+
+        // 7. Invalid hash fallback preserves safety without crashing
+        const routeInvalid = resolveInitialRoute("#nonexistent-slug-xyz");
+        if (!routeInvalid || routeInvalid.mode !== "workspace" || routeInvalid.key !== "README.md" || routeInvalid.anchor !== "") {{
+          console.error("Invalid hash fallback failed:", routeInvalid);
+          process.exit(11);
         }}
 
         process.exit(0);
