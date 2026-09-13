@@ -121,7 +121,7 @@ const items = {items_json};
       }
     }
 
-    function setMainMode(mode, triggerSwitch = true) {
+    function setMainMode(mode, triggerSwitch = true, options = {}) {
       mainMode = mode;
       localStorage.setItem("mainMode", mode);
 
@@ -148,7 +148,7 @@ const items = {items_json};
             <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
-        updateUrlHash("#roadmap");
+        updateUrlHash("#roadmap", { replace: Boolean(options && (options.replaceHistory || options.replace)) });
         setTimeout(() => {
           if (!roadmapGraphInstance) {
             initRoadmapGraph();
@@ -167,7 +167,7 @@ const items = {items_json};
         if (mobileNav) mobileNav.classList.remove("hidden");
         syncResponsiveLayout();
         if (triggerSwitch) {
-          switchItem(currentKey, false);
+          switchItem(currentKey, false, true, options);
         }
       }
     }
@@ -408,15 +408,39 @@ const items = {items_json};
       return html;
     }
     
-    function switchItem(key, rerenderSearch = true, syncHash = true) {
+    function switchItem(key, rerenderSearch = true, syncHash = true, options = {}) {
+      let shouldRerender = true;
+      let shouldSyncHash = true;
+      let opts = {};
+
+      if (arguments.length === 2) {
+        if (typeof rerenderSearch === "object" && rerenderSearch !== null) {
+          opts = rerenderSearch;
+        } else {
+          shouldSyncHash = Boolean(rerenderSearch);
+        }
+      } else if (arguments.length === 3) {
+        if (typeof syncHash === "object" && syncHash !== null) {
+          shouldSyncHash = Boolean(rerenderSearch);
+          opts = syncHash;
+        } else {
+          shouldRerender = Boolean(rerenderSearch);
+          shouldSyncHash = Boolean(syncHash);
+        }
+      } else if (arguments.length >= 4) {
+        shouldRerender = Boolean(rerenderSearch);
+        shouldSyncHash = Boolean(syncHash);
+        opts = options || {};
+      }
+
       if (!items[key]) return;
       currentKey = key;
       const item = items[key];
 
       setMainMode("workspace", false);
 
-      if (syncHash) {
-        updateUrlHash("#" + key);
+      if (shouldSyncHash) {
+        updateUrlHash(key, { replace: Boolean(opts && (opts.replaceHistory || opts.replace)) });
       }
 
       treeStructure.forEach(folder => {
@@ -426,7 +450,7 @@ const items = {items_json};
         }
       });
 
-      if (rerenderSearch) {
+      if (shouldRerender) {
         renderTree(document.getElementById("search").value);
       } else {
         document.querySelectorAll(".nav-item").forEach(el => {
@@ -730,21 +754,40 @@ const items = {items_json};
 
     /**
      * Updates the window URL hash while protecting against recursive hashchange loops.
+     * Supports options: { replace = false }.
+     * When options.replace is true, calls history.replaceState.
+     * When options.replace is false, calls history.pushState.
      */
-    function updateUrlHash(newHash) {
-      if (!newHash) return;
-      if (typeof window !== "undefined" && window.location && window.location.hash === newHash) {
-        lastHandledHash = newHash;
+    function updateUrlHash(hashKey, options = {}) {
+      if (!hashKey) return;
+      const targetHash = hashKey.startsWith("#") ? hashKey : "#" + hashKey;
+      if (typeof window !== "undefined" && window.location && window.location.hash === targetHash) {
+        lastHandledHash = targetHash;
         return;
       }
       isInternalUrlUpdate = true;
-      lastHandledHash = newHash;
+      lastHandledHash = targetHash;
+      const shouldReplace = Boolean(options && options.replace);
       try {
-        if (typeof history !== "undefined" && history.replaceState) {
-          history.replaceState(null, null, newHash);
+        if (typeof history !== "undefined") {
+          if (shouldReplace && typeof history.replaceState === "function") {
+            history.replaceState({ key: hashKey }, "", targetHash);
+          } else if (!shouldReplace && typeof history.pushState === "function") {
+            history.pushState({ key: hashKey }, "", targetHash);
+          } else if (typeof history.replaceState === "function") {
+            history.replaceState({ key: hashKey }, "", targetHash);
+          } else if (typeof window !== "undefined" && window.location) {
+            window.location.hash = targetHash;
+          }
         } else if (typeof window !== "undefined" && window.location) {
-          window.location.hash = newHash;
+          window.location.hash = targetHash;
         }
+      } catch (err) {
+        try {
+          if (typeof window !== "undefined" && window.location) {
+            window.location.hash = targetHash;
+          }
+        } catch (_) {}
       } finally {
         setTimeout(() => {
           isInternalUrlUpdate = false;
@@ -764,13 +807,13 @@ const items = {items_json};
 
       const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
       if (mode !== mainMode) {
-        setMainMode(mode, false);
+        setMainMode(mode, false, { replaceHistory: true });
       }
 
       if (mode === "workspace") {
         const itemChanged = (key !== currentKey);
         if (itemChanged && items[key]) {
-          switchItem(key, true, false);
+          switchItem(key, true, false, { replaceHistory: true });
         }
         if (anchor) {
           scrollToAnchor(anchor, itemChanged ? DOM_RENDER_DELAY_MS : 0);
@@ -814,11 +857,12 @@ const items = {items_json};
           const anchorId = rawHref.substring(1);
           if (items[anchorId]) {
             enforceNotesView();
-            switchItem(anchorId);
+            switchItem(anchorId, true, true, { replaceHistory: false });
             return;
           }
           scrollToAnchor(anchorId);
-          updateUrlHash(currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`);
+          const targetHash = currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`;
+          updateUrlHash(targetHash, { replace: false });
           return;
         }
 
@@ -830,10 +874,13 @@ const items = {items_json};
           const targetKey = resolved.key;
 
           enforceNotesView();
-          switchItem(targetKey);
-
           if (resolved.anchor) {
+            switchItem(targetKey, true, false, { replaceHistory: false });
             scrollToAnchor(resolved.anchor, DOM_RENDER_DELAY_MS);
+            const targetHash = targetKey === "README.md" ? `#${resolved.anchor}` : `#${targetKey}#${resolved.anchor}`;
+            updateUrlHash(targetHash, { replace: false });
+          } else {
+            switchItem(targetKey, true, true, { replaceHistory: false });
           }
           return;
         } else if (isRelativeDocLink) {
@@ -953,7 +1000,7 @@ const items = {items_json};
           if (firstMatchElement) {
             const key = firstMatchElement.getAttribute("data-key");
             if (key && items[key]) {
-              switchItem(key, false);
+              switchItem(key, false, true, { replaceHistory: false });
               firstMatchElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
               const notesViewer = document.getElementById("notesViewer");
               if (notesViewer) {
@@ -993,10 +1040,10 @@ const items = {items_json};
     updateProgressBadge();
 
     if (mainMode === "roadmap") {
-      setMainMode("roadmap");
+      setMainMode("roadmap", true, { replaceHistory: true });
     } else {
       setMainMode("workspace", false);
-      switchItem(currentKey, true, !initialAnchor);
+      switchItem(currentKey, true, !initialAnchor, { replaceHistory: true });
       if (initialAnchor) {
         scrollToAnchor(initialAnchor, DOM_RENDER_DELAY_MS);
       }

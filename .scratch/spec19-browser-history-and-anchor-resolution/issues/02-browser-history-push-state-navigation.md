@@ -1,7 +1,7 @@
 # Ticket 02: Browser History Push-State Navigation & Reactive History Synchronization
 
 **Spec**: `specs/19-browser-history-push-state-navigation-and-generic-anchor-resolution-hardening.md`
-**Status**: Blocked
+**Status**: Completed
 **Blocked By**: `01-generic-syntax-anchor-resolution-and-allowlist-elimination.md`
 
 ---
