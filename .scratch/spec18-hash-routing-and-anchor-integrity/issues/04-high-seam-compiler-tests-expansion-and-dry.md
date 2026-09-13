@@ -15,10 +15,10 @@ In `tests/test_update_index.py`:
 
 **Blocked by:** 01-standalone-anchor-preservation-and-route-fallback.md, 02-reactive-in-session-hash-navigation.md, 03-eliminate-residual-dead-extension-swapping.md
 
-**Status:** todo
+**Status:** done
 
-- [ ] Parameterize repetitive `assertNotIn` checks
-- [ ] Add assertions checking zero dead `.replace(/\.py$/, ".md")` in resolver/router functions
-- [ ] Add high-seam test case for standalone anchor resolution (`#complexity`)
-- [ ] Add high-seam test case for static document resolution (`README.md`)
-- [ ] Add high-seam assertion for `hashchange` listener registration
+- [x] Parameterize repetitive `assertNotIn` checks
+- [x] Add assertions checking zero dead `.replace(/\.py$/, ".md")` in resolver/router functions
+- [x] Add high-seam test case for standalone anchor resolution (`#complexity`)
+- [x] Add high-seam test case for static document resolution (`README.md`)
+- [x] Add high-seam assertion for `hashchange` listener registration
