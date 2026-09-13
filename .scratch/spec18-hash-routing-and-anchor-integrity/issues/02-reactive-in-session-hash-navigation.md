@@ -14,9 +14,9 @@ In `templates/src/scripts/app.js`:
 
 **Blocked by:** 01-standalone-anchor-preservation-and-route-fallback.md
 
-**Status:** todo
+**Status:** done
 
-- [ ] Add `window.addEventListener("hashchange", ...)` handler
-- [ ] Route hash updates via `resolveInitialRoute`
-- [ ] Handle seamless mode switching and item switching on hash navigation
-- [ ] Handle smooth scrolling to target anchors when hash changes in-session
+- [x] Add `window.addEventListener("hashchange", ...)` handler
+- [x] Route hash updates via `resolveInitialRoute`
+- [x] Handle seamless mode switching and item switching on hash navigation
+- [x] Handle smooth scrolling to target anchors when hash changes in-session

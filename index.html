@@ -550,6 +550,8 @@
     let mobileTab = "notes"; // 'notes', 'code'
     let workspaceSplitRatio = parseFloat(localStorage.getItem("workspaceSplitRatio") || "50");
     const collapsedFolders = JSON.parse(localStorage.getItem("treeCollapsedFolders") || "{}");
+    let isInternalUrlUpdate = false;
+    let lastHandledHash = (typeof window !== "undefined" && window.location && window.location.hash) ? window.location.hash : "";
     let initialAnchor = "";
     if (window.location.hash && window.location.hash.length > 1) {
       const initialRoute = resolveInitialRoute(window.location.hash);
@@ -668,9 +670,7 @@
             <span class="breadcrumb-file" title="Interactive Topology Graph">Interactive Topology Graph</span>
           `;
         }
-        if (history.replaceState) {
-          history.replaceState(null, null, "#roadmap");
-        }
+        updateUrlHash("#roadmap");
         setTimeout(() => {
           if (!roadmapGraphInstance) {
             initRoadmapGraph();
@@ -900,11 +900,7 @@
       currentKey = key;
       const item = items[key];
       setMainMode("workspace", false);
-      if (history.replaceState) {
-        history.replaceState(null, null, "#" + key);
-      } else {
-        window.location.hash = "#" + key;
-      }
+      updateUrlHash("#" + key);
       treeStructure.forEach(folder => {
         if (folder.filter && folder.filter(key) && collapsedFolders[folder.id]) {
           collapsedFolders[folder.id] = false;
@@ -1138,6 +1134,57 @@
         return slug1 === cleanAnchor || slug2 === cleanAnchor || cleanHeading === cleanAnchor;
       }) || null;
     }
+    function updateUrlHash(newHash) {
+      if (!newHash) return;
+      if (typeof window !== "undefined" && window.location && window.location.hash === newHash) {
+        lastHandledHash = newHash;
+        return;
+      }
+      isInternalUrlUpdate = true;
+      lastHandledHash = newHash;
+      try {
+        if (typeof history !== "undefined" && history.replaceState) {
+          history.replaceState(null, null, newHash);
+        } else if (typeof window !== "undefined" && window.location) {
+          window.location.hash = newHash;
+        }
+      } finally {
+        setTimeout(() => {
+          isInternalUrlUpdate = false;
+        }, 0);
+      }
+    }
+    function handleHashChange() {
+      if (isInternalUrlUpdate) return;
+      const currentHash = window.location.hash;
+      if (currentHash === lastHandledHash) return;
+      lastHandledHash = currentHash;
+      const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
+      if (mode !== mainMode) {
+        setMainMode(mode, false);
+      }
+      if (mode === "workspace") {
+        const itemChanged = (key !== currentKey);
+        if (itemChanged && items[key]) {
+          switchItem(key);
+        }
+        if (anchor) {
+          const scrollTarget = () => {
+            const notesViewer = document.getElementById("notesViewer");
+            if (!notesViewer) return;
+            const targetEl = findHeadingElement(notesViewer, anchor);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          };
+          if (itemChanged) {
+            setTimeout(scrollTarget, DOM_RENDER_DELAY_MS);
+          } else {
+            scrollTarget();
+          }
+        }
+      }
+    }
     function enforceNotesView() {
       if (window.innerWidth <= 768) {
         setMobileTab("notes");
@@ -1318,6 +1365,7 @@
         }
       }
     });
+    window.addEventListener("hashchange", handleHashChange);
     initLinkInterceptor();
     renderTree();
     updateProgressBadge();
