@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 
-def _get_node_binary(self=None):
+def _get_node_binary():
     """Discover Node.js executable via NODE_BIN env, PATH, or fnm installation."""
     env_node = os.environ.get("NODE_BIN")
     if env_node:
@@ -29,7 +29,7 @@ REPO_ROOT = Path(__file__).parent.parent
 class TestUpdateIndex(unittest.TestCase):
     def _get_node_binary(self):
         """Instance method hook delegating to centralized _get_node_binary helper."""
-        return _get_node_binary(self)
+        return _get_node_binary()
 
     def test_all_11_topics_curriculum_are_parsed_without_empty_content(self):
         documents = collect_workspace_documents()
@@ -461,11 +461,11 @@ class TestUpdateIndex(unittest.TestCase):
         self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
         tracks_decl = tracks_decl_match.group(0)
 
-        resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        resolver_match = re.search(r"function resolveEntityReference\(rawHref.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(resolver_match, "resolveEntityReference function must be in compiled HTML")
         resolver_fn = resolver_match.group(0)
 
-        router_match = re.search(r"function resolveInitialRoute\(rawHash\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        router_match = re.search(r"function resolveInitialRoute\(rawHash.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
         router_fn = router_match.group(0)
 
@@ -480,6 +480,10 @@ class TestUpdateIndex(unittest.TestCase):
         hashchange_match = re.search(r"function handleHashChange\(\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(hashchange_match, "handleHashChange function must be in compiled HTML")
         hashchange_fn = hashchange_match.group(0)
+
+        update_hash_match = re.search(r"function updateUrlHash\(hashKey.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(update_hash_match, "updateUrlHash function must be in compiled HTML")
+        update_url_hash_fn = update_hash_match.group(0)
 
         # Assert zero hardcoded 'problems/' prefix literals in routing / entity resolution routines and HTML
         forbidden_fn_prefixes = ["problems/${", "'problems/' +", '"problems/" +']
@@ -567,12 +571,23 @@ class TestUpdateIndex(unittest.TestCase):
           }}
         }};
 
+        let historyCalls = [];
+        global.history = {{
+          pushState: (state, title, url) => {{
+            historyCalls.push({{ action: "pushState", state, title, url }});
+          }},
+          replaceState: (state, title, url) => {{
+            historyCalls.push({{ action: "replaceState", state, title, url }});
+          }}
+        }};
+
         {tracks_decl}
         configuredTracks.push({{ id: "custom", dir_path: "external/custom" }});
         {resolver_fn}
         {router_fn}
         {heading_finder_fn}
         {scroll_fn}
+        {update_url_hash_fn}
         {hashchange_fn}
 
         // 1. Direct legacy path resolution on standard tracks (step 3)
@@ -687,6 +702,17 @@ class TestUpdateIndex(unittest.TestCase):
           process.exit(16);
         }}
 
+        // 4. Invalid route normalization in handleHashChange
+        isInternalUrlUpdate = false;
+        historyCalls = [];
+        window.location.hash = "#nonexistent-track/missing-problem.py";
+        lastHandledHash = "";
+        handleHashChange();
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].state !== null || historyCalls[0].url !== "#README.md") {{
+          console.error("handleHashChange invalid route normalization failed:", historyCalls);
+          process.exit(18);
+        }}
+
         process.exit(0);
         """
         proc = subprocess.run([node_bin, "-e", js_code], capture_output=True, text=True)
@@ -709,17 +735,21 @@ class TestUpdateIndex(unittest.TestCase):
         self.assertIsNotNone(tracks_decl_match, "configuredTracks declaration must be in compiled HTML")
         tracks_decl = tracks_decl_match.group(0)
 
-        resolver_match = re.search(r"function resolveEntityReference\(rawHref\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        resolver_match = re.search(r"function resolveEntityReference\(rawHref.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(resolver_match, "resolveEntityReference function must be in compiled HTML")
         resolver_fn = resolver_match.group(0)
 
-        router_match = re.search(r"function resolveInitialRoute\(rawHash\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        router_match = re.search(r"function resolveInitialRoute\(rawHash.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(router_match, "resolveInitialRoute function must be in compiled HTML")
         router_fn = router_match.group(0)
 
         update_hash_match = re.search(r"function updateUrlHash\(hashKey.*?\)\s*\{.*?\n    \}", html_text, re.DOTALL)
         self.assertIsNotNone(update_hash_match, "updateUrlHash function must be in compiled HTML")
         update_url_hash_fn = update_hash_match.group(0)
+
+        hashchange_match = re.search(r"function handleHashChange\(\)\s*\{.*?\n    \}", html_text, re.DOTALL)
+        self.assertIsNotNone(hashchange_match, "handleHashChange function must be in compiled HTML")
+        hashchange_fn = hashchange_match.group(0)
 
         js_code = f"""
         const items = {{
@@ -748,10 +778,16 @@ class TestUpdateIndex(unittest.TestCase):
           }}
         }};
 
+        function switchItem() {{}}
+        function setMainMode() {{}}
+        function scrollToAnchor() {{}}
+        const DOM_RENDER_DELAY_MS = 60;
+
         {tracks_decl}
         {resolver_fn}
         {router_fn}
         {update_url_hash_fn}
+        {hashchange_fn}
 
         // 1. Generic syntax standalone anchor resolution without static allowlists
         const customAnchors = [
@@ -798,12 +834,32 @@ class TestUpdateIndex(unittest.TestCase):
           process.exit(5);
         }}
 
-        // 2. Route fallback for unrecognized / invalid paths
+        // 1d. Headings starting with topic- or lc- must resolve as valid generic anchors (not falsely rejected)
+        const prefixedCustomAnchors = [
+          "topic-custom-anchor",
+          "topic-discussion-summary",
+          "lc-custom-proof",
+          "lc-notes-appendix"
+        ];
+        for (const anchor of prefixedCustomAnchors) {{
+          const route = resolveInitialRoute("#" + anchor);
+          if (!route || route.mode !== "workspace" || route.key !== "README.md" || route.anchor !== anchor) {{
+            console.error("Prefixed custom anchor resolution failed for #" + anchor + ":", route);
+            process.exit(16);
+          }}
+          const ref = resolveEntityReference("#" + anchor, "README.md");
+          if (!ref || !ref.isAnchorOnly || ref.anchor !== anchor || ref.key !== "README.md") {{
+            console.error("resolveEntityReference anchor-only failed for #" + anchor + ":", ref);
+            process.exit(17);
+          }}
+        }}
+
+        // 2. Route fallback for unrecognized / invalid paths (unindexed paths with path separators or extensions)
         const invalidRoutes = [
           "#nonexistent-track/missing-problem.py",
           "#unknown-dir/notes.md",
-          "#topic-99-unknown",
-          "#lc-9999-unknown"
+          "#invalid-path/item.py",
+          "#unindexed/doc.md"
         ];
         for (const inv of invalidRoutes) {{
           const route = resolveInitialRoute(inv);
@@ -828,7 +884,7 @@ class TestUpdateIndex(unittest.TestCase):
         window.location.hash = "";
         lastHandledHash = "";
         updateUrlHash("problems/top-100/lc-0001-two-sum.py", {{ replace: false }});
-        if (historyCalls.length !== 1 || historyCalls[0].action !== "pushState" || historyCalls[0].url !== "#problems/top-100/lc-0001-two-sum.py") {{
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "pushState" || historyCalls[0].state !== null || historyCalls[0].url !== "#problems/top-100/lc-0001-two-sum.py") {{
           console.error("updateUrlHash pushState failed:", historyCalls);
           process.exit(8);
         }}
@@ -842,7 +898,7 @@ class TestUpdateIndex(unittest.TestCase):
         window.location.hash = "";
         lastHandledHash = "";
         updateUrlHash("README.md", {{ replace: true }});
-        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].url !== "#README.md") {{
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].state !== null || historyCalls[0].url !== "#README.md") {{
           console.error("updateUrlHash replaceState failed:", historyCalls);
           process.exit(10);
         }}
@@ -886,9 +942,20 @@ class TestUpdateIndex(unittest.TestCase):
         lastHandledHash = "";
         historyCalls = [];
         updateUrlHash("#random-anchor-slug", {{ replace: true }});
-        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].url !== "#random-anchor-slug") {{
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].state !== null || historyCalls[0].url !== "#random-anchor-slug") {{
           console.error("updateUrlHash random anchor slug replaceState failed:", historyCalls);
           process.exit(15);
+        }}
+
+        // 4. Invalid route normalization in handleHashChange
+        isInternalUrlUpdate = false;
+        historyCalls = [];
+        window.location.hash = "#nonexistent-track/missing-problem.py";
+        lastHandledHash = "";
+        handleHashChange();
+        if (historyCalls.length !== 1 || historyCalls[0].action !== "replaceState" || historyCalls[0].state !== null || historyCalls[0].url !== "#README.md") {{
+          console.error("handleHashChange invalid route normalization failed in fallback test:", historyCalls);
+          process.exit(18);
         }}
 
         process.exit(0);
@@ -907,6 +974,7 @@ class TestUpdateIndex(unittest.TestCase):
             with unittest.mock.patch.dict(os.environ, {"NODE_BIN": str(tmp_path)}):
                 discovered = self._get_node_binary()
                 self.assertEqual(discovered, str(tmp_path))
+                self.assertEqual(_get_node_binary(), str(tmp_path))
         finally:
             if tmp_path.exists():
                 tmp_path.unlink()

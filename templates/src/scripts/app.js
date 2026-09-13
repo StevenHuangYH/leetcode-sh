@@ -409,28 +409,17 @@ const items = {items_json};
     }
     
     function switchItem(key, rerenderSearch = true, syncHash = true, options = {}) {
-      let shouldRerender = true;
-      let shouldSyncHash = true;
-      let opts = {};
+      let shouldRerender = rerenderSearch;
+      let shouldSyncHash = syncHash;
+      let opts = options || {};
 
-      if (arguments.length === 2) {
-        if (typeof rerenderSearch === "object" && rerenderSearch !== null) {
-          opts = rerenderSearch;
-        } else {
-          shouldSyncHash = Boolean(rerenderSearch);
-        }
-      } else if (arguments.length === 3) {
-        if (typeof syncHash === "object" && syncHash !== null) {
-          shouldSyncHash = Boolean(rerenderSearch);
-          opts = syncHash;
-        } else {
-          shouldRerender = Boolean(rerenderSearch);
-          shouldSyncHash = Boolean(syncHash);
-        }
-      } else if (arguments.length >= 4) {
-        shouldRerender = Boolean(rerenderSearch);
-        shouldSyncHash = Boolean(syncHash);
-        opts = options || {};
+      if (typeof rerenderSearch === "object" && rerenderSearch !== null) {
+        opts = rerenderSearch;
+        shouldRerender = true;
+        shouldSyncHash = true;
+      } else if (typeof syncHash === "object" && syncHash !== null) {
+        opts = syncHash;
+        shouldSyncHash = true;
       }
 
       if (!items[key]) return;
@@ -557,22 +546,46 @@ const items = {items_json};
      * EntityReferenceResolver: Resolves relative file paths, stems, LC numbers, or slugs
      * to a registered DocumentEntity key in the in-memory items manifest.
      */
-    function resolveEntityReference(rawHref) {
-      const activeDocKey = arguments[1];
+    function resolveEntityReference(rawHref, activeDocKey = null) {
       if (!rawHref) return null;
 
       let href = rawHref.trim();
+      try {
+        href = decodeURIComponent(href);
+      } catch (_) {}
       if (!href) return null;
 
       // Handle leading '#' prefix for standalone anchors or fragment-based routing
       if (href.startsWith("#")) {
-        const sub = href.replace(/^#+/, "").trim();
-        if (!sub) return null;
-        const targetEntity = resolveEntityReference(sub);
+        const candidate = href.replace(/^#+/, "").trim();
+        if (!candidate) return null;
+
+        // Composite #doc#anchor reference
+        if (candidate.includes("#")) {
+          const subHashIdx = candidate.indexOf("#");
+          const docPart = candidate.substring(0, subHashIdx);
+          const anchorPart = candidate.substring(subHashIdx + 1);
+          const resolvedDoc = resolveEntityReference(docPart, activeDocKey);
+          if (resolvedDoc && resolvedDoc.key && typeof items !== "undefined" && items[resolvedDoc.key]) {
+            return { key: resolvedDoc.key, anchor: anchorPart };
+          }
+          return null;
+        }
+
+        // Direct entity key or problem slug match
+        const targetEntity = resolveEntityReference(candidate, activeDocKey);
         if (targetEntity && targetEntity.key && typeof items !== "undefined" && items[targetEntity.key]) {
           return targetEntity;
         }
-        return { key: activeDocKey || null, anchor: sub, isAnchorOnly: true };
+
+        // Unindexed paths containing '/' or '.py'/'.md'
+        const isUnindexedPath = candidate.includes("/") || candidate.endsWith(".py") || candidate.endsWith(".md");
+        if (isUnindexedPath) {
+          return null;
+        }
+
+        // Generic standalone anchor bound to active document
+        return { key: activeDocKey || null, anchor: candidate, isAnchorOnly: true };
       }
 
       let anchor = "";
@@ -668,8 +681,7 @@ const items = {items_json};
      * Delegates entity resolution directly to resolveEntityReference while preserving
      * standalone anchor targets and user view mode.
      */
-    function resolveInitialRoute(rawHash) {
-      const activeDocumentKey = arguments[1];
+    function resolveInitialRoute(rawHash, activeDocumentKey = null) {
       const fallbackKey = activeDocumentKey || ((typeof currentKey !== "undefined" && currentKey) ? currentKey : "README.md");
       const DEFAULT_ROUTE = { mode: "workspace", key: "README.md", anchor: "" };
       const fallbackRoute = (typeof mainMode !== "undefined" && mainMode)
@@ -679,13 +691,7 @@ const items = {items_json};
       if (!rawHash) {
         return fallbackRoute;
       }
-      let hashKey = "";
-      try {
-        hashKey = decodeURIComponent(rawHash);
-      } catch (e) {
-        hashKey = rawHash;
-      }
-      const cleanHash = hashKey.replace(/^#/, "").trim();
+      const cleanHash = rawHash.replace(/^#/, "").trim();
       if (!cleanHash) {
         return fallbackRoute;
       }
@@ -693,25 +699,17 @@ const items = {items_json};
         return { mode: "roadmap", key: "README.md", anchor: "" };
       }
 
-      const resolved = resolveEntityReference(hashKey, fallbackKey);
+      const resolved = resolveEntityReference(rawHash, activeDocumentKey);
       if (resolved) {
         if (resolved.isAnchorOnly) {
-          const isPathOrSlug = resolved.anchor.includes("/") ||
-            resolved.anchor.endsWith(".md") ||
-            resolved.anchor.endsWith(".py") ||
-            resolved.anchor.startsWith("topic-") ||
-            resolved.anchor.startsWith("lc-");
-          if (isPathOrSlug) {
-            return fallbackRoute;
-          }
-          return { mode: "workspace", key: resolved.key || fallbackKey, anchor: resolved.anchor };
+          return { mode: "workspace", key: fallbackKey, anchor: resolved.anchor };
         }
         if (resolved.key && items[resolved.key]) {
           return { mode: "workspace", key: resolved.key, anchor: resolved.anchor || "" };
         }
       }
 
-      return fallbackRoute;
+      return { ...fallbackRoute, isFallback: true };
     }
 
     /**
@@ -757,7 +755,7 @@ const items = {items_json};
      * When options.replace is true, calls history.replaceState.
      * When options.replace is false, calls history.pushState.
      */
-    function updateUrlHash(hashKey, options = {}) {
+    function updateUrlHash(hashKey, { replace = false } = {}) {
       if (!hashKey) return;
       const targetHash = hashKey.startsWith("#") ? hashKey : "#" + hashKey;
       if (typeof window !== "undefined" && window.location && window.location.hash === targetHash) {
@@ -766,15 +764,14 @@ const items = {items_json};
       }
       isInternalUrlUpdate = true;
       lastHandledHash = targetHash;
-      const shouldReplace = Boolean(options && options.replace);
       try {
         if (typeof history !== "undefined") {
-          if (shouldReplace && typeof history.replaceState === "function") {
-            history.replaceState({ key: hashKey }, "", targetHash);
-          } else if (!shouldReplace && typeof history.pushState === "function") {
-            history.pushState({ key: hashKey }, "", targetHash);
+          if (replace && typeof history.replaceState === "function") {
+            history.replaceState(null, "", targetHash);
+          } else if (!replace && typeof history.pushState === "function") {
+            history.pushState(null, "", targetHash);
           } else if (typeof history.replaceState === "function") {
-            history.replaceState({ key: hashKey }, "", targetHash);
+            history.replaceState(null, "", targetHash);
           } else if (typeof window !== "undefined" && window.location) {
             window.location.hash = targetHash;
           }
@@ -804,7 +801,12 @@ const items = {items_json};
       if (currentHash === lastHandledHash) return;
       lastHandledHash = currentHash;
 
-      const { mode, key, anchor } = resolveInitialRoute(window.location.hash);
+      const route = resolveInitialRoute(window.location.hash);
+      if (route && route.isFallback) {
+        updateUrlHash(route.key, { replace: true });
+      }
+
+      const { mode, key, anchor } = route;
       if (mode !== mainMode) {
         setMainMode(mode, false, { replaceHistory: true });
       }
@@ -835,6 +837,13 @@ const items = {items_json};
      * InternalNavigationInterceptor: Intercepts link clicks within workspace & notes
      * to route internal files, in-page anchors, and external links without triggering page downloads.
      */
+    /**
+     * Formats a canonical URL hash for deep anchor navigation.
+     */
+    function formatAnchorHash(docKey, anchor) {
+      return docKey === "README.md" ? `#${anchor}` : `#${docKey}#${anchor}`;
+    }
+
     function initLinkInterceptor() {
       document.addEventListener("click", (e) => {
         const link = e.target.closest("a");
@@ -860,14 +869,14 @@ const items = {items_json};
             return;
           }
           scrollToAnchor(anchorId);
-          const targetHash = currentKey === "README.md" ? `#${anchorId}` : `#${currentKey}#${anchorId}`;
+          const targetHash = formatAnchorHash(currentKey, anchorId);
           updateUrlHash(targetHash, { replace: false });
           return;
         }
 
         // 3. Relative File / Entity Reference
         const isRelativeDocLink = rawHref.endsWith(".py") || rawHref.endsWith(".md") || rawHref.startsWith("./") || rawHref.startsWith("../") || rawHref.startsWith("problem-index/") || rawHref.startsWith("topic-");
-        const resolved = resolveEntityReference(rawHref);
+        const resolved = resolveEntityReference(rawHref, currentKey);
         if (resolved && resolved.key && items[resolved.key]) {
           e.preventDefault();
           const targetKey = resolved.key;
@@ -876,7 +885,7 @@ const items = {items_json};
           if (resolved.anchor) {
             switchItem(targetKey, true, false, { replaceHistory: false });
             scrollToAnchor(resolved.anchor, DOM_RENDER_DELAY_MS);
-            const targetHash = targetKey === "README.md" ? `#${resolved.anchor}` : `#${targetKey}#${resolved.anchor}`;
+            const targetHash = formatAnchorHash(targetKey, resolved.anchor);
             updateUrlHash(targetHash, { replace: false });
           } else {
             switchItem(targetKey, true, true, { replaceHistory: false });
