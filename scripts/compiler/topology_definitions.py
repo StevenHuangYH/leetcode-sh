@@ -263,7 +263,7 @@ CANONICAL_TOPOLOGY_NODES: List[TopologyNodeData] = [
         position={"x": 720, "y": 350},
         status="mastered",
         summary="Floyd's Tortoise and Hare cycle detection (2k - k = n*cycle), finding midpoint, and K-group recursive reversals.",
-        keywords=["linked-list-cycle", "middle-of-the-linked-list", "reorder-list", "reverse-nodes-in-k-group", "快慢指针", "环形链表"]
+        keywords=["linked-list-cycle", "middle-of-the-linked-list", "reorder-list", "reverse-nodes-in-k-group", "快慢指针", "环形链表", "partition-list", "分隔链表", "lc-0086"]
     ),
     TopologyNodeData(
         id="recursion-ops",

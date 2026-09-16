@@ -154,7 +154,7 @@ This guide provides a comprehensive overview of object-oriented programming foun
         """Assert all companion notes in daily-practice/ pass validation."""
         from scripts.validator.note_validator import audit_notes_directory
         daily_results = audit_notes_directory(REPO_ROOT / "problems" / "daily-practice")
-        self.assertEqual(len(daily_results), 20, "Should audit all 20 daily practice companion notes")
+        self.assertEqual(len(daily_results), 21, "Should audit all 21 daily practice companion notes")
         for name, res in daily_results.items():
             self.assertTrue(res.is_valid, f"Daily practice note {name} failed validation: {res.errors}")
 
