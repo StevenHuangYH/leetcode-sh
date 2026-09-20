@@ -27,3 +27,6 @@ venv/
 # Compiler build cache
 .cache/
 
+# Local scratch and playground
+.scratch/
+playground/
