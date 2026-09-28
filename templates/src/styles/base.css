@@ -708,6 +708,7 @@
     }
     .markdown-body {
       color: var(--text-main);
+      width: 100%;
       max-width: 900px;
       margin: 0 auto;
       line-height: 1.8;

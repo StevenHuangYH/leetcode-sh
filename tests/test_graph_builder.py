@@ -50,7 +50,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertIn("diff-array", node_ids)
         self.assertIn("sliding-window", node_ids)
 
-        # Check edge consistency
+        # Check edge consistency1
         for edge in graph["edges"]:
             edge_data = edge["data"]
             source = edge_data["source"]

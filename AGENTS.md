@@ -160,3 +160,16 @@ Whenever a push is executed, the assistant must provide a structured confirmatio
 2. **Viewer Navigation Path**: The exact sidebar path in `index.html` where the note/solution can be viewed (e.g., `Daily Practice Track -> LC 0153 find minimum in rotated sorted array`).
 3. **Browser Cache Invalidation Reminder**: Explicit instructions to hard-refresh the browser tab (`Ctrl + Shift + R` or `Cmd + Shift + R`) to bypass cached HTML.
 
+## Agent skills
+
+### Issue tracker
+
+For ticket lookup, spec publication, or issue updates, read [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md). This repository uses GitHub Issues.
+
+### Triage labels
+
+Before triaging issues, read [docs/agents/triage-labels.md](docs/agents/triage-labels.md) for the five canonical role mappings.
+
+### Domain docs
+
+Before exploring domain concepts or proposing architectural changes, read [docs/agents/domain.md](docs/agents/domain.md) for the single-context documentation rules.

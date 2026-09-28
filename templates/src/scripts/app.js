@@ -382,15 +382,17 @@ const items = {items_json};
       if (!markdownText) return "";
       const mathBlocks = [];
       
-      // 1. Protect block math $$...$$
-      let text = markdownText.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+      // 1. Protect dollar and backslash-delimited block math.
+      let text = markdownText.replace(/\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\]/g, (match, dollarFormula, bracketFormula) => {
+        const formula = dollarFormula ?? bracketFormula;
         const token = `@@MATH_BLOCK_${mathBlocks.length}@@`;
         mathBlocks.push({ token, formula, display: true });
         return token;
       });
       
-      // 2. Protect inline math $...$
-      text = text.replace(/\$([^$\n]+?)\$/g, (match, formula) => {
+      // 2. Protect dollar and backslash-delimited inline math.
+      text = text.replace(/\$([^$\n]+?)\$|\\\(([\s\S]*?)\\\)/g, (match, dollarFormula, bracketFormula) => {
+        const formula = dollarFormula ?? bracketFormula;
         const token = `@@MATH_INLINE_${mathBlocks.length}@@`;
         mathBlocks.push({ token, formula, display: false });
         return token;
@@ -510,14 +512,14 @@ const items = {items_json};
         }
 
         try {
-          const hasMath = item.notes && (item.notes.includes("$") || item.notes.includes("\(") || item.notes.includes("\["));
+          const hasMath = item.notes && (item.notes.includes("$") || item.notes.includes("\\(") || item.notes.includes("\\["));
           if (hasMath && typeof renderMathInElement === "function") {
             renderMathInElement(notesViewer, {
               delimiters: [
                 {left: "$$", right: "$$", display: true},
                 {left: "$", right: "$", display: false},
-                {left: "\(", right: "\)", display: false},
-                {left: "\[", right: "\]", display: true}
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true}
               ],
               throwOnError: false
             });

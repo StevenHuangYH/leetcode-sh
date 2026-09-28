@@ -104,9 +104,13 @@ class ProblemCollector:
             files = sorted(os.listdir(track_dir))
             pairings: Dict[str, FilePairing] = {}
             for f in files:
-                if f.startswith("__") or f.endswith(".pyc") or f == "file_topics.txt":
+                if (
+                    f.startswith("__")
+                    or not f.endswith((".py", ".md"))
+                    or not (track_dir / f).is_file()
+                ):
                     continue
-                stem = f[:-3] if f.endswith(".py") or f.endswith(".md") else f
+                stem = f[:-3]
                 if stem not in pairings:
                     pairings[stem] = FilePairing(stem=stem)
                 if f.endswith(".py"):
